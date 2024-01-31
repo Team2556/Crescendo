@@ -37,6 +37,10 @@ public class IntakeSubsystem extends SubsystemBase {
         intake.set(speed);
     }
 
+    public void intakeOff() {
+        intake.set(0.0);
+    }
+
     public int getPostion() {
         if (LSF.get()){postion = 1;}
         else if (LSS.get()){postion = 2;}
