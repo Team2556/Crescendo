@@ -19,6 +19,7 @@ public final class Constants {
 
   public static class Ports {
     // Place Holder
-    public static final int intakeMotorPort = 1;
+    public static final int intakeMotorPort1 = 1;
+    public static final int intakeMotorPort2 = 2;
   }
 }
