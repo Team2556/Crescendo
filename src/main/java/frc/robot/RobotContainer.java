@@ -16,9 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ShooterState;
-import frc.robot.commands.ShooterControl;
 import frc.robot.commands.TeleopDrive;
-import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
 
@@ -34,7 +32,6 @@ public class RobotContainer{
     // The robot's subsystems and commands are defined here...
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                             "swerve"));
-    private Shooter shooter = new Shooter();
 
     // CommandJoystick driverController   = new CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
     XboxController driverXbox = new XboxController(0);
