@@ -57,7 +57,7 @@ public class RobotContainer{
             () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND), 
-            () -> false);
+            () -> true);
 
         drivebase.setDefaultCommand(closedFieldRel);
 
@@ -97,9 +97,9 @@ public class RobotContainer{
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // return new PathPlannerAuto("4 Note Leave");
+        return new PathPlannerAuto("4 Note Leave");
         // An example command will be run in autonomous
-        return drivebase.getAutonomousCommand("Lateral Test", true);
+        // return drivebase.getAutonomousCommand("Straight Test", true);
     }
 
     public void setDriveMode() {

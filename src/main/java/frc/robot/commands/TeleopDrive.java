@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+
+import org.photonvision.PhotonCamera;
+
 import swervelib.SwerveController;
 
 /**
@@ -24,6 +27,8 @@ public class TeleopDrive extends Command
   private final DoubleSupplier   omega;
   private final BooleanSupplier  driveMode;
   private final SwerveController controller;
+
+  // PhotonCamera camera = new PhotonCamera("photonvision");
 
   /**
    * Creates a new ExampleCommand.
@@ -58,12 +63,17 @@ public class TeleopDrive extends Command
     double angVelocity = Math.pow(-omega.getAsDouble(), 3);
     SmartDashboard.putNumber("vX", xVelocity);
     SmartDashboard.putNumber("vY", yVelocity);
-    SmartDashboard.putNumber("omega", angVelocity);
+    SmartDashboard.putNumber("omega", angVelocity); 
 
     // Drive using raw values.
     swerve.drive(new Translation2d(xVelocity * swerve.maximumSpeed, yVelocity * swerve.maximumSpeed),
                  angVelocity * controller.config.maxAngularVelocity,
                  driveMode.getAsBoolean());
+
+    // var result = camera.getLatestResult();
+    // if(result.hasTargets()) {
+    //   SmartDashboard.putString("Camera Result", result.getBestTarget().toString());
+    // }
   }
 
   // Called once the command ends or is interrupted.

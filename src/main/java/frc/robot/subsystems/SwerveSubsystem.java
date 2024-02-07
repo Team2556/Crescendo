@@ -18,6 +18,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.io.File;
@@ -75,7 +76,7 @@ public class SwerveSubsystem extends SubsystemBase
       throw new RuntimeException(e);
     }
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
-
+    swerveDrive.setCosineCompensator(false);
     setupPathPlanner();
   }
 
@@ -92,11 +93,9 @@ public class SwerveSubsystem extends SubsystemBase
         new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                                          new PIDConstants(5.0, 0.0, 0.0),
                                          // Translation PID constants
-                                         new PIDConstants(swerveDrive.swerveController.config.headingPIDF.p,
-                                                          swerveDrive.swerveController.config.headingPIDF.i,
-                                                          swerveDrive.swerveController.config.headingPIDF.d),
+                                         new PIDConstants(5,0,0),
                                          // Rotation PID constants
-                                         4.5,
+                                         2.0,
                                          // Max module speed, in m/s
                                          swerveDrive.swerveDriveConfiguration.getDriveBaseRadiusMeters(),
                                          // Drive base radius in meters. Distance from robot center to furthest module.
@@ -191,6 +190,10 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+
+    SmartDashboard.putNumber("x pose", getPose().getX());
+    SmartDashboard.putNumber("y pose", getPose().getY());
+    SmartDashboard.putNumber("theta pose", getPose().getRotation().getDegrees());
   }
 
   @Override
