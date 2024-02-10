@@ -30,8 +30,11 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(rightTrigger.getAsDouble() > 0.05) {
+    if(this.rightTrigger.getAsDouble() > 0.05 && intakeSubsystem.getPostion() != 3) {
       intakeSubsystem.setIntakeMotor(0.5);
+    }
+    else {
+      intakeSubsystem.intakeOff();
     }
   }
 

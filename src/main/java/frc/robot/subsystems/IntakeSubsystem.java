@@ -21,10 +21,10 @@ public class IntakeSubsystem extends SubsystemBase {
     private final CANSparkFlex intake1 = new CANSparkFlex(intakeMotorPort1, CANSparkLowLevel.MotorType.kBrushless);
     private final CANSparkFlex intake2 = new CANSparkFlex(intakeMotorPort2, CANSparkLowLevel.MotorType.kBrushless);
     
-    /*(0,1,2...ect refer to ports) (LS stands for limit switch; F:1st S:2st L:3st)*/
-    DigitalInput LSF = new DigitalInput(0);
-    DigitalInput LSS = new DigitalInput(1);
-    DigitalInput LSL = new DigitalInput(2);
+    /*LS stands for limit switch*/
+    DigitalInput LS_1 = new DigitalInput(0);
+    DigitalInput LS_2 = new DigitalInput(1);
+    DigitalInput LS_3 = new DigitalInput(2);
 
     int postion; 
 
@@ -47,10 +47,11 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public int getPostion() {
-        if (LSF.get()){postion = 1;}
-        else if (LSS.get()){postion = 2;}
-        else if (LSL.get()){postion = 3;}
-        return postion;
+        /* Get Value of each limit switch, returns 0 if none are on */
+        if (LS_3.get()){return 3;}
+        else if (LS_2.get()){return 2;}
+        else if (LS_1.get()){return 1;}
+        else {return 0;}
     }
 
     public static IntakeSubsystem getInstance() {
