@@ -36,12 +36,18 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void setIntakeMotor(double speed) {
-        SmartDashboard.putNumber("Intake Speed", speed);
-        intake1.set(speed);
-        intake2.set(speed);
+        /* SmartDashboard.putNumber("Intake Speed", speed); */
+        if (getPostion() == 3) {
+            intakeOff();
+        }
+        else {
+            intake1.set(speed);
+            intake2.set(speed);
+        }
     }
-
+    
     public void intakeOff() {
+        /* SmartDashboard.putNumber("Intake Speed", 0.0); */
         intake1.set(0.0);
         intake2.set(0.0);
     }
