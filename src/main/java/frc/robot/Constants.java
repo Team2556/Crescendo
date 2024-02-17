@@ -4,14 +4,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
 import swervelib.math.Matter;
 import swervelib.parser.PIDFConfig;
 
@@ -74,10 +68,6 @@ public final class Constants {
     }
 
     public static final double ROBOT_MASS = (50.0) * 0.453592; // lbs * kg per pound
-    public static final Transform3d ROBOT_TO_CAMERA = new Transform3d(
-        new Translation3d(Units.inchesToMeters(-9.0), Units.inchesToMeters(7.0), Units.inchesToMeters(28.0)), 
-        new Rotation3d(0.0, 0.0, 180.0));
-    public static final Transform3d CAMERA_TO_ROBOT = ROBOT_TO_CAMERA.inverse();
     public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
     public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
 
@@ -103,25 +93,4 @@ public final class Constants {
         public static final double RIGHT_X_DEADBAND = 0.15;
         public static final double TURN_CONSTANT = 0.75;
     }
-
-    public class FieldK {
-        public static final double kFieldLength = 16.54;
-        public static final double kFieldWidth = 8.21;
-
-        public static final AprilTagFieldLayout kFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-
-        public static final int kBlueCenterTrapID = 14;
-        public static final int kBlueLeftTrapID = 15;
-        public static final int kBlueRightTrapID = 16;
-
-        public static final int kBlueCenterTrapId = 14;
-        public static final int kBlueLeftTrapId = 15;
-        public static final int kBlueRightTrapId = 16;
-
-        public static final int kRedLeftTrapId = 11;
-        public static final int kRedRightTrapId = 12;
-        public static final int kRedCenterTrapId = 13;
-
-    }
-
 }
