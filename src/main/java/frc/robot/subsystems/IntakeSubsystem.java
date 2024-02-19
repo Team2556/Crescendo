@@ -18,31 +18,32 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final static IntakeSubsystem instance = getInstance();
-    private final CANSparkFlex intake1 = new CANSparkFlex(intakeMotorPort1, CANSparkLowLevel.MotorType.kBrushless);
-
+    private final CANSparkFlex intakeMotor = new CANSparkFlex(intakeMotorPort1, CANSparkLowLevel.MotorType.kBrushless);
+    
     DigitalInput intakeLimitSwitch = new DigitalInput(1);
 
     public IntakeSubsystem() {
-        intake1.restoreFactoryDefaults();
-        intake1.setIdleMode(CANSparkFlex.IdleMode.kBrake);
+        intakeMotor.restoreFactoryDefaults();
+        intakeMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
     }
 
     public void setIntakeMotor(double speed) {
         SmartDashboard.putNumber("Intake Speed", speed);
         if (intakeLimitSwitch.get()) {
             intakeOff();
-        } else {
-            intake1.set(speed);
+        }
+        else {
+            intakeMotor.set(speed);
         }
     }
-
+    
     public void intakeOff() {
         SmartDashboard.putNumber("Intake Speed", 0.0);
-        intake1.set(0.0);
+        intakeMotor.set(0.0);
     }
 
     public static IntakeSubsystem getInstance() {
-        if (instance == null)
+        if(instance == null)
             return new IntakeSubsystem();
         return instance;
     }
