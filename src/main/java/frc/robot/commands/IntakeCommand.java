@@ -30,14 +30,15 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(this.rightTrigger.getAsDouble() > 0.05) {
+    if (this.rightTrigger.getAsDouble() > 0.05) {
       intakeSubsystem.setIntakeMotor(0.5);
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override
