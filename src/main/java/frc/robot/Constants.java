@@ -4,93 +4,82 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
-import swervelib.math.Matter;
-import swervelib.parser.PIDFConfig;
-
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This
- * class should not be used for any other purpose. All constants should be declared globally (i.e. public static). Do
- * not put anything functional in this class.
+ * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
+ * constants. This class should not be used for any other purpose. All constants should be declared
+ * globally (i.e. public static). Do not put anything functional in this class.
  *
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    // ToDo Get proper port numbers.
-    // Swerve ports are in 'deploy/swerve/modules/.'
-    public static final class Ports {
-        public static final int intakeMotorPort = 20;
-        public static final int shooterLeftMotorPort = 22;
-        public static final int shooterRightMotorPort = 24;
-        public static final int climbMotorPort = 26;
-    }
-    // ToDo See if separate PID constants are necessary.
-    public static final PIDFConfig shooterLeftPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000175, 0.0);
-    public static final PIDFConfig shooterRightPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000170, 0.0);
-    public static final double shooterVelocityError = 30; // RPM
+  public static class OperatorConstants {
+    public static final int kDriverControllerPort = 0;
+  }
 
-    // ToDo Get proper values.
-    public static final class ElevatorConfiguration {
-        public static final double kDt = 0.02; // loop time
-        public static final double kMaxVelocity = 1.75;
-        public static final double kMaxAcceleration = 0.75;
-        public static final double kP = 0.1;
-        public static final double kI = 0.0;
-        public static final double kD = 0.01;
-        public static final double kS = 1.1;
-        public static final double kG = 1.2;
-        public static final double kV = 1.3;
-        // ToDo Apply proper conversions to climb encoder & get the fully climbed position.
-        public static final double climbGoal = 0;
-        public static final double downGoal = 0;
-        public static final double climbGoalTolerance = 0.1;
-    }
+  public static class MotorPorts {
+    public static final int kLeftShooterPort = 11;
+    public static final int kRightShooterPort = 12;
+    //public static final int kAimFlap = 2;
+    public static final int kLeftFlap = 13;
+    public static final int kRightFlap = 14;
+  }
 
-    public enum ShooterState {
-        STOP(0.0),
-        AMP(100.0),
-        SUBWOOFER(1000.0),
-        CLOSE(1500.0),
-        MIDDLE(3000.0),
-        FAR(5000.0);
 
-        private final double velocity;
+  public static class ShooterConstants {
+    public static final double kLeftShooterP = 0.0002;
+    public static final double kLeftShooterI = 0;
+    public static final double kLeftShooterIZone = 0;
+    public static final double kLeftShooterD = 0.0;
+    public static final double kLeftShooterFF = 0.000175;
 
-        ShooterState(double velocity) {
-            this.velocity = velocity;
-        }
+    public static final double kRightShooterP = 0.0002;
+    public static final double kRightShooterI = 0;
+    public static final double kRightShooterIZone = 0;
+    public static final double kRighthooterD = 0.0;
+    public static final double kRightShooterFF = 0.000170;
 
-        public double getVelocity() {
-            return velocity;
-        }
-    }
+    public static final double kMinPIDOutput = -1.0;
+    public static final double kMaxPIDOutput = 1.0;
 
-    public static final double ROBOT_MASS = (50.0) * 0.453592; // lbs * kg per pound
-    public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
-    public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
+    public static final double kVelocityTolerance = 30;   
 
-    public static final class Auton {
+    public static final double kAmpSpeed = 100;
+    public static final double kSpeakerCloseSpeed = 1000;
+    public static final double kSpeakerMidSpeed = 3000;
+    public static final double kSpeakerFarSpeed = 5000;
+    public static final double kIntakeSpeed = -1000;
+  }
 
-        public static final PIDFConfig TranslationPID = new PIDFConfig(0.7, 0, 0);
-        public static final PIDFConfig angleAutoPID = new PIDFConfig(0.4, 0, 0.01);
+  public static class FlapValues {
+    public static final double home = 0.0;
+    public static final double ampValue= 4.0 ; //rot. to encoder values
+    public static final double speakerValue = 8.0 ;
 
-        public static final double MAX_ACCELERATION = 2;
-    }
+    public static final double kLeftFlapP = 0.05;
+    public static final double kLeftFlapI = 0;
+    public static final double kLeftFlapIZone = 0;
+    public static final double kLeftFlapD = 0.01;
+    public static final double kLeftFlapFF = 0.000170;
 
-    public static final class Drivebase {
+    public static final double kRightFlapP = .005;
+    public static final double kRightFlapI = 0;
+    public static final double kRightFlapIZone = 0;
+    public static final double kRightFlapD = 0.01;
+    public static final double kRightFlapFF = 0.000170;
 
-        // Hold time on motor brakes when disabled
-        public static final double WHEEL_LOCK_TIME = 10; // seconds
-    }
+    public static final double kRight90 = 18.357092;
+    public static final double kLeft90 = 19.976112;
+    public static final double kRight45 = 84.216331;
+    public static final double kLeft45 = 86.787819;
+    public static final double kSlantLLeft = 118.931427;
+    public static final double kSlantLRight = 195.433777;
+    public static final double kSlantRLeft = 205.076996;
+    public static final double kSlantRRight = 79.716240;
+  }
 
-    public static class OperatorConstants {
-
-        // Joystick Deadband
-        public static final double LEFT_X_DEADBAND = 0.15;
-        public static final double LEFT_Y_DEADBAND = 0.15;
-        public static final double RIGHT_X_DEADBAND = 0.15;
-        public static final double TURN_CONSTANT = 0.75;
-    }
+  public static class DigitalInputs {
+    public static final int kLeftLimitSwitch = 1;
+    public static final int kRightLimitSwitch = 0;
+  }
 }
