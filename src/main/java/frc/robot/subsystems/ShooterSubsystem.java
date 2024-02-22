@@ -20,8 +20,8 @@ import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ShooterSubsystem. */
-  private CANSparkFlex leftShooter = new CANSparkFlex(MotorPorts.kLeftShooterPort, MotorType.kBrushless);
-  private CANSparkFlex rightShooter = new CANSparkFlex(MotorPorts.kRightShooterPort, MotorType.kBrushless);
+  private CANSparkFlex leftShooter;
+  private CANSparkFlex rightShooter;
   public CANSparkMax leftFlap;
   public CANSparkMax rightFlap;
   public RelativeEncoder lFlapEncoder;
@@ -32,7 +32,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private SparkPIDController rightShooterPID;
   private SparkPIDController lFlapPID;
   private SparkPIDController rFlapPID;
-  private double targetSpeed = 0;
+  private double targetVelocity = 0;
   private int rollingAverage = 0;
   private final static ShooterSubsystem instance = ShooterSubsystem.getInstance();
   public final DigitalInput leftLimitSwitch;
@@ -42,6 +42,9 @@ public class ShooterSubsystem extends SubsystemBase {
   
 
   public ShooterSubsystem() {
+    leftShooter = new CANSparkFlex(MotorPorts.kLeftShooterPort, MotorType.kBrushless);
+    rightShooter = new CANSparkFlex(MotorPorts.kRightShooterPort, MotorType.kBrushless);
+    
     leftLimitSwitch = new DigitalInput(Constants.DigitalInputs.kLeftLimitSwitch);
     rightLimitSwitch = new DigitalInput(Constants.DigitalInputs.kRightLimitSwitch);
 
@@ -54,20 +57,14 @@ public class ShooterSubsystem extends SubsystemBase {
     leftShooter.setInverted(false);
     rightShooter.setInverted(true);
 
-    lFlapEncoder = leftFlap.getEncoder();
-    rFlapEncoder = rightFlap.getEncoder();
-
     leftShooterEncoder = leftShooter.getEncoder();
     rightShooterEncoder = rightShooter.getEncoder();
 
     leftShooterPID = leftShooter.getPIDController();
     rightShooterPID = rightShooter.getPIDController();
 
-    leftShooterPID.setFeedbackDevice(leftShooter.getEncoder());
-    rightShooterPID.setFeedbackDevice(rightShooter.getEncoder());
-
-    lFlapPID = leftFlap.getPIDController();
-    rFlapPID = rightFlap.getPIDController();
+    leftShooterPID.setFeedbackDevice(leftShooterEncoder);
+    rightShooterPID.setFeedbackDevice(rightShooterEncoder);
 
     leftShooterPID.setP(ShooterConstants.kLeftShooterP);
     leftShooterPID.setI(ShooterConstants.kLeftShooterI);
@@ -82,6 +79,12 @@ public class ShooterSubsystem extends SubsystemBase {
     rightShooterPID.setD(ShooterConstants.kRighthooterD);
     rightShooterPID.setFF(ShooterConstants.kRightShooterFF);
     rightShooterPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
+
+    lFlapEncoder = leftFlap.getEncoder();
+    rFlapEncoder = rightFlap.getEncoder();
+
+    lFlapPID = leftFlap.getPIDController();
+    rFlapPID = rightFlap.getPIDController();
 
     lFlapPID.setP(FlapValues.kLeftFlapP);
     lFlapPID.setI(FlapValues.kLeftFlapI);
@@ -102,27 +105,18 @@ public class ShooterSubsystem extends SubsystemBase {
     leftShooter.burnFlash();
     rightShooter.burnFlash();
 
-     leftFlap.burnFlash();
-     rightFlap.burnFlash();
+    leftFlap.burnFlash();
+    rightFlap.burnFlash();
 
     leftHomeFlag = false;
     rightHomeFlag = false;
   }
 
-
-  // public double getlFlapEncoderValue(){
-  //   return lFlapEncoder.getPosition();
-  // }
-
-  // public void setAimRotations(double rotations){
-  //   leftPID.setReference(rotations, CANSparkBase.ControlType.kPosition);
-  // }
-
   //Uses PID to bring rpm of shooter to parameter
   public void setShooterVelocity(double velocity) {
-    SmartDashboard.putNumber("Set Velocity", velocity);
-    leftShooterPID.setReference(targetSpeed, CANSparkBase.ControlType.kVelocity);
-    rightShooterPID.setReference(targetSpeed, CANSparkBase.ControlType.kVelocity);
+    targetVelocity = velocity;
+    leftShooterPID.setReference(velocity, CANSparkBase.ControlType.kVelocity);
+    rightShooterPID.setReference(velocity, CANSparkBase.ControlType.kVelocity);
   }
 
   //Uses PID to bring flaps to parameters
@@ -149,8 +143,8 @@ public class ShooterSubsystem extends SubsystemBase {
   
   //Checks if the shooter is roughly running at desired speed
   public boolean isOnTarget() {
-    boolean leftOnTarget = Math.abs(targetSpeed - leftShooterEncoder.getVelocity()) <= ShooterConstants.kVelocityTolerance;
-    boolean rightOnTarget = Math.abs(targetSpeed - rightShooterEncoder.getVelocity()) <= ShooterConstants.kVelocityTolerance;
+    boolean leftOnTarget = Math.abs(targetVelocity - leftShooterEncoder.getVelocity()) <= ShooterConstants.kVelocityTolerance;
+    boolean rightOnTarget = Math.abs(targetVelocity - rightShooterEncoder.getVelocity()) <= ShooterConstants.kVelocityTolerance;
     return leftOnTarget && rightOnTarget;
   }
 
@@ -191,12 +185,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
   }
 
-  //Used to adjust speed to be correct number
-  public double calibrateSpeed(double originalSpeed) {
-    double newSpeed = (originalSpeed / 1.05) - 10.2007;
-    return newSpeed;
-  }
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -213,7 +201,7 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Average Velocity", getVelocity());
     SmartDashboard.putBoolean("Launcher On Target", isOnTarget());
     SmartDashboard.putBoolean("Avg Launcher On Target", isOnTargetAverage(7));
-    SmartDashboard.putNumber("Target Velocity", targetSpeed);
+    SmartDashboard.putNumber("Target Velocity", targetVelocity);
     SmartDashboard.putNumber("Left Encoder", lFlapEncoder.getPosition());
     SmartDashboard.putNumber("Right Encoder", rFlapEncoder.getPosition());
 

@@ -98,12 +98,10 @@ public class ShootCommand extends Command {
     switch (shooterSpeeds) {
       case AMP:
         if (m_rightTrigger.getAsBoolean()) {
-          SmartDashboard.putBoolean("Trying to Shoot", true);
           m_shooterSubsystem.setShooterVelocity(Constants.ShooterConstants.kAmpSpeed);
         } else if (m_leftTrigger.getAsBoolean()) {
           m_shooterSubsystem.setShooterVelocity(Constants.ShooterConstants.kIntakeSpeed);
         } else {
-        SmartDashboard.putBoolean("Trying to Shoot", false);
           m_shooterSubsystem.stop();
         }
         if (m_leftY.getAsDouble() < -.85) {
