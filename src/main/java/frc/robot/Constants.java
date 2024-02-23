@@ -47,8 +47,8 @@ public final class Constants {
     public static final double kAmpSpeed = 100;
     public static final double kSpeakerCloseSpeed = 1000;
     public static final double kSpeakerMidSpeed = 3000;
-    public static final double kSpeakerFarSpeed = 5000;
-    public static final double kIntakeSpeed = -1000;
+    public static final double kSpeakerFarSpeed = 6700;
+    public static final double kIntakeSpeed = -1500;
   }
 
   public static class FlapValues {
@@ -56,26 +56,26 @@ public final class Constants {
     public static final double ampValue= 4.0 ; //rot. to encoder values
     public static final double speakerValue = 8.0 ;
 
-    public static final double kLeftFlapP = 0.05;
+    public static final double kLeftFlapP = 0.1;
     public static final double kLeftFlapI = 0;
     public static final double kLeftFlapIZone = 0;
-    public static final double kLeftFlapD = 0.01;
+    public static final double kLeftFlapD = 0;
     public static final double kLeftFlapFF = 0.000170;
 
-    public static final double kRightFlapP = .005;
+    public static final double kRightFlapP = .06;
     public static final double kRightFlapI = 0;
     public static final double kRightFlapIZone = 0;
-    public static final double kRightFlapD = 0.01;
+    public static final double kRightFlapD = 0;
     public static final double kRightFlapFF = 0.000170;
 
-    public static final double kRight90 = 18.357092;
-    public static final double kLeft90 = 19.976112;
-    public static final double kRight45 = 84.216331;
-    public static final double kLeft45 = 86.787819;
-    public static final double kSlantLLeft = 118.931427;
-    public static final double kSlantLRight = 195.433777;
-    public static final double kSlantRLeft = 205.076996;
-    public static final double kSlantRRight = 79.716240;
+    public static final double kRight90 = 18.523756;
+    public static final double kLeft90 = 17.880909;
+    public static final double kRight45 = kRight90 / 2;
+    public static final double kLeft45 = kLeft90 / 2;
+    public static final double kSlantLLeft = kLeft45;
+    public static final double kSlantLRight = 26.690289;
+    public static final double kSlantRLeft = 25.356977;
+    public static final double kSlantRRight = kLeft45;
   }
 
   public static class DigitalInputs {
@@ -83,3 +83,14 @@ public final class Constants {
     public static final int kRightLimitSwitch = 0;
   }
 }
+//
+//Dpad
+//    up for 90*
+//    down for 45*
+//    right for right angle
+//    left for left angle
+//
+//Start to reset
+//
+//right trigger to shoot
+//left trigger intake

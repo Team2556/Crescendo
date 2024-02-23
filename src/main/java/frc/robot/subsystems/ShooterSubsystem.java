@@ -119,6 +119,25 @@ public class ShooterSubsystem extends SubsystemBase {
     rightShooterPID.setReference(velocity, CANSparkBase.ControlType.kVelocity);
   }
 
+  public void setLeftShootVelocity(double outsideVelocity) {
+    leftShooterPID.setReference(outsideVelocity / 2, CANSparkBase.ControlType.kVelocity);
+    rightShooterPID.setReference(outsideVelocity, CANSparkBase.ControlType.kVelocity);
+  }
+
+  public void setRightShootVelocity(double outsideVelocity) {
+    leftShooterPID.setReference(outsideVelocity, CANSparkBase.ControlType.kVelocity);
+    rightShooterPID.setReference(outsideVelocity / 2, CANSparkBase.ControlType.kVelocity);
+  }
+
+  public void setAngledShoot(double averageVelocity, double leftPos, double rightPos) {
+    double rightVelocity = averageVelocity + 
+      ((Constants.FlapValues.kRight90 - rightPos) / Constants.FlapValues.kRight90) * averageVelocity;
+    double leftVelocity = averageVelocity + 
+      ((Constants.FlapValues.kLeft90 - leftPos) / Constants.FlapValues.kLeft90) * averageVelocity;
+    rightShooterPID.setReference(rightVelocity, CANSparkBase.ControlType.kVelocity);
+    leftShooterPID.setReference(leftVelocity, CANSparkBase.ControlType.kVelocity);
+  }
+
   //Uses PID to bring flaps to parameters
   public void setFlapPosition(double leftPosition, double rightPosition) {
     lFlapPID.setReference(leftPosition, CANSparkBase.ControlType.kPosition);
@@ -204,6 +223,8 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Target Velocity", targetVelocity);
     SmartDashboard.putNumber("Left Encoder", lFlapEncoder.getPosition());
     SmartDashboard.putNumber("Right Encoder", rFlapEncoder.getPosition());
+    SmartDashboard.putBoolean("Left Limit Switch", leftLimitSwitch.get());
+    SmartDashboard.putBoolean("Right Limit Switch", rightLimitSwitch.get());
 
     SmartDashboard.putBoolean("L Home", leftHomeFlag);
     SmartDashboard.putBoolean("R Home", rightHomeFlag);
