@@ -8,15 +8,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.PixycamSubsystem;
 
 public class Pixy extends Command {
   private boolean check = false;
-  // private static Vision m_vision;
   private String[] objLocation;
   private float[] XandY= {0,0};
-  private final Vision m_vision = Vision.getInstance();
-  private final Trigger btnPress;
+  private final PixycamSubsystem m_vision = PixycamSubsystem.getInstance();
+  private final Trigger btnPress; //controller button
 
   public Pixy(Trigger bs) {
     addRequirements(m_vision);
@@ -32,7 +31,7 @@ public class Pixy extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    try {
+    try { //Call pixy values, convert them into a new array
       objLocation = m_vision.getPixyValue();
       if (btnPress.getAsBoolean()) {
         SmartDashboard.putString("X", objLocation[0]);
@@ -40,9 +39,6 @@ public class Pixy extends Command {
         XandY[1]= Float.parseFloat(objLocation[1]);
         SmartDashboard.putNumber("Number array Y", XandY[1]);
 
-        // m_vision.readData(objLocation);
-        // m_vision.getPixyValue();
-        // m_vision.getError();
       } else {
         SmartDashboard.getString("error", "Button not found");
       }
@@ -56,12 +52,6 @@ public class Pixy extends Command {
   public void end(boolean interrupted) {
   }
 
-  // public static Vision getInstance() {
-  // return vision;
-  // // if(instance == null)
-  // // return new Vision();
-  // // return instance;
-  // }
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
