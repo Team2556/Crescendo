@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -93,4 +97,101 @@ public final class Constants {
         public static final double RIGHT_X_DEADBAND = 0.15;
         public static final double TURN_CONSTANT = 0.75;
     }
-}
+    public static final Transform3d ROBOT_TO_CAMERA = new Transform3d(
+        new Translation3d(Units.inchesToMeters(-9.0), Units.inchesToMeters(7.0), Units.inchesToMeters(28.0)), 
+        new Rotation3d(0.0, 0.0, 180.0));
+    public class FieldK {
+        public static final double kFieldLength = 16.54;
+        public static final double kFieldWidth = 8.21;
+
+        public static final AprilTagFieldLayout kFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+
+        public static final int kBlueCenterTrapID = 14;
+        public static final int kBlueLeftTrapID = 15;
+        public static final int kBlueRightTrapID = 16;
+
+        public static final int kBlueCenterTrapId = 14;
+        public static final int kBlueLeftTrapId = 15;
+        public static final int kBlueRightTrapId = 16;
+
+        public static final int kRedLeftTrapId = 11;
+        public static final int kRedRightTrapId = 12;
+        public static final int kRedCenterTrapId = 13;
+
+    }
+    public static class MotorPorts {
+        public static final int kLeftShooterPort = 11;
+        public static final int kRightShooterPort = 12;
+        public static final int kPanningPort = 0;
+        //public static final int kAimFlap = 2;
+        public static final int kLeftFlap = 13;
+        public static final int kRightFlap = 14;
+      }
+    
+    
+      public static class ShooterConstants {
+        public static final double kLeftShooterP = 0.0002;
+        public static final double kLeftShooterI = 0;
+        public static final double kLeftShooterIZone = 0;
+        public static final double kLeftShooterD = 0.0;
+        public static final double kLeftShooterFF = 0.000175;
+    
+        public static final double kRightShooterP = 0.0002;
+        public static final double kRightShooterI = 0;
+        public static final double kRightShooterIZone = 0;
+        public static final double kRighthooterD = 0.0;
+        public static final double kRightShooterFF = 0.000170;
+    
+        public static final double kMinPIDOutput = -1.0;
+        public static final double kMaxPIDOutput = 1.0;
+    
+        public static final double kVelocityTolerance = 30;   
+    
+        public static final double kAmpSpeed = 100;
+        public static final double kSpeakerCloseSpeed = 1000;
+        public static final double kSpeakerMidSpeed = 3000;
+        public static final double kSpeakerFarSpeed = 6700;
+        public static final double kIntakeSpeed = -1500;
+      }
+    
+      public static class FlapValues {
+        public static final double home = 0.0;
+        public static final double ampValue= 4.0 ; //rot. to encoder values
+        public static final double speakerValue = 8.0 ;
+    
+        public static final double kLeftFlapP = 0.1;
+        public static final double kLeftFlapI = 0;
+        public static final double kLeftFlapIZone = 0;
+        public static final double kLeftFlapD = 0;
+        public static final double kLeftFlapFF = 0.000170;
+    
+        public static final double kRightFlapP = .06;
+        public static final double kRightFlapI = 0;
+        public static final double kRightFlapIZone = 0;
+        public static final double kRightFlapD = 0;
+        public static final double kRightFlapFF = 0.000170;
+    
+        public static final double kRight90 = 18.523756;
+        public static final double kLeft90 = 17.880909;
+        public static final double kRight45 = kRight90 / 2;
+        public static final double kLeft45 = kLeft90 / 2;
+        public static final double kSlantLLeft = kLeft45;
+        public static final double kSlantLRight = 26.690289;
+        public static final double kSlantRLeft = 25.356977;
+        public static final double kSlantRRight = kLeft45;
+      }
+    
+      public static class DigitalInputs {
+        public static final int kLeftLimitSwitch = 1;
+        public static final int kRightLimitSwitch = 0;
+        public static final int kDownLimitSwitch = 2;
+      }
+
+      public static class AimValues {
+        public static double kAimP = 0.0;
+        public static double kAimI = 0.0;
+        public static double kAimIZone = 0.0;
+        public static double kAimD = 0.0;
+        public static double kAimFF = 0.0;
+      }
+    }

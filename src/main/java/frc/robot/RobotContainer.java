@@ -16,9 +16,15 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ShooterState;
+import frc.robot.commands.ChaseTagCommand;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
+import frc.robot.commands.ShootCommand;
+import frc.robot.subsystems.PhotonSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+
+import org.photonvision.PhotonCamera;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -33,6 +39,14 @@ public class RobotContainer{
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                             "swerve"));
 
+    private final PhotonCamera camera = new PhotonCamera("photonVision");
+
+    private final ChaseTagCommand chaseTagCommand = new ChaseTagCommand(camera, drivebase, drivebase::getPose);
+
+    private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
+
+    private final PhotonSubsystem m_photonSubsystem = PhotonSubsystem.getInstance();
+
     // CommandJoystick driverController   = new CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
     XboxController driverXbox = new XboxController(0);
     XboxController operatorXbox = new XboxController(1);
@@ -42,6 +56,27 @@ public class RobotContainer{
      */
     public RobotContainer() {
         // Configure the trigger bindings
+        m_shooterSubsystem.setDefaultCommand(
+      new ShootCommand(
+        m_shooterSubsystem,
+        operatorXbox.start(null),
+        operatorXbox.povLeft(null),
+        operatorXbox.povRight(null),
+        operatorXbox.povUp(null),
+        operatorXbox.povDown(null),
+        operatorXbox::getLeftY,
+        operatorXbox.leftTrigger(0.8, null),
+        operatorXbox.rightTrigger(0.8, null),
+        operatorXbox.x(null)
+      )
+    );
+
+    // m_photonSubsystem.setDefaultCommand(
+    //     new photonCommand(
+    //         m_photonSubsystem
+    //     )
+    // );
+
         configureBindings();
 
         // AbsoluteFieldDrive closedFieldAbsoluteDrive = new AbsoluteFieldDrive(drivebase,
@@ -58,6 +93,8 @@ public class RobotContainer{
             () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND), 
             () -> true);
+
+
 
         drivebase.setDefaultCommand(closedFieldRel);
 
@@ -77,6 +114,7 @@ public class RobotContainer{
         new JoystickButton(driverXbox, 4).onTrue((new InstantCommand(drivebase::zeroGyro)));
         new JoystickButton(driverXbox, 2).onTrue(new InstantCommand(drivebase::addFakeVisionReading));
         new JoystickButton(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
+        new JoystickButton(driverXbox, 1).whileTrue(chaseTagCommand);
         // A
         // new JoystickButton(operatorXbox, 1).onTrue(new InstantCommand(() -> shooter.setState(ShooterState.AMP)))
         //         .onFalse(new InstantCommand(shooter::stop));
