@@ -4,17 +4,38 @@
 
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.ClimbSubsystem;
 
 public class ClimbCommand extends CommandBase {
+  private final ClimbSubsystem climbSubsystem = ClimbSubsystem.getInstance();
+  private BooleanSupplier xbox2_A, xbox2_B, xbox2_Y;
+
   /** Creates a new ClimbCommand. */
-  public ClimbCommand() {
+  public ClimbCommand(BooleanSupplier A, BooleanSupplier B, BooleanSupplier Y) {
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(climbSubsystem);
+
+    this.xbox2_A = A;
+    this.xbox2_B = B;
+    this.xbox2_Y = Y;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    if (this.xbox2_B.getAsBoolean()) {
+      climbSubsystem.disableArms();
+    }
+    else if (this.xbox2_Y.getAsBoolean()) {
+      climbSubsystem.extendArms();
+    }
+    else if (this.xbox2_A.getAsBoolean()) {
+      climbSubsystem.retractArms();
+    }
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
