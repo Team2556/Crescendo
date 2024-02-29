@@ -10,12 +10,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.ShooterState;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
@@ -29,11 +27,10 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
  */
 public class RobotContainer{
 
-    // The robot's subsystems and commands are defined here...
+    // Instances of robot subsystems
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                             "swerve"));
-
-    // CommandJoystick driverController   = new CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
+    // Drive controllers
     XboxController driverXbox = new XboxController(0);
     XboxController operatorXbox = new XboxController(1);
 
@@ -41,27 +38,16 @@ public class RobotContainer{
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        // Configure the trigger bindings
         configureBindings();
-
-        // AbsoluteFieldDrive closedFieldAbsoluteDrive = new AbsoluteFieldDrive(drivebase,
-        //                                                                      () ->
-        //                                                                          MathUtil.applyDeadband(driverXbox.getLeftY(),
-        //                                                                                                 OperatorConstants.LEFT_Y_DEADBAND),
-        //                                                                      () -> MathUtil.applyDeadband(driverXbox.getLeftX(),
-        //                                                                                                   OperatorConstants.LEFT_X_DEADBAND),
-        //                                                                      () -> driverXbox.getRawAxis(2));
 
         TeleopDrive closedFieldRel = new TeleopDrive(
             drivebase,
             () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-            () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND), 
+            () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND),
             () -> true);
 
         drivebase.setDefaultCommand(closedFieldRel);
-
-        // shooter.setDefaultCommand(new ShooterControl());
     }
 
     /**
@@ -72,23 +58,8 @@ public class RobotContainer{
      * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
      */
     private void configureBindings() {
-        // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-
-        new JoystickButton(driverXbox, 4).onTrue((new InstantCommand(drivebase::zeroGyro)));
-        new JoystickButton(driverXbox, 2).onTrue(new InstantCommand(drivebase::addFakeVisionReading));
         new JoystickButton(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
-        // A
-        // new JoystickButton(operatorXbox, 1).onTrue(new InstantCommand(() -> shooter.setState(ShooterState.AMP)))
-        //         .onFalse(new InstantCommand(shooter::stop));
-        // // B
-        // new JoystickButton(operatorXbox, 2).onTrue(new InstantCommand(() -> shooter.setState(ShooterState.CLOSE)))
-        //         .onFalse(new InstantCommand(shooter::stop));
-        // // X
-        // new JoystickButton(operatorXbox, 3).onTrue(new InstantCommand(() -> shooter.setState(ShooterState.MIDDLE)))
-        //         .onFalse(new InstantCommand(shooter::stop));
-        // // Y
-        // new JoystickButton(operatorXbox, 4).onTrue(new InstantCommand(() -> shooter.setState(ShooterState.FAR)))
-        //         .onFalse(new InstantCommand(shooter::stop));
+        new JoystickButton(driverXbox, 4).onTrue((new InstantCommand(drivebase::zeroGyro)));
     }
 
     /**
@@ -98,15 +69,5 @@ public class RobotContainer{
      */
     public Command getAutonomousCommand() {
         return new PathPlannerAuto("4 Note Leave");
-        // An example command will be run in autonomous
-        // return drivebase.getAutonomousCommand("Straight Test", true);
-    }
-
-    public void setDriveMode() {
-        //drivebase.setDefaultCommand();
-    }
-
-    public void setMotorBrake(boolean brake) {
-        drivebase.setMotorBrake(brake);
     }
 }

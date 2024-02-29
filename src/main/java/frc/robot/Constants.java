@@ -71,20 +71,6 @@ public final class Constants {
     public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
     public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
 
-    public static final class Auton {
-
-        public static final PIDFConfig TranslationPID = new PIDFConfig(0.7, 0, 0);
-        public static final PIDFConfig angleAutoPID = new PIDFConfig(0.4, 0, 0.01);
-
-        public static final double MAX_ACCELERATION = 2;
-    }
-
-    public static final class Drivebase {
-
-        // Hold time on motor brakes when disabled
-        public static final double WHEEL_LOCK_TIME = 10; // seconds
-    }
-
     public static class OperatorConstants {
 
         // Joystick Deadband
