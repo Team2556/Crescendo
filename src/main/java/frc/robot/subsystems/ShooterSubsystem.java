@@ -13,235 +13,278 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.FlapValues;
-import frc.robot.Constants.MotorPorts;
+import frc.robot.Constants.Ports;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.ShooterConstants.FlapState;
+import frc.robot.Constants.ShooterConstants.ShooterState;
+
+import static frc.robot.Constants.ShooterConstants.leftShooterPIDF;
+import static frc.robot.Constants.ShooterConstants.rightShooterPIDF;
+import static frc.robot.Constants.ShooterConstants.leftFlapPIDF;
+import static frc.robot.Constants.ShooterConstants.rightFlapPIDF;
 
 public class ShooterSubsystem extends SubsystemBase {
-  /** Creates a new ShooterSubsystem. */
-  private CANSparkFlex leftShooter;
-  private CANSparkFlex rightShooter;
-  public CANSparkMax leftFlap;
-  public CANSparkMax rightFlap;
-  public RelativeEncoder lFlapEncoder;
-  public RelativeEncoder rFlapEncoder;
-  private RelativeEncoder leftShooterEncoder;
-  private RelativeEncoder rightShooterEncoder;
-  private SparkPIDController leftShooterPID;
-  private SparkPIDController rightShooterPID;
-  private SparkPIDController lFlapPID;
-  private SparkPIDController rFlapPID;
-  private double targetVelocity = 0;
-  private int rollingAverage = 0;
-  private final static ShooterSubsystem instance = ShooterSubsystem.getInstance();
-  public final DigitalInput leftLimitSwitch;
-  public final DigitalInput rightLimitSwitch;
-  public boolean leftHomeFlag = false;
-  public boolean rightHomeFlag = false;
-  
+    /** Creates a new ShooterSubsystem. */
+    private final static ShooterSubsystem instance = ShooterSubsystem.getInstance();
+    // Shooter motors
+    private final CANSparkFlex leftShooter, rightShooter;
+    // Flap motors
+    public final CANSparkMax leftFlap, rightFlap;
+    // Limit switches for flaps
+    public final DigitalInput leftLimitSwitch, rightLimitSwitch;
+    // Spark max/flex encoders
+    private final RelativeEncoder lFlapEncoder, rFlapEncoder, leftShooterEncoder, rightShooterEncoder;
+    // Spark max/flex pid controllers
+    private final SparkPIDController leftShooterPID, rightShooterPID, lFlapPID, rFlapPID;
+    // Whether flaps have been zeroed with their limit switches.
+    public boolean leftHomeFlag = false, rightHomeFlag = false;
+    // Target velocity instance variable.
+    private double targetVelocity = 0;
+    // Rolling average instance variable.
+    private int rollingAverage = 0;
+    private ShooterState shooterState = ShooterState.STOP;
+    private FlapState flapState = FlapState.NONE;
 
-  public ShooterSubsystem() {
-    leftShooter = new CANSparkFlex(MotorPorts.kLeftShooterPort, MotorType.kBrushless);
-    rightShooter = new CANSparkFlex(MotorPorts.kRightShooterPort, MotorType.kBrushless);
-    
-    leftLimitSwitch = new DigitalInput(Constants.DigitalInputs.kLeftLimitSwitch);
-    rightLimitSwitch = new DigitalInput(Constants.DigitalInputs.kRightLimitSwitch);
+    /**
+     * Constructor to handle the initialization and configuration of motors,
+     * encoders, pid controllers, and limit switches.
+     */
+    public ShooterSubsystem() {
+        leftShooter = new CANSparkFlex(Ports.kLeftShooterPort, MotorType.kBrushless);
+        rightShooter = new CANSparkFlex(Ports.kRightShooterPort, MotorType.kBrushless);
 
-    leftFlap = new CANSparkMax(MotorPorts.kLeftFlap, MotorType.kBrushless);
-    rightFlap = new CANSparkMax(MotorPorts.kRightFlap, MotorType.kBrushless);
+        leftFlap = new CANSparkMax(Ports.kLeftFlap, MotorType.kBrushless);
+        rightFlap = new CANSparkMax(Ports.kRightFlap, MotorType.kBrushless);
 
-    leftShooter.clearFaults();
-    rightShooter.clearFaults();
+        leftLimitSwitch = new DigitalInput(Ports.kLeftLimitSwitch);
+        rightLimitSwitch = new DigitalInput(Ports.kRightLimitSwitch);
 
-    leftShooter.setInverted(false);
-    rightShooter.setInverted(true);
+        leftShooter.clearFaults();
+        rightShooter.clearFaults();
 
-    leftShooterEncoder = leftShooter.getEncoder();
-    rightShooterEncoder = rightShooter.getEncoder();
+        leftShooter.setInverted(false);
+        rightShooter.setInverted(true);
 
-    leftShooterPID = leftShooter.getPIDController();
-    rightShooterPID = rightShooter.getPIDController();
+        leftShooterEncoder = leftShooter.getEncoder();
+        rightShooterEncoder = rightShooter.getEncoder();
 
-    leftShooterPID.setFeedbackDevice(leftShooterEncoder);
-    rightShooterPID.setFeedbackDevice(rightShooterEncoder);
+        leftShooterPID = leftShooter.getPIDController();
+        rightShooterPID = rightShooter.getPIDController();
 
-    leftShooterPID.setP(ShooterConstants.kLeftShooterP);
-    leftShooterPID.setI(ShooterConstants.kLeftShooterI);
-    leftShooterPID.setIZone(ShooterConstants.kLeftShooterIZone);
-    leftShooterPID.setD(ShooterConstants.kLeftShooterD);
-    leftShooterPID.setFF(ShooterConstants.kLeftShooterFF);
-    leftShooterPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
+        leftShooterPID.setFeedbackDevice(leftShooterEncoder);
+        rightShooterPID.setFeedbackDevice(rightShooterEncoder);
 
-    rightShooterPID.setP(ShooterConstants.kRightShooterP);
-    rightShooterPID.setI(ShooterConstants.kRightShooterI);
-    rightShooterPID.setIZone(ShooterConstants.kRightShooterIZone);
-    rightShooterPID.setD(ShooterConstants.kRighthooterD);
-    rightShooterPID.setFF(ShooterConstants.kRightShooterFF);
-    rightShooterPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
+        leftShooterPID.setP(leftShooterPIDF.p);
+        leftShooterPID.setI(leftShooterPIDF.i);
+        leftShooterPID.setIZone(leftShooterPIDF.iz);
+        leftShooterPID.setD(leftShooterPIDF.d);
+        leftShooterPID.setFF(leftShooterPIDF.f);
+        leftShooterPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
 
-    lFlapEncoder = leftFlap.getEncoder();
-    rFlapEncoder = rightFlap.getEncoder();
+        rightShooterPID.setP(rightShooterPIDF.p);
+        rightShooterPID.setI(rightShooterPIDF.i);
+        rightShooterPID.setIZone(rightShooterPIDF.iz);
+        rightShooterPID.setD(rightShooterPIDF.d);
+        rightShooterPID.setFF(rightShooterPIDF.f);
+        rightShooterPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
 
-    lFlapPID = leftFlap.getPIDController();
-    rFlapPID = rightFlap.getPIDController();
+        lFlapEncoder = leftFlap.getEncoder();
+        rFlapEncoder = rightFlap.getEncoder();
 
-    lFlapPID.setP(FlapValues.kLeftFlapP);
-    lFlapPID.setI(FlapValues.kLeftFlapI);
-    lFlapPID.setIZone(FlapValues.kLeftFlapIZone);
-    lFlapPID.setD(FlapValues.kLeftFlapD);
-    lFlapPID.setFF(FlapValues.kLeftFlapFF);
-    lFlapPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
+        lFlapPID = leftFlap.getPIDController();
+        rFlapPID = rightFlap.getPIDController();
 
-    rFlapPID.setP(FlapValues.kRightFlapP);
-    rFlapPID.setI(FlapValues.kRightFlapI);
-    rFlapPID.setIZone(FlapValues.kRightFlapIZone);
-    rFlapPID.setD(FlapValues.kRightFlapD);
-    rFlapPID.setFF(FlapValues.kRightFlapFF);
-    rFlapPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
+        lFlapPID.setP(leftFlapPIDF.p);
+        lFlapPID.setI(leftFlapPIDF.i);
+        lFlapPID.setIZone(leftFlapPIDF.iz);
+        lFlapPID.setD(leftFlapPIDF.d);
+        lFlapPID.setFF(leftFlapPIDF.f);
+        lFlapPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
 
-    stop();
+        rFlapPID.setP(rightFlapPIDF.p);
+        rFlapPID.setI(rightFlapPIDF.i);
+        rFlapPID.setIZone(rightFlapPIDF.iz);
+        rFlapPID.setD(rightFlapPIDF.d);
+        rFlapPID.setFF(rightFlapPIDF.f);
+        rFlapPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
 
-    leftShooter.burnFlash();
-    rightShooter.burnFlash();
+        stop();
 
-    leftFlap.burnFlash();
-    rightFlap.burnFlash();
+        leftShooter.burnFlash();
+        rightShooter.burnFlash();
 
-    leftHomeFlag = false;
-    rightHomeFlag = false;
-  }
+        leftFlap.burnFlash();
+        rightFlap.burnFlash();
 
-  //Uses PID to bring rpm of shooter to parameter
-  public void setShooterVelocity(double velocity) {
-    targetVelocity = velocity;
-    leftShooterPID.setReference(velocity, CANSparkBase.ControlType.kVelocity);
-    rightShooterPID.setReference(velocity, CANSparkBase.ControlType.kVelocity);
-  }
-
-  public void setLeftShootVelocity(double outsideVelocity) {
-    leftShooterPID.setReference(outsideVelocity / 2, CANSparkBase.ControlType.kVelocity);
-    rightShooterPID.setReference(outsideVelocity, CANSparkBase.ControlType.kVelocity);
-  }
-
-  public void setRightShootVelocity(double outsideVelocity) {
-    leftShooterPID.setReference(outsideVelocity, CANSparkBase.ControlType.kVelocity);
-    rightShooterPID.setReference(outsideVelocity / 2, CANSparkBase.ControlType.kVelocity);
-  }
-
-  public void setAngledShoot(double averageVelocity, double leftPos, double rightPos) {
-    double rightVelocity = averageVelocity + 
-      ((Constants.FlapValues.kRight90 - rightPos) / Constants.FlapValues.kRight90) * averageVelocity;
-    double leftVelocity = averageVelocity + 
-      ((Constants.FlapValues.kLeft90 - leftPos) / Constants.FlapValues.kLeft90) * averageVelocity;
-    rightShooterPID.setReference(rightVelocity, CANSparkBase.ControlType.kVelocity);
-    leftShooterPID.setReference(leftVelocity, CANSparkBase.ControlType.kVelocity);
-  }
-
-  //Uses PID to bring flaps to parameters
-  public void setFlapPosition(double leftPosition, double rightPosition) {
-    lFlapPID.setReference(leftPosition, CANSparkBase.ControlType.kPosition);
-    rFlapPID.setReference(rightPosition, CANSparkBase.ControlType.kPosition);
-  }
-
-  //Sets speed via raw voltage
-  public void setSpeed(double speed) {
-    leftShooter.set(speed);
-    rightShooter.set(speed);
-  }
-
-  //Zeros shooter rpm
-  public void stop() {
-    setSpeed(0);
-  }
-
-  public double getVelocity() {
-    double average = (leftShooterEncoder.getVelocity() + rightShooterEncoder.getVelocity()) / 2;
-    return average;
-  }
-  
-  //Checks if the shooter is roughly running at desired speed
-  public boolean isOnTarget() {
-    boolean leftOnTarget = Math.abs(targetVelocity - leftShooterEncoder.getVelocity()) <= ShooterConstants.kVelocityTolerance;
-    boolean rightOnTarget = Math.abs(targetVelocity - rightShooterEncoder.getVelocity()) <= ShooterConstants.kVelocityTolerance;
-    return leftOnTarget && rightOnTarget;
-  }
-
-  //Checks if it's close to target on average
-  public boolean isOnTargetAverage(int percent) {
-    if (percent > 10) {
-      percent = 10;
-    } else if (percent < 0) {
-      percent = 0;
+        leftHomeFlag = false;
+        rightHomeFlag = false;
     }
 
-    if (rollingAverage > percent) {
-      return true;
-    }
-    return false;
-  }
-
-  //Brings flaps to 0 and zeroes the encoders
-  public void flapHome() {
-    if (!rightHomeFlag || !leftHomeFlag) {
-    
-      if (!rightLimitSwitch.get()) {
-        rightFlap.set(-.05);
-      } else  {
-        rightFlap.set(0);
-        
-        rightHomeFlag = true;
-      }
-      if (!leftLimitSwitch.get()) {
-        leftFlap.set(-.05);
-      } else {
-        leftFlap.set(0);
-        
-        leftHomeFlag = true;
-      }
-      rFlapEncoder.setPosition(0);
-      lFlapEncoder.setPosition(0);
-    }
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    if (isOnTarget()) {
-      if (rollingAverage < 10) {
-        rollingAverage++;
-      }
-    } else if (rollingAverage > 0) {
-      rollingAverage--;
+    /**
+     * Set shooter velocity.
+     * Updates targetVelocity.
+     * @param velocity target velocity.
+     */
+    public void setShooterVelocity(double velocity) {
+        targetVelocity = velocity;
+        leftShooterPID.setReference(velocity, CANSparkBase.ControlType.kVelocity);
+        rightShooterPID.setReference(velocity, CANSparkBase.ControlType.kVelocity);
     }
 
-    SmartDashboard.putNumber("Left Velocity", leftShooterEncoder.getVelocity());
-    SmartDashboard.putNumber("Right Velocity", rightShooterEncoder.getVelocity());
-    SmartDashboard.putNumber("Average Velocity", getVelocity());
-    SmartDashboard.putBoolean("Launcher On Target", isOnTarget());
-    SmartDashboard.putBoolean("Avg Launcher On Target", isOnTargetAverage(7));
-    SmartDashboard.putNumber("Target Velocity", targetVelocity);
-    SmartDashboard.putNumber("Left Encoder", lFlapEncoder.getPosition());
-    SmartDashboard.putNumber("Right Encoder", rFlapEncoder.getPosition());
-    SmartDashboard.putBoolean("Left Limit Switch", leftLimitSwitch.get());
-    SmartDashboard.putBoolean("Right Limit Switch", rightLimitSwitch.get());
+    /**
+     * Sets flap to position.
+     * @param leftPosition position of left flap.
+     * @param rightPosition position of right flap.
+     */
 
-    SmartDashboard.putBoolean("L Home", leftHomeFlag);
-    SmartDashboard.putBoolean("R Home", rightHomeFlag);
+    public void setFlapPosition(double leftPosition, double rightPosition) {
+        lFlapPID.setReference(leftPosition, CANSparkBase.ControlType.kPosition);
+        rFlapPID.setReference(rightPosition, CANSparkBase.ControlType.kPosition);
+    }
 
-    //If limit switch is ever tripped, zeroes the encoders
-    if (leftLimitSwitch.get()) {
-      lFlapEncoder.setPosition(0);
+    /**
+     * Set speed based off of percent.
+     * @param speed speed percent from -1 to 1
+     */
+    public void setSpeed(double speed) {
+        leftShooter.set(speed);
+        rightShooter.set(speed);
     }
-    if (rightLimitSwitch.get()) {
-      rFlapEncoder.setPosition(0);
-    }
-  }
 
-  public static ShooterSubsystem getInstance() {
-    if (instance == null) {
-      return new ShooterSubsystem();
+    /**
+     * Stop shooter motors.
+     */
+    public void stop() {
+        setSpeed(0);
     }
-    return instance;
-  } 
+
+    /**
+     * Get average velocity between the left and right shooter motors.
+     * @return Average velocity of the shooters.
+     */
+    public double getVelocity() {
+        return (leftShooterEncoder.getVelocity() + rightShooterEncoder.getVelocity()) / 2.0;
+    }
+
+    /**
+     * Get whether the current velocity is close enough to the target velocity based off a velocity error constant.
+     * @return Whether the current velocity is near the target velocity.
+     */
+    public boolean isOnTarget() {
+        return Math.abs(targetVelocity - getVelocity()) <= ShooterConstants.kVelocityTolerance;
+    }
+
+    /**
+     * Check how often the shooter is 'on target' by being near the target velocity.
+     * @param percent Minimum of the average to be acceptable.
+     * @return Whether the average times on target is greater than the minimum input.
+     */
+    public boolean isOnTargetAverage(int percent) {
+        if (percent > 10) {
+          percent = 10;
+        } else if (percent < 0) {
+          percent = 0;
+        }
+
+        return rollingAverage > percent;
+    }
+
+    /**
+     * Move the flaps until they reach the limit switch to zero their positions.
+     */
+    public void flapHome() {
+        if (rightHomeFlag && leftHomeFlag) {
+            flapState = FlapState.NONE;
+            return;
+        }
+
+        if (!rightLimitSwitch.get()) {
+            rightFlap.set(-.05);
+        } else {
+            rFlapEncoder.setPosition(0);
+            rightFlap.set(0);
+            rightHomeFlag = true;
+        }
+
+        if (!leftLimitSwitch.get()) {
+            leftFlap.set(-.05);
+        } else {
+            lFlapEncoder.setPosition(0);
+            leftFlap.set(0);
+            leftHomeFlag = true;
+        }
+    }
+
+    public void resetFlaps() {
+        leftHomeFlag = false;
+        rightHomeFlag = false;
+        flapState = FlapState.RESET;
+    }
+
+    public ShooterState getShooterState() {
+        return shooterState;
+    }
+
+    public void setShooterState(ShooterState shooterState) {
+        this.shooterState = shooterState;
+    }
+
+    public FlapState getFlapState() {
+        return flapState;
+    }
+
+    public void setFlapState(FlapState flapState) {
+        this.flapState = flapState;
+    }
+
+    @Override
+    public void periodic() {
+        if (isOnTarget()) {
+          if (rollingAverage < 10)
+            rollingAverage++;
+        } else if (rollingAverage > 0)
+            rollingAverage--;
+
+        SmartDashboard.putNumber("Average Velocity", getVelocity());
+        SmartDashboard.putBoolean("Launcher On Target", isOnTarget());
+        SmartDashboard.putNumber("Target Velocity", targetVelocity);
+
+        SmartDashboard.putString("Shooter State", shooterState.name());
+        SmartDashboard.putString("Flap State", flapState.name());
+
+//        dashboardVerbose();
+
+        // If limit switch is ever tripped, zeroes the encoders
+        if (leftLimitSwitch.get())
+            lFlapEncoder.setPosition(0);
+        if (rightLimitSwitch.get())
+            rFlapEncoder.setPosition(0);
+    }
+
+    /**
+     * Update SmartDashboard with new shooter values. Includes all relevant data of the shooter.
+     */
+    private void dashboardVerbose() {
+        SmartDashboard.putNumber("Left Velocity", leftShooterEncoder.getVelocity());
+        SmartDashboard.putNumber("Right Velocity", rightShooterEncoder.getVelocity());
+        SmartDashboard.putBoolean("Avg Launcher On Target", isOnTargetAverage(7));
+        SmartDashboard.putNumber("Left Encoder", lFlapEncoder.getPosition());
+        SmartDashboard.putNumber("Right Encoder", rFlapEncoder.getPosition());
+        SmartDashboard.putBoolean("Left Limit Switch", leftLimitSwitch.get());
+        SmartDashboard.putBoolean("Right Limit Switch", rightLimitSwitch.get());
+
+        SmartDashboard.putBoolean("L Home", leftHomeFlag);
+        SmartDashboard.putBoolean("R Home", rightHomeFlag);
+    }
+
+    /**
+     * The method to retrieve the Shooter instance; creates new instance if the Shooter has not been instantiated.
+     * @return Shooter instance.
+     */
+    public static ShooterSubsystem getInstance() {
+        if (instance == null) {
+            return new ShooterSubsystem();
+        }
+        return instance;
+    }
 }

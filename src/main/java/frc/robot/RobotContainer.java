@@ -21,6 +21,9 @@ import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
 
+import frc.robot.Constants.ShooterConstants.ShooterState;
+import frc.robot.Constants.ShooterConstants.FlapState;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -34,7 +37,7 @@ public class RobotContainer {
     private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
     // Drive controllers
     XboxController driverXbox = new XboxController(0);
-    CommandXboxController operatorXbox = new CommandXboxController(1);
+    XboxController operatorXbox = new XboxController(1);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -49,19 +52,7 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND),
             () -> true);
 
-        m_shooterSubsystem.setDefaultCommand(
-                new ShootCommand(
-                        m_shooterSubsystem,
-                        operatorXbox.start(),
-                        operatorXbox.povLeft(),
-                        operatorXbox.povRight(),
-                        operatorXbox.povUp(),
-                        operatorXbox.povDown(),
-                        operatorXbox::getLeftY,
-                        operatorXbox.leftTrigger(0.8),
-                        operatorXbox.rightTrigger(0.8)
-                )
-        );
+        m_shooterSubsystem.setDefaultCommand(new ShootCommand(m_shooterSubsystem));
 
         drivebase.setDefaultCommand(closedFieldRel);
     }
@@ -76,6 +67,12 @@ public class RobotContainer {
     private void configureBindings() {
         new JoystickButton(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
         new JoystickButton(driverXbox, 4).onTrue((new InstantCommand(drivebase::zeroGyro)));
+
+        new JoystickButton(operatorXbox, 8).onTrue(new InstantCommand(m_shooterSubsystem::resetFlaps));
+        new JoystickButton(operatorXbox, 6).onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
+        new JoystickButton(operatorXbox, 5).onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.AMP)));
+        new JoystickButton(operatorXbox, 4).onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.AUTO)));
+        new JoystickButton(operatorXbox, 3).onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.STRAIGHT)));
     }
 
     /**
