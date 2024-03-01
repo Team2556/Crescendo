@@ -17,10 +17,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ShooterState;
 import frc.robot.commands.ChaseTagCommand;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
 import frc.robot.commands.ShootCommand;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PhotonSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -46,6 +48,8 @@ public class RobotContainer{
     private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
 
     private final PhotonSubsystem m_photonSubsystem = PhotonSubsystem.getInstance();
+
+    private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
 
     // CommandJoystick driverController   = new CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
     XboxController driverXbox = new XboxController(0);
@@ -78,6 +82,14 @@ public class RobotContainer{
     //         m_photonSubsystem
     //     )
     // );
+    
+    intakeSubsystem.setDefaultCommand(
+            new IntakeCommand(
+                intakeSubsystem,
+                driverXbox.rightTrigger(0.5, null)
+                )
+        );
+
 
         configureBindings();
 
