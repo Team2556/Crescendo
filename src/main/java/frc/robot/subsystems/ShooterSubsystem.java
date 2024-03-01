@@ -180,6 +180,16 @@ public class ShooterSubsystem extends SubsystemBase {
     leftShooterPID.setReference(leftVelocity, CANSparkBase.ControlType.kVelocity);
   }
 
+  public boolean speedsOnTarget(double distance, double leftPos, double rightPos) {
+    double leftTargetSpeed = distanceToSpeed(distance) + 
+      ((Constants.FlapValues.kLeft90 - leftPos) / Constants.FlapValues.kLeft90) * distanceToSpeed(distance);
+    boolean leftSpeedCheck = leftShooterEncoder.getVelocity() <= leftTargetSpeed * 1.1 || leftShooterEncoder.getVelocity() >= leftTargetSpeed * 0.9;
+    double rightTargetSpeed = distanceToSpeed(distance) + 
+      ((Constants.FlapValues.kRight90 - rightPos) / Constants.FlapValues.kRight90) * distanceToSpeed(distance);
+    boolean rightSpeedCheck = rightShooterEncoder.getVelocity() <= rightTargetSpeed * 1.1 || rightShooterEncoder.getVelocity() >= rightTargetSpeed * 0.9;
+    return leftSpeedCheck && rightSpeedCheck;
+  }
+
   public void setAngledShoot(double averageVelocity, double leftPos, double rightPos) {
     double rightVelocity = averageVelocity + 
       ((Constants.FlapValues.kRight90 - rightPos) / Constants.FlapValues.kRight90) * averageVelocity;
@@ -292,6 +302,11 @@ public class ShooterSubsystem extends SubsystemBase {
     shooterAimPID.setReference(angleToAimTicks(angle), CANSparkBase.ControlType.kPosition);
   }
 
+  public void goToAmpPosition() {
+    setFlapPosition(Constants.FlapValues.kLeft90, Constants.FlapValues.kRight90);
+    setAimPosition(Constants.AimValues.kAmpAim);
+  }
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

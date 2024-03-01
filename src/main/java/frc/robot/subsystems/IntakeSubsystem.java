@@ -20,7 +20,7 @@ import frc.robot.Constants.Ports;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final static IntakeSubsystem instance = getInstance();
-    private final CANSparkMax intake1 = new CANSparkMax(intakeMotorPort, CANSparkLowLevel.MotorType.kBrushless);
+    private final static CANSparkMax intake = new CANSparkMax(intakeMotorPort, CANSparkLowLevel.MotorType.kBrushless);
    // private final CANSparkFlex intake2 = new CANSparkFlex(intakeMotorPort2, CANSparkLowLevel.MotorType.kBrushless);
     
     /*LS stands for limit switch*/
@@ -33,24 +33,24 @@ public class IntakeSubsystem extends SubsystemBase {
     public IntakeSubsystem() {
         //intake1.restoreFactoryDefaults();
         //intake2.restoreFactoryDefaults();
-        intake1.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        intake.setIdleMode(CANSparkMax.IdleMode.kBrake);
         //intake2.setIdleMode(CANSparkFlex.IdleMode.kBrake);
     }
 
-    public void setIntakeMotor(double speed) {
+    public static void setIntakeMotor(double speed) {
         /* SmartDashboard.putNumber("Intake Speed", speed); */
         // if (getPostion() == 3) {
         //     intakeOff();
         // }
        // else {
-            intake1.set(speed);
+            intake.set(speed);
            // intake2.set(speed);
     //     }
      }
     
     public void intakeOff() {
         /* SmartDashboard.putNumber("Intake Speed", 0.0); */
-        intake1.set(0.0);
+        intake.set(0.0);
        // intake2.set(0.0);
     }
 

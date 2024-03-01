@@ -63,17 +63,19 @@ public class RobotContainer{
         m_shooterSubsystem.setDefaultCommand(
       new ShootCommand(
         m_shooterSubsystem,
-        operatorXbox.start(null),
-        operatorXbox.povLeft(null),
-        operatorXbox.povRight(null),
-        operatorXbox.povUp(null),
-        operatorXbox.povDown(null),
+        driverXbox.start(null),
+        driverXbox.povLeft(null),
+        driverXbox.povRight(null),
+        driverXbox.povUp(null),
+        driverXbox.povDown(null),
         operatorXbox::getLeftY,
         operatorXbox.leftTrigger(0.8, null),
         operatorXbox.rightTrigger(0.8, null),
         operatorXbox.x(null),
         operatorXbox.a(null),
-        operatorXbox.b(null)
+        operatorXbox.b(null),
+        driverXbox.rightBumper(null),
+        driverXbox.leftBumper(null)
       )
     );
 
@@ -86,7 +88,8 @@ public class RobotContainer{
     intakeSubsystem.setDefaultCommand(
             new IntakeCommand(
                 intakeSubsystem,
-                driverXbox.rightTrigger(0.5, null)
+                driverXbox.rightTrigger(0.5, null),
+                driverXbox.leftTrigger(0.5, null)
                 )
         );
 

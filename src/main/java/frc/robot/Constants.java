@@ -193,5 +193,6 @@ public final class Constants {
         public static double kAimIZone = 0.0;
         public static double kAimD = 0.0;
         public static double kAimFF = 0.0;
+        public static double kAmpAim = 0.0;
       }
     }

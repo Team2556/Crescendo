@@ -7,10 +7,12 @@ package frc.robot.commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PhotonSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.Constants;
@@ -28,12 +30,16 @@ public class ShootCommand extends Command {
   BooleanEvent m_x;
   BooleanEvent m_a;
   BooleanEvent m_b;
+  BooleanEvent m_rBumper;
+  BooleanEvent m_lBumper;
   private final BooleanEvent m_rightTrigger;
   BooleanEvent m_leftTrigger;
   private final DoubleSupplier m_leftY;
   private double targetInput;
   private double lFlapEncoder;
   private double rFlapEncoder;
+  Timer shooterTimer = new Timer();
+  Timer intakeTimer = new Timer();
 
   private static ShooterSpeeds shooterSpeeds = ShooterSpeeds.SPEAKER_MID;
   public enum ShooterSpeeds {
@@ -51,7 +57,7 @@ public class ShootCommand extends Command {
     LEFT,
     RIGHT
   }
-  public ShootCommand(ShooterSubsystem shooterSubsystem, BooleanEvent booleanEvent, BooleanEvent booleanEvent2, BooleanEvent booleanEvent3, BooleanEvent booleanEvent4, BooleanEvent booleanEvent5, DoubleSupplier leftY, BooleanEvent booleanEvent6, BooleanEvent booleanEvent7, BooleanEvent booleanEvent8, BooleanEvent booleanEvent9, BooleanEvent booleanEvent10) {
+  public ShootCommand(ShooterSubsystem shooterSubsystem, BooleanEvent booleanEvent, BooleanEvent booleanEvent2, BooleanEvent booleanEvent3, BooleanEvent booleanEvent4, BooleanEvent booleanEvent5, DoubleSupplier leftY, BooleanEvent booleanEvent6, BooleanEvent booleanEvent7, BooleanEvent booleanEvent8, BooleanEvent booleanEvent9, BooleanEvent booleanEvent10, BooleanEvent booleanEvent11, BooleanEvent booleanEvent12) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooterSubsystem = shooterSubsystem;
     // lFlapEncoder = m_shooterSubsystem.getlFlapEncoderValue();
@@ -66,6 +72,8 @@ public class ShootCommand extends Command {
     m_x = booleanEvent8;
     m_a = booleanEvent9;
     m_b = booleanEvent10;
+    m_rBumper = booleanEvent11;
+    m_lBumper = booleanEvent12;
     addRequirements(shooterSubsystem);
   }
 
@@ -97,6 +105,29 @@ public class ShootCommand extends Command {
     m_shooterSubsystem.flapHome();
     flapPosition = FlapPositions.RESET;
     m_shooterSubsystem.aimHome();
+
+    if(m_rBumper.getAsBoolean()) {
+      m_shooterSubsystem.setFlapPositionByTags(PhotonSubsystem.targetRotation);
+      m_shooterSubsystem.setVelocityByTags(PhotonSubsystem.targetX, 
+                                           m_shooterSubsystem.lFlapEncoder.getPosition(), 
+                                           m_shooterSubsystem.rFlapEncoder.getPosition());
+      m_shooterSubsystem.setAimPositionByTags(PhotonSubsystem.shootAngle);
+      if (!m_rBumper.getAsBoolean() || m_shooterSubsystem.speedsOnTarget(PhotonSubsystem.targetX, 
+                                                                         m_shooterSubsystem.lFlapEncoder.getPosition(), 
+                                                                         m_shooterSubsystem.rFlapEncoder.getPosition())) {
+        intakeTimer.reset();
+        intakeTimer.start();
+        if (intakeTimer.get() < 1) {
+          IntakeSubsystem.setIntakeMotor(0.8);
+        } else {
+          IntakeSubsystem.setIntakeMotor(0.0);
+        }
+      }
+    }
+
+    if (m_lBumper.getAsBoolean()) {
+      m_shooterSubsystem.goToAmpPosition();
+    }
 
     if (m_a.getAsBoolean()) {
       m_shooterSubsystem.setFlapPositionByTags(PhotonSubsystem.targetRotation);

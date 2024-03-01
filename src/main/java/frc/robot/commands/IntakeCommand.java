@@ -10,14 +10,15 @@ import frc.robot.subsystems.IntakeSubsystem;
 
 public class IntakeCommand extends Command {
   private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
-  private final BooleanEvent rightTrigger;
+  private final BooleanEvent rightTrigger, leftTrigger;
 
   /** Creates a new IntakeCommand. */
-  public IntakeCommand(IntakeSubsystem intakeSubsystem, BooleanEvent rightTrigger) {
+  public IntakeCommand(IntakeSubsystem intakeSubsystem, BooleanEvent rightTrigger, BooleanEvent leftTrigger) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(intakeSubsystem);
 
     this.rightTrigger = rightTrigger;
+    this.leftTrigger = leftTrigger;
   }
 
   // Called when the command is initially scheduled.
@@ -31,6 +32,8 @@ public class IntakeCommand extends Command {
   public void execute() {
     if(this.rightTrigger.getAsBoolean()) {
       intakeSubsystem.setIntakeMotor(0.8);
+    } else if (this.leftTrigger.getAsBoolean()) {
+      intakeSubsystem.setIntakeMotor(-0.8);
     } else {
       intakeSubsystem.setIntakeMotor(0);
     }
