@@ -67,7 +67,9 @@ public class RobotContainer{
         operatorXbox::getLeftY,
         operatorXbox.leftTrigger(0.8, null),
         operatorXbox.rightTrigger(0.8, null),
-        operatorXbox.x(null)
+        operatorXbox.x(null),
+        operatorXbox.a(null),
+        operatorXbox.b(null)
       )
     );
 

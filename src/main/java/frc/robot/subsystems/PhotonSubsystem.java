@@ -19,9 +19,9 @@ public class PhotonSubsystem extends SubsystemBase {
   private final static PhotonSubsystem instance = PhotonSubsystem.getInstance();
 
   private final PhotonCamera camera = new PhotonCamera("photonVision");
-double targetX;
-double targetY;
-double targetRotation;
+public static double targetX;
+public static double targetY;
+public static double targetRotation;
 public static double shootAngle;
 double xSquared;
 double speakerHeight = Units.inchesToMeters(78);

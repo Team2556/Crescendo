@@ -283,8 +283,13 @@ public class ShooterSubsystem extends SubsystemBase {
     shooterAimPID.setReference(shooterAngle, CANSparkBase.ControlType.kPosition);
   }
 
+  //Will be tested to determine scale factor
+  public double angleToAimTicks(double angle) {
+    return angle;
+  }
+
   public void setAimPositionByTags(double angle) {
-    
+    shooterAimPID.setReference(angleToAimTicks(angle), CANSparkBase.ControlType.kPosition);
   }
 
   @Override
@@ -318,6 +323,9 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     if (rightLimitSwitch.get()) {
       rFlapEncoder.setPosition(0);
+    }
+    if (downLimitSwitch.get()) {
+      shooterAimEncoder.setPosition(0);
     }
   }
 

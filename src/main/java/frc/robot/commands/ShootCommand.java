@@ -26,6 +26,8 @@ public class ShootCommand extends Command {
   BooleanEvent m_up;
   BooleanEvent m_down;
   BooleanEvent m_x;
+  BooleanEvent m_a;
+  BooleanEvent m_b;
   private final BooleanEvent m_rightTrigger;
   BooleanEvent m_leftTrigger;
   private final DoubleSupplier m_leftY;
@@ -49,7 +51,7 @@ public class ShootCommand extends Command {
     LEFT,
     RIGHT
   }
-  public ShootCommand(ShooterSubsystem shooterSubsystem, BooleanEvent booleanEvent, BooleanEvent booleanEvent2, BooleanEvent booleanEvent3, BooleanEvent booleanEvent4, BooleanEvent booleanEvent5, DoubleSupplier leftY, BooleanEvent booleanEvent6, BooleanEvent booleanEvent7, BooleanEvent booleanEvent8) {
+  public ShootCommand(ShooterSubsystem shooterSubsystem, BooleanEvent booleanEvent, BooleanEvent booleanEvent2, BooleanEvent booleanEvent3, BooleanEvent booleanEvent4, BooleanEvent booleanEvent5, DoubleSupplier leftY, BooleanEvent booleanEvent6, BooleanEvent booleanEvent7, BooleanEvent booleanEvent8, BooleanEvent booleanEvent9, BooleanEvent booleanEvent10) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooterSubsystem = shooterSubsystem;
     // lFlapEncoder = m_shooterSubsystem.getlFlapEncoderValue();
@@ -62,6 +64,8 @@ public class ShootCommand extends Command {
     m_leftTrigger = booleanEvent6;
     m_rightTrigger = booleanEvent7;
     m_x = booleanEvent8;
+    m_a = booleanEvent9;
+    m_b = booleanEvent10;
     addRequirements(shooterSubsystem);
   }
 
@@ -94,8 +98,18 @@ public class ShootCommand extends Command {
     flapPosition = FlapPositions.RESET;
     m_shooterSubsystem.aimHome();
 
+    if (m_a.getAsBoolean()) {
+      m_shooterSubsystem.setFlapPositionByTags(PhotonSubsystem.targetRotation);
+    }
+
+    if (m_b.getAsBoolean()) {
+      m_shooterSubsystem.setVelocityByTags(PhotonSubsystem.targetX, 
+                                           m_shooterSubsystem.lFlapEncoder.getPosition(), 
+                                           m_shooterSubsystem.rFlapEncoder.getPosition());
+    }
+
     if (m_x.getAsBoolean()) {
-      m_shooterSubsystem.setAimPosition(PhotonSubsystem.shootAngle);
+      m_shooterSubsystem.setAimPositionByTags(PhotonSubsystem.shootAngle);
     }
 
     //If start pressed, homes and zeros flaps
