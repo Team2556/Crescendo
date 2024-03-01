@@ -4,31 +4,43 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.RelativeEncoder;
+import static frc.robot.Constants.Ports;
+
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimbSubsystem extends SubsystemBase {
   private final static ClimbSubsystem instance = getInstance();
 
-  private final Talon climbMotor = new Talon(0);
   public final double climbSpeed = 0.5;
+
+  private final CANSparkMax climbMotor = new CANSparkMax(Ports.climbMotoPort, CANSparkMaxLowLevel.MotorType.kBrushless);
+  private final RelativeEncoder climbEncoder = climbMotor.getEncoder();
 
   private final DigitalInput LeftLimit = new DigitalInput(0);
   private final DigitalInput RightLimit = new DigitalInput(1);
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
-    disableArms();;
+    disableArms();
   }
 
   public void extendArms() {
-    climbMotor.set(climbSpeed);
+    if (climbEncoder.getPosition() < 15) {
+      climbMotor.set(climbSpeed);
+    } else {
+      disableArms();
+    }
   }
 
   public void retractArms() {
     if (!LeftLimit.get() && !RightLimit.get()) {
       climbMotor.set(-climbSpeed);
+    } else {
+      disableArms();
     }
   }
 
