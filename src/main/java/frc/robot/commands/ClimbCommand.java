@@ -26,6 +26,12 @@ public class ClimbCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    climbSubsystem.disableArms();
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
     if (this.xbox2_B.getAsBoolean()) {
       climbSubsystem.disableArms();
     }
@@ -36,10 +42,6 @@ public class ClimbCommand extends CommandBase {
       climbSubsystem.retractArms();
     }
   }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
