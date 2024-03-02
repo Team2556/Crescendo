@@ -7,7 +7,9 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
 
@@ -29,6 +31,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // DigitalInput LS_3 = new DigitalInput(2);
 
     int postion; 
+    Timer timer = new Timer();
 
     public IntakeSubsystem() {
         //intake1.restoreFactoryDefaults();
@@ -46,12 +49,30 @@ public class IntakeSubsystem extends SubsystemBase {
             intake.set(speed);
            // intake2.set(speed);
     //     }
-     }
+    }
     
     public void intakeOff() {
         /* SmartDashboard.putNumber("Intake Speed", 0.0); */
         intake.set(0.0);
        // intake2.set(0.0);
+    }
+
+    public void moveToShooter() {
+        timer.reset();
+        timer.restart();
+        if (timer.get() < .25) {
+            intake.set(0.8);
+        } else {
+            intake.set(0.0);
+        }
+    }
+
+    public Command intakeOnCommand() {
+        return this.runOnce(() -> intake.set(0.8));
+    }
+
+    public Command intakeOffCommand() {
+        return this.runOnce(() -> intake.set(0.0));
     }
 
     // public int getPostion() {

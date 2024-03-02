@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ShooterState;
 import frc.robot.commands.ChaseTagCommand;
+import frc.robot.commands.IndividualShoot;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -28,6 +29,8 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 import org.photonvision.PhotonCamera;
 
+import com.fasterxml.jackson.core.sym.Name;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /**
@@ -93,7 +96,9 @@ public class RobotContainer{
                 )
         );
 
-
+        NamedCommands.registerCommand("Shoot", new IndividualShoot());
+        NamedCommands.registerCommand("Intake On", intakeSubsystem.intakeOnCommand());
+        NamedCommands.registerCommand("Intake Off", intakeSubsystem.intakeOffCommand());
         configureBindings();
 
         // AbsoluteFieldDrive closedFieldAbsoluteDrive = new AbsoluteFieldDrive(drivebase,

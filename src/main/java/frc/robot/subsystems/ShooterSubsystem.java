@@ -42,9 +42,9 @@ public class ShooterSubsystem extends SubsystemBase {
   private SparkPIDController rFlapPID;
   private SparkPIDController shooterAimPID;
   
-  public final DigitalInput leftLimitSwitch;
-  public final DigitalInput rightLimitSwitch;
-  public final DigitalInput downLimitSwitch;
+  // public final DigitalInput leftLimitSwitch;
+  // public final DigitalInput rightLimitSwitch;
+
 
   private double targetVelocity = 0;
   private int rollingAverage = 0;
@@ -64,9 +64,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     shooterAim = new CANSparkMax(1, MotorType.kBrushless);
 
-    leftLimitSwitch = new DigitalInput(Constants.DigitalInputs.kLeftLimitSwitch);
-    rightLimitSwitch = new DigitalInput(Constants.DigitalInputs.kRightLimitSwitch);
-    downLimitSwitch = new DigitalInput(Constants.DigitalInputs.kDownLimitSwitch);
+    // leftLimitSwitch = new DigitalInput(Constants.DigitalInputs.kLeftLimitSwitch);
+    // rightLimitSwitch = new DigitalInput(Constants.DigitalInputs.kRightLimitSwitch);
 
     leftShooter.clearFaults();
     rightShooter.clearFaults();
@@ -262,39 +261,28 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   //Brings flaps to 0 and zeroes the encoders
-  public void flapHome() {
-    if (!rightHomeFlag || !leftHomeFlag) {
+  // public void flapHome() {
+  //   if (!rightHomeFlag || !leftHomeFlag) {
     
-      if (!rightLimitSwitch.get()) {
-        rightFlap.set(-.05);
-      } else  {
-        rightFlap.set(0);
+  //     if (!rightLimitSwitch.get()) {
+  //       rightFlap.set(-.05);
+  //     } else  {
+  //       rightFlap.set(0);
         
-        rightHomeFlag = true;
-      }
-      if (!leftLimitSwitch.get()) {
-        leftFlap.set(-.05);
-      } else {
-        leftFlap.set(0);
+  //       rightHomeFlag = true;
+  //     }
+  //     if (!leftLimitSwitch.get()) {
+  //       leftFlap.set(-.05);
+  //     } else {
+  //       leftFlap.set(0);
         
-        leftHomeFlag = true;
-      }
-      rFlapEncoder.setPosition(0);
-      lFlapEncoder.setPosition(0);
-    }
-  }
+  //       leftHomeFlag = true;
+  //     }
+  //     rFlapEncoder.setPosition(0);
+  //     lFlapEncoder.setPosition(0);
+  //   }
+  // }
 
-  //Brings aim to 0 and zeroes encoder
-  public void aimHome() {
-    if (!aimHomeFlag) {
-      if (!downLimitSwitch.get()) {
-        shooterAim.set(-.05);
-      } else {
-        shooterAim.set(0);
-      }
-      shooterAimEncoder.setPosition(0);
-    }
-  }
 
   public void setAimPosition(double shooterAngle) {
     shooterAimPID.setReference(shooterAngle, CANSparkBase.ControlType.kPosition);
@@ -335,22 +323,19 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Target Velocity", targetVelocity);
     SmartDashboard.putNumber("Left Encoder", lFlapEncoder.getPosition());
     SmartDashboard.putNumber("Right Encoder", rFlapEncoder.getPosition());
-    SmartDashboard.putBoolean("Left Limit Switch", leftLimitSwitch.get());
-    SmartDashboard.putBoolean("Right Limit Switch", rightLimitSwitch.get());
+    // SmartDashboard.putBoolean("Left Limit Switch", leftLimitSwitch.get());
+    // SmartDashboard.putBoolean("Right Limit Switch", rightLimitSwitch.get());
 
     SmartDashboard.putBoolean("L Home", leftHomeFlag);
     SmartDashboard.putBoolean("R Home", rightHomeFlag);
 
     //If limit switch is ever tripped, zeroes the encoders
-    if (leftLimitSwitch.get()) {
-      lFlapEncoder.setPosition(0);
-    }
-    if (rightLimitSwitch.get()) {
-      rFlapEncoder.setPosition(0);
-    }
-    if (downLimitSwitch.get()) {
-      shooterAimEncoder.setPosition(0);
-    }
+    // if (leftLimitSwitch.get()) {
+    //   lFlapEncoder.setPosition(0);
+    // }
+    // if (rightLimitSwitch.get()) {
+    //   rFlapEncoder.setPosition(0);
+    // }
   }
 
   public static ShooterSubsystem getInstance() {

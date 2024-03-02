@@ -31,11 +31,11 @@ public class IntakeCommand extends Command {
   @Override
   public void execute() {
     if(this.rightTrigger.getAsBoolean()) {
-      intakeSubsystem.setIntakeMotor(0.8);
+      IntakeSubsystem.setIntakeMotor(0.8);
     } else if (this.leftTrigger.getAsBoolean()) {
-      intakeSubsystem.setIntakeMotor(-0.8);
+      IntakeSubsystem.setIntakeMotor(-0.8);
     } else {
-      intakeSubsystem.setIntakeMotor(0);
+      IntakeSubsystem.setIntakeMotor(0);
     }
   }
 

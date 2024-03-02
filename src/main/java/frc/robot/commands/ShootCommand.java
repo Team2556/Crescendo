@@ -102,9 +102,9 @@ public class ShootCommand extends Command {
     // SmartDashboard.putBoolean("y", m_y.getAsBoolean());
 
     //Homes flaps and aimer upon initialization
-    m_shooterSubsystem.flapHome();
-    flapPosition = FlapPositions.RESET;
-    m_shooterSubsystem.aimHome();
+    // m_shooterSubsystem.flapHome();
+    // flapPosition = FlapPositions.RESET;
+    // m_shooterSubsystem.aimHome();
 
     if(m_rBumper.getAsBoolean()) {
       m_shooterSubsystem.setFlapPositionByTags(PhotonSubsystem.targetRotation);
@@ -147,7 +147,7 @@ public class ShootCommand extends Command {
     if (m_start.getAsBoolean()) {
       m_shooterSubsystem.rightHomeFlag = false;
       m_shooterSubsystem.leftHomeFlag = false;
-      m_shooterSubsystem.flapHome();
+      // m_shooterSubsystem.flapHome();
       flapPosition = FlapPositions.RESET;
     }
 

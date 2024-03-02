@@ -179,9 +179,10 @@ public final class Constants {
       }
     
       public static class DigitalInputs {
-        public static final int kLeftLimitSwitch = 1;
-        public static final int kRightLimitSwitch = 0;
-        public static final int kDownLimitSwitch = 2;
+        public static final int kLeftLimitSwitch = 0;
+        public static final int kRightLimitSwitch = 1;
+        public static final int kLClimbLimitSwitch = 2;
+        public static final int kRClimbLimitSwitch = 3;
       }
 
       public static class AimValues {
