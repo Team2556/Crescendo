@@ -45,29 +45,29 @@ public class SwerveSubsystem extends SubsystemBase {
     * @param directory Directory of swerve drive config files.
     */
     public SwerveSubsystem(File directory) {
-    // Angle conversion factor is 360 / (GEAR RATIO * ENCODER RESOLUTION)
-    // The encoder resolution per motor revolution is 1 per motor revolution.
-    double angleConversionFactor = SwerveMath.calculateDegreesPerSteeringRotation(1, 1);
-    // Motor conversion factor is (PI * WHEEL DIAMETER IN METERS) / (GEAR RATIO * ENCODER RESOLUTION).
-    // The encoder resolution per motor revolution is 1 per motor revolution.
-    double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(3.89), 7.0, 1);
-    System.out.println("\"conversionFactor\": {");
-    System.out.println("\t\"angle\": " + angleConversionFactor + ",");
-    System.out.println("\t\"drive\": " + driveConversionFactor);
-    System.out.println("}");
+        // Angle conversion factor is 360 / (GEAR RATIO * ENCODER RESOLUTION)
+        // The encoder resolution per motor revolution is 1 per motor revolution.
+        double angleConversionFactor = SwerveMath.calculateDegreesPerSteeringRotation(1, 1);
+        // Motor conversion factor is (PI * WHEEL DIAMETER IN METERS) / (GEAR RATIO * ENCODER RESOLUTION).
+        // The encoder resolution per motor revolution is 1 per motor revolution.
+        double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(3.89), 7.0, 1);
+        System.out.println("\"conversionFactor\": {");
+        System.out.println("\t\"angle\": " + angleConversionFactor + ",");
+        System.out.println("\t\"drive\": " + driveConversionFactor);
+        System.out.println("}");
 
-    // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
-    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
-    try {
-        swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed, angleConversionFactor, driveConversionFactor);
-        // Alternative method if you don't want to supply the conversion factor via JSON files.
-        // swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed, angleConversionFactor, driveConversionFactor);
-    } catch (Exception e) {
-        throw new RuntimeException(e);
-    }
-    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
-    swerveDrive.setCosineCompensator(false);
-    setupPathPlanner();
+        // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
+        try {
+            swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed, angleConversionFactor, driveConversionFactor);
+            // Alternative method if you don't want to supply the conversion factor via JSON files.
+            // swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed, angleConversionFactor, driveConversionFactor);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
+        swerveDrive.setCosineCompensator(true);
+        setupPathPlanner();
     }
 
     /**

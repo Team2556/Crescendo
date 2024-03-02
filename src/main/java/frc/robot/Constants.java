@@ -16,9 +16,12 @@ import swervelib.parser.PIDFConfig;
  */
 public final class Constants {
     public static class OperatorConstants {
-    public static final double LEFT_Y_DEADBAND = 0.15;
-    public static final double LEFT_X_DEADBAND = 0.15;
-    public static final double RIGHT_X_DEADBAND = 0.15;
+        public static final double LEFT_Y_DEADBAND = 0.15;
+        public static final double LEFT_X_DEADBAND = 0.15;
+        public static final double RIGHT_X_DEADBAND = 0.15;
+
+        public static final double LEFT_TRIGGER_DEADBAND = 0.3;
+        public static final double RIGHT_TRIGGER_DEADBAND = 0.3;
     }
 
     public static class Ports {
@@ -27,11 +30,13 @@ public final class Constants {
         public static final int kLeftFlap = 13;
         public static final int kRightFlap = 14;
 
+        public static final int kIntakePort = 20;
+
         // Digital Inputs
         public static final int kLeftLimitSwitch = 1;
         public static final int kRightLimitSwitch = 0;
+        public static final int kIntakeLimitSwitch = 2;
     }
-
 
     public static class ShooterConstants {
         public static final PIDFConfig leftShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000175, 0.0);
@@ -43,9 +48,9 @@ public final class Constants {
 
         public enum ShooterState {
             STOP(0.0),
-            INTAKE(-1500),
-            AMP(100),
-            SPEAKER(6700);
+            INTAKE(-1500.0),
+            AMP(100.0),
+            SPEAKER(6700.0);
             private final double velocity;
             ShooterState(double velocity) {
                 this.velocity = velocity;
@@ -65,6 +70,9 @@ public final class Constants {
         // Conversion factors
         public static final double leftFlapDegrees = kLeft90 / 90.0;
         public static final double rightFlapDegrees = kRight90 / 90.0;
+
+        public static final double kIntakeMaxSpeed = 0.8;
+        public static final double kOuttakeMaxSpeed = -0.5;
 
         public enum FlapState {
             NONE,

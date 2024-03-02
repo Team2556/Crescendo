@@ -10,7 +10,9 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ShootCommand;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -35,8 +37,9 @@ public class RobotContainer {
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                             "swerve"));
     private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
+    private final IntakeSubsystem m_intakeSubsystem = IntakeSubsystem.getInstance();
     // Drive controllers
-    XboxController driverXbox = new XboxController(0);
+    CommandXboxController driverXbox = new CommandXboxController(0);
     XboxController operatorXbox = new XboxController(1);
 
     /**
@@ -52,7 +55,9 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND),
             () -> true);
 
-        m_shooterSubsystem.setDefaultCommand(new ShootCommand(m_shooterSubsystem));
+        m_shooterSubsystem.setDefaultCommand(new ShootCommand(m_shooterSubsystem, drivebase));
+
+        m_intakeSubsystem.setDefaultCommand(new IntakeCommand(m_intakeSubsystem, driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
 
         drivebase.setDefaultCommand(closedFieldRel);
     }
@@ -65,8 +70,8 @@ public class RobotContainer {
      * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
      */
     private void configureBindings() {
-        new JoystickButton(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
-        new JoystickButton(driverXbox, 4).onTrue((new InstantCommand(drivebase::zeroGyro)));
+        driverXbox.x().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
+        driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
 
         new JoystickButton(operatorXbox, 8).onTrue(new InstantCommand(m_shooterSubsystem::resetFlaps));
         new JoystickButton(operatorXbox, 6).onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
