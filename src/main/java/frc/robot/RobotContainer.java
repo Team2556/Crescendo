@@ -10,8 +10,10 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ElevatorCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ShootCommand;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,9 +40,10 @@ public class RobotContainer {
                                                                             "swerve"));
     private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
     private final IntakeSubsystem m_intakeSubsystem = IntakeSubsystem.getInstance();
+    private final ElevatorSubsystem m_elevatorSubsystem = ElevatorSubsystem.getInstance();
     // Drive controllers
     CommandXboxController driverXbox = new CommandXboxController(0);
-    XboxController operatorXbox = new XboxController(1);
+    CommandXboxController operatorXbox = new CommandXboxController(1);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -55,9 +58,11 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND),
             () -> true);
 
-        m_shooterSubsystem.setDefaultCommand(new ShootCommand(m_shooterSubsystem, drivebase));
+        m_shooterSubsystem.setDefaultCommand(new ShootCommand(m_shooterSubsystem, drivebase, operatorXbox.rightTrigger(0.5)));
 
         m_intakeSubsystem.setDefaultCommand(new IntakeCommand(m_intakeSubsystem, driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
+
+        m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(m_elevatorSubsystem, () -> operatorXbox.getLeftY()));
 
         drivebase.setDefaultCommand(closedFieldRel);
     }
@@ -73,11 +78,11 @@ public class RobotContainer {
         driverXbox.x().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
         driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
 
-        new JoystickButton(operatorXbox, 8).onTrue(new InstantCommand(m_shooterSubsystem::resetFlaps));
-        new JoystickButton(operatorXbox, 6).onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
-        new JoystickButton(operatorXbox, 5).onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.AMP)));
-        new JoystickButton(operatorXbox, 4).onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.AUTO)));
-        new JoystickButton(operatorXbox, 3).onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.STRAIGHT)));
+        operatorXbox.start().onTrue(new InstantCommand(m_shooterSubsystem::resetFlaps));
+        operatorXbox.rightBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
+        operatorXbox.leftBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.AMP)));
+        operatorXbox.y().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.AUTO)));
+        operatorXbox.x().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.STRAIGHT)));
     }
 
     /**

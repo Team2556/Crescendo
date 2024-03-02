@@ -25,12 +25,14 @@ public final class Constants {
     }
 
     public static class Ports {
-        public static final int kLeftShooterPort = 11;
-        public static final int kRightShooterPort = 12;
-        public static final int kLeftFlap = 13;
-        public static final int kRightFlap = 14;
+        public static final int kIntakePort = 9;
+        public static final int kClimbPort = 10;
+        public static final int kShooterPitch = 11;
+        public static final int kLeftShooterPort = 12;
+        public static final int kRightShooterPort = 13;
+        public static final int kLeftFlap = 14;
+        public static final int kRightFlap = 15;
 
-        public static final int kIntakePort = 20;
 
         // Digital Inputs
         public static final int kLeftLimitSwitch = 1;
@@ -80,5 +82,25 @@ public final class Constants {
             STRAIGHT,
             AUTO
         }
+    }
+
+    // ToDo Get proper values.
+    public static final class ElevatorConstants {
+        // Max speed for manual speed control; percent speed.
+        public static final double kMaxSpeed = 0.6;
+        public static final double kClimbDeadband = 0.25;
+        public static final double kDt = 0.02; // loop time
+        public static final double kMaxVelocity = 1.75;
+        public static final double kMaxAcceleration = 0.75;
+        public static final double kP = 0.1;
+        public static final double kI = 0.0;
+        public static final double kD = 0.01;
+        public static final double kS = 1.1;
+        public static final double kG = 1.2;
+        public static final double kV = 1.3;
+        // ToDo Apply proper conversions to climb encoder & get the fully climbed position.
+        public static final double climbGoal = 0;
+        public static final double downGoal = 0;
+        public static final double climbGoalTolerance = 0.1;
     }
 }
