@@ -156,11 +156,13 @@ public class ShooterSubsystem extends SubsystemBase {
     rightShooterPID.setReference(velocity, CANSparkBase.ControlType.kVelocity);
   }
 
+  //Halves left velocity to make note spin counter clockwise
   public void setLeftShootVelocity(double outsideVelocity) {
     leftShooterPID.setReference(outsideVelocity / 2, CANSparkBase.ControlType.kVelocity);
     rightShooterPID.setReference(outsideVelocity, CANSparkBase.ControlType.kVelocity);
   }
 
+  //Halves right velocity to make note spin clockwise
   public void setRightShootVelocity(double outsideVelocity) {
     leftShooterPID.setReference(outsideVelocity, CANSparkBase.ControlType.kVelocity);
     rightShooterPID.setReference(outsideVelocity / 2, CANSparkBase.ControlType.kVelocity);
@@ -171,6 +173,7 @@ public class ShooterSubsystem extends SubsystemBase {
     return distance;
   }
 
+  //Bases speed of distance from april tags and how far each side is from 90 degrees they are, adds if past, subtracts if before
   public void setVelocityByTags(double distance, double leftPos, double rightPos) {
     double rightVelocity = distanceToSpeed(distance) + 
       ((Constants.FlapValues.kRight90 - rightPos) / Constants.FlapValues.kRight90) * distanceToSpeed(distance);
@@ -180,6 +183,7 @@ public class ShooterSubsystem extends SubsystemBase {
     leftShooterPID.setReference(leftVelocity, CANSparkBase.ControlType.kVelocity);
   }
 
+  //Checks if the speeds of the flywheels are within 10% of desired value
   public boolean speedsOnTarget(double distance, double leftPos, double rightPos) {
     double leftTargetSpeed = distanceToSpeed(distance) + 
       ((Constants.FlapValues.kLeft90 - leftPos) / Constants.FlapValues.kLeft90) * distanceToSpeed(distance);
@@ -190,6 +194,7 @@ public class ShooterSubsystem extends SubsystemBase {
     return leftSpeedCheck && rightSpeedCheck;
   }
 
+  //Moves speeds off of placement of flaps
   public void setAngledShoot(double averageVelocity, double leftPos, double rightPos) {
     double rightVelocity = averageVelocity + 
       ((Constants.FlapValues.kRight90 - rightPos) / Constants.FlapValues.kRight90) * averageVelocity;
@@ -213,6 +218,7 @@ public class ShooterSubsystem extends SubsystemBase {
     return angle * Constants.FlapValues.kRight90 / 90;
   }
 
+  //Moves flaps based on angle from april tag
   public void setFlapPositionByTags(double angle) {
     lFlapPID.setReference(angleToLeftFlapTick(angle), CANSparkBase.ControlType.kPosition);
     rFlapPID.setReference(angleToRightFlapTick(angle), CANSparkBase.ControlType.kPosition);
@@ -278,6 +284,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
   }
 
+  //Brings aim to 0 and zeroes encoder
   public void aimHome() {
     if (!aimHomeFlag) {
       if (!downLimitSwitch.get()) {
@@ -298,10 +305,12 @@ public class ShooterSubsystem extends SubsystemBase {
     return angle;
   }
 
+  //Uses vertical angle to april tag to determine angle
   public void setAimPositionByTags(double angle) {
     shooterAimPID.setReference(angleToAimTicks(angle), CANSparkBase.ControlType.kPosition);
   }
 
+  //Moves flaps to 90 degrees and then moves aim to amp position
   public void goToAmpPosition() {
     setFlapPosition(Constants.FlapValues.kLeft90, Constants.FlapValues.kRight90);
     setAimPosition(Constants.AimValues.kAmpAim);
