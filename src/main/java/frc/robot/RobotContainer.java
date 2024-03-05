@@ -75,13 +75,13 @@ public class RobotContainer {
      * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
      */
     private void configureBindings() {
-        driverXbox.x().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
+        driverXbox.leftStick().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
         driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
+        driverXbox.a().onTrue(new InstantCommand(() -> {
+            drivebase.setMaximumSpeed(TeleopDrive.slowMode ? SLOW_MAX_SPEED : SWERVE_MAX_SPEED);
+            TeleopDrive.slowMode = !TeleopDrive.slowMode;
+        }));
 
-        operatorXbox.start().onTrue(new InstantCommand(m_shooterSubsystem::resetFlaps));
-        operatorXbox.rightBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
-        operatorXbox.leftBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.AMP)));
-        operatorXbox.y().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.AUTO)));
         operatorXbox.x().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.STRAIGHT)));
     }
 

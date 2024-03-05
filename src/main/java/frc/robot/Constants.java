@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
 import swervelib.parser.PIDFConfig;
 
 /**
@@ -23,6 +24,9 @@ public final class Constants {
         public static final double LEFT_TRIGGER_DEADBAND = 0.3;
         public static final double RIGHT_TRIGGER_DEADBAND = 0.3;
     }
+
+    public static final double SLOW_MAX_SPEED = Units.feetToMeters(4.0);
+    public static final double SWERVE_MAX_SPEED = Units.feetToMeters(16.0);
 
     public static class Ports {
         public static final int kIntakePort = 9;

@@ -28,6 +28,8 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
+import static frc.robot.Constants.SWERVE_MAX_SPEED;
+
 public class SwerveSubsystem extends SubsystemBase {
 
     /**
@@ -37,7 +39,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
     * Maximum speed of the robot in meters per second, used to limit acceleration.
     */
-    public double maximumSpeed = Units.feetToMeters(16.0);
+    public double maximumSpeed = SWERVE_MAX_SPEED;
 
     /**
     * Initialize {@link SwerveDrive} with the directory provided.
@@ -57,7 +59,7 @@ public class SwerveSubsystem extends SubsystemBase {
         System.out.println("}");
 
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
-        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
             swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed, angleConversionFactor, driveConversionFactor);
             // Alternative method if you don't want to supply the conversion factor via JSON files.
@@ -309,7 +311,8 @@ public class SwerveSubsystem extends SubsystemBase {
     * Lock the swerve drive to prevent it from moving.
     */
     public void lock() {
-        swerveDrive.lockPose();
+        if(getFieldVelocity().vxMetersPerSecond < 0.5 && getFieldVelocity().vyMetersPerSecond < 0.5 && getFieldVelocity().omegaRadiansPerSecond < 0.5)
+            swerveDrive.lockPose();
     }
 
     /**
@@ -319,5 +322,13 @@ public class SwerveSubsystem extends SubsystemBase {
     */
     public Rotation2d getPitch() {
         return swerveDrive.getPitch();
+    }
+
+    public void addVisionMeasurement(Pose2d pose, double timestamp) {
+        swerveDrive.addVisionMeasurement(pose, timestamp);
+    }
+
+    public void setMaximumSpeed(double speed) {
+        swerveDrive.setMaximumSpeed(speed);
     }
 }
