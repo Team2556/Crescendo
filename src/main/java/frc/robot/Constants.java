@@ -39,9 +39,11 @@ public final class Constants {
 
 
         // Digital Inputs
-        public static final int kLeftLimitSwitch = 1;
-        public static final int kRightLimitSwitch = 0;
-        public static final int kIntakeLimitSwitch = 2;
+        public static final int kLeftFlapLimitSwitch = 0;
+        public static final int kRightFlapLimitSwitch = 1;
+        public static final int kLeftClimbLimitSwitch = 2;
+        public static final int kRightClimbLimitSwitch = 3;
+        public static final int kIntakeBreakBeam = 4;
     }
 
     public static class ShooterConstants {
@@ -51,6 +53,10 @@ public final class Constants {
         public static final double kMinPIDOutput = -1.0;
 
         public static final double kVelocityTolerance = 30;
+
+        public static final double kFlapTolerance = 1.0;
+        public static final double kPitchTolerance = 1.0;
+        public static final double kPitchAmpPosition = 80.0;
 
         public enum ShooterState {
             STOP(0.0),
@@ -77,9 +83,6 @@ public final class Constants {
         public static final double leftFlapDegrees = kLeft90 / 90.0;
         public static final double rightFlapDegrees = kRight90 / 90.0;
 
-        public static final double kIntakeMaxSpeed = 0.8;
-        public static final double kOuttakeMaxSpeed = -0.5;
-
         public enum FlapState {
             NONE,
             RESET,
@@ -88,10 +91,13 @@ public final class Constants {
         }
     }
 
+    public static final double kIntakeMaxSpeed = 0.8;
+    public static final double kOuttakeMaxSpeed = -0.5;
+
     // ToDo Get proper values.
     public static final class ElevatorConstants {
         // Max speed for manual speed control; percent speed.
-        public static final double kMaxSpeed = 0.6;
+        public static final double kMaxSpeed = 1.0;
         public static final double kClimbDeadband = 0.25;
         public static final double kDt = 0.02; // loop time
         public static final double kMaxVelocity = 1.75;

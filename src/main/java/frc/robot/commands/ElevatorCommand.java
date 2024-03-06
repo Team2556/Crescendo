@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -32,8 +33,8 @@ public class ElevatorCommand extends Command {
 //            m_elevatorSubsystem.set(m_leftStick.getAsDouble() * Constants.ElevatorConstants.kMaxSpeed);
 //        } else
 //            m_elevatorSubsystem.holdPosition();
-
-        m_elevatorSubsystem.set(m_leftStick.getAsDouble() * Constants.ElevatorConstants.kMaxSpeed);
+        SmartDashboard.putNumber("Climb Speed", m_leftStick.getAsDouble() * Constants.ElevatorConstants.kMaxSpeed);
+        m_elevatorSubsystem.setClimbSpeed(m_leftStick.getAsDouble() * Constants.ElevatorConstants.kMaxSpeed);
     }
 
     @Override

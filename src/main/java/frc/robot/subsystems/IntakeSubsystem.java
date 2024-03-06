@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static frc.robot.Constants.Ports.kIntakeLimitSwitch;
+import static frc.robot.Constants.Ports.kIntakeBreakBeam;
 import static frc.robot.Constants.Ports.kIntakePort;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -26,7 +26,7 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotor.clearFaults();
         intakeMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
 
-        intakeLimitSwitch = new DigitalInput(kIntakeLimitSwitch);
+        intakeLimitSwitch = new DigitalInput(kIntakeBreakBeam);
     }
 
     /**
@@ -34,7 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * @param speed Speed for the motor.
      */
     public void setIntakeMotor(double speed) {
-        if (intakeLimitSwitch.get())
+        if (!intakeLimitSwitch.get())
             stop();
         else
             set(speed);

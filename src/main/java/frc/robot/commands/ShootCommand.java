@@ -41,21 +41,25 @@ public class ShootCommand extends Command {
     @Override
     public void execute() {
         //ToDo Add calculations for auto-alignment with flaps
-        switch (m_shooterSubsystem.getFlapState()) {
-            case RESET -> m_shooterSubsystem.flapHome();
-            case STRAIGHT -> m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
-            case AUTO -> {
-                Pose2d pose = swerveSubsystem.getPose();
-                double flapLeftAngle, flapRightAngle;
-                double speakerY = 5.5;
+//        switch (m_shooterSubsystem.getFlapState()) {
+//            case RESET -> m_shooterSubsystem.flapHome();
+//            case STRAIGHT -> m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
+//            case AUTO -> {
+//                Pose2d pose = swerveSubsystem.getPose();
+//                double flapLeftAngle, flapRightAngle;
+//                double speakerY = 5.5;
+//
+//                double deltaY = pose.getY() - speakerY;
+//                double hyp = Math.sqrt(deltaY * deltaY + pose.getX() * pose.getX());
+//                double sin = Math.sin(deltaY / hyp);
+//                double flapCenter = sin - pose.getRotation().getRadians();
+//                SmartDashboard.putNumber("Flap Center", Math.toDegrees(flapCenter));
+//
+//
+//            }
+//        }
 
-                double deltaY = pose.getY()-speakerY;
-                double hyp = Math.sqrt(deltaY * deltaY + pose.getX() * pose.getX());
-                double sin = Math.sin(deltaY / hyp);
-                double flapCenter = sin - pose.getRotation().getRadians();
-                SmartDashboard.putNumber("Flap Center", Math.toDegrees(flapCenter));
-            }
-        }
+//        m_shooterSubsystem.setPitchPosition(300.0);
 
         if(m_rightTrigger.getAsBoolean())
             m_shooterSubsystem.setShooterVelocity(m_shooterSubsystem.getShooterState().getVelocity());

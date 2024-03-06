@@ -7,13 +7,13 @@ import java.util.function.DoubleSupplier;
 
 import static frc.robot.Constants.OperatorConstants.LEFT_TRIGGER_DEADBAND;
 import static frc.robot.Constants.OperatorConstants.RIGHT_TRIGGER_DEADBAND;
-import static frc.robot.Constants.ShooterConstants.kIntakeMaxSpeed;
-import static frc.robot.Constants.ShooterConstants.kOuttakeMaxSpeed;
+import static frc.robot.Constants.kIntakeMaxSpeed;
+import static frc.robot.Constants.kOuttakeMaxSpeed;
 
-public class IntakeCommand extends Command {
+public class IntakeControlCommand extends Command {
     private final IntakeSubsystem m_subsystem;
     private final DoubleSupplier m_rightTrigger, m_leftTrigger;
-    public IntakeCommand(IntakeSubsystem subsystem, DoubleSupplier rightTrigger, DoubleSupplier leftTrigger) {
+    public IntakeControlCommand(IntakeSubsystem subsystem, DoubleSupplier rightTrigger, DoubleSupplier leftTrigger) {
         m_subsystem = subsystem;
         m_rightTrigger = rightTrigger;
         m_leftTrigger = leftTrigger;

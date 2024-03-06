@@ -7,26 +7,23 @@ package frc.robot;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ElevatorCommand;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.ShootCommand;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.TeleopDrive;
-import frc.robot.subsystems.SwerveSubsystem;
+
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import frc.robot.Constants.ShooterConstants.ShooterState;
 import frc.robot.Constants.ShooterConstants.FlapState;
+import org.photonvision.PhotonCamera;
+
+import static frc.robot.Constants.SLOW_MAX_SPEED;
+import static frc.robot.Constants.SWERVE_MAX_SPEED;
+import static frc.robot.Constants.ShooterConstants.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -41,6 +38,7 @@ public class RobotContainer {
     private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
     private final IntakeSubsystem m_intakeSubsystem = IntakeSubsystem.getInstance();
     private final ElevatorSubsystem m_elevatorSubsystem = ElevatorSubsystem.getInstance();
+//    private final PoseSubsystem m_poseSubsystem = PoseSubsystem.getInstance();
     // Drive controllers
     CommandXboxController driverXbox = new CommandXboxController(0);
     CommandXboxController operatorXbox = new CommandXboxController(1);
@@ -59,10 +57,14 @@ public class RobotContainer {
             () -> true);
 
         m_shooterSubsystem.setDefaultCommand(new ShootCommand(m_shooterSubsystem, drivebase, operatorXbox.rightTrigger(0.5)));
-
-        m_intakeSubsystem.setDefaultCommand(new IntakeCommand(m_intakeSubsystem, driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
-
-        m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(m_elevatorSubsystem, () -> operatorXbox.getLeftY()));
+//
+        m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(m_intakeSubsystem, driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
+//
+        m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(m_elevatorSubsystem, () -> -operatorXbox.getLeftY()));
+//
+//        m_poseSubsystem.setDefaultCommand(new PoseUpdateCommand(m_poseSubsystem));
+//
+//        m_poseSubsystem.initialize(drivebase, m_shooterSubsystem, new PhotonCamera("photonVision"));
 
         drivebase.setDefaultCommand(closedFieldRel);
     }
@@ -82,8 +84,41 @@ public class RobotContainer {
             TeleopDrive.slowMode = !TeleopDrive.slowMode;
         }));
 
+        operatorXbox.start().onTrue(new InstantCommand(m_shooterSubsystem::resetFlaps));
+        operatorXbox.rightBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
+        operatorXbox.leftBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.AMP)));
+        operatorXbox.y().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.AUTO)));
         operatorXbox.x().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.STRAIGHT)));
-    }
+
+        AtomicBoolean shot = new AtomicBoolean(false);
+        // Command to execute when right bumper is pressed
+        Command pressCommand = new SequentialCommandGroup(
+                new WaitUntilCommand(m_shooterSubsystem::shouldShoot), // Wait until shooter is ready
+                new IntakeSetCommand(0.4).withTimeout(1.0), // Run intake command
+                new InstantCommand(() -> shot.set(true)) // Set 'shot' to true
+        );
+
+        // Command to execute when right bumper is released
+        Command releaseCommand = new SequentialCommandGroup(
+                // Run intake command and set 'shot' to false
+                new IntakeSetCommand(0.4).withTimeout(1.0)
+                        .alongWith(new InstantCommand(() -> shot.set(false)))
+        );
+
+        driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand);
+
+        Command ampScore = new SequentialCommandGroup(
+                new RunCommand(() -> {
+                    m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
+//                    m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
+                }, m_shooterSubsystem)
+                        .andThen(new WaitUntilCommand(() -> m_shooterSubsystem.flapsArrived(kLeft90, kRight90)))
+                        .andThen(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem))
+                        .andThen(new WaitUntilCommand(() -> m_shooterSubsystem.shooterPitchArrived(kPitchAmpPosition)))
+        );
+
+        driverXbox.leftBumper().onTrue(ampScore).onFalse(new IntakeSetCommand(0.4).withTimeout(1.0));
+   }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -91,6 +126,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("4 Note Leave");
+        return new PathPlannerAuto("Basic");
     }
 }

@@ -4,11 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.*;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,10 +14,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FlapState;
 import frc.robot.Constants.ShooterConstants.ShooterState;
 
-import static frc.robot.Constants.ShooterConstants.leftShooterPIDF;
-import static frc.robot.Constants.ShooterConstants.rightShooterPIDF;
-import static frc.robot.Constants.ShooterConstants.leftFlapPIDF;
-import static frc.robot.Constants.ShooterConstants.rightFlapPIDF;
+import static frc.robot.Constants.ShooterConstants.*;
 
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new ShooterSubsystem. */
@@ -29,13 +22,14 @@ public class ShooterSubsystem extends SubsystemBase {
     // Shooter motors
     private final CANSparkFlex leftShooter, rightShooter;
     // Flap motors
-    public final CANSparkMax leftFlap, rightFlap;
+    public final CANSparkMax leftFlap, rightFlap, shooterPitch;
     // Limit switches for flaps
     public final DigitalInput leftLimitSwitch, rightLimitSwitch;
     // Spark max/flex encoders
     private final RelativeEncoder lFlapEncoder, rFlapEncoder, leftShooterEncoder, rightShooterEncoder;
+    private final SparkAbsoluteEncoder shooterPitchEncoder;
     // Spark max/flex pid controllers
-    private final SparkPIDController leftShooterPID, rightShooterPID, lFlapPID, rFlapPID;
+    private final SparkPIDController leftShooterPID, rightShooterPID, lFlapPID, rFlapPID, shooterPitchPID;
     // Whether flaps have been zeroed with their limit switches.
     public boolean leftHomeFlag = false, rightHomeFlag = false;
     // Target velocity instance variable.
@@ -56,8 +50,10 @@ public class ShooterSubsystem extends SubsystemBase {
         leftFlap = new CANSparkMax(Ports.kLeftFlap, MotorType.kBrushless);
         rightFlap = new CANSparkMax(Ports.kRightFlap, MotorType.kBrushless);
 
-        leftLimitSwitch = new DigitalInput(Ports.kLeftLimitSwitch);
-        rightLimitSwitch = new DigitalInput(Ports.kRightLimitSwitch);
+        shooterPitch = new CANSparkMax(Ports.kShooterPitch, MotorType.kBrushless);
+
+        leftLimitSwitch = new DigitalInput(Ports.kLeftFlapLimitSwitch);
+        rightLimitSwitch = new DigitalInput(Ports.kRightFlapLimitSwitch);
 
         leftShooter.clearFaults();
         rightShooter.clearFaults();
@@ -70,6 +66,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
         leftShooterPID = leftShooter.getPIDController();
         rightShooterPID = rightShooter.getPIDController();
+
+        shooterPitchPID = shooterPitch.getPIDController();
 
         leftShooterPID.setFeedbackDevice(leftShooterEncoder);
         rightShooterPID.setFeedbackDevice(rightShooterEncoder);
@@ -107,6 +105,25 @@ public class ShooterSubsystem extends SubsystemBase {
         rFlapPID.setD(rightFlapPIDF.d);
         rFlapPID.setFF(rightFlapPIDF.f);
         rFlapPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
+
+        shooterPitch.restoreFactoryDefaults();
+        shooterPitch.clearFaults();
+
+        shooterPitchEncoder = shooterPitch.getAbsoluteEncoder();
+        shooterPitchEncoder.setInverted(true);
+        shooterPitchEncoder.setPositionConversionFactor(360.0);
+        shooterPitchEncoder.setVelocityConversionFactor(6.0);
+
+        shooterPitchPID.setFeedbackDevice(shooterPitchEncoder);
+        shooterPitchPID.setP(0.009);
+        shooterPitchPID.setI(0.0);
+        shooterPitchPID.setD(0);
+        shooterPitchPID.setFF(0);
+        shooterPitchPID.setIZone(0);
+
+        shooterPitchPID.setPositionPIDWrappingEnabled(true);
+        shooterPitchPID.setPositionPIDWrappingMaxInput(360.0);
+        shooterPitchPID.setPositionPIDWrappingMinInput(0.0);
 
         stop();
 
@@ -149,6 +166,10 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setSpeed(double speed) {
         leftShooter.set(speed);
         rightShooter.set(speed);
+    }
+
+    public void setPitchPosition(double position) {
+        shooterPitchPID.setReference(position, CANSparkBase.ControlType.kPosition);
     }
 
     /**
@@ -215,10 +236,30 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
+    public boolean shouldShoot() {
+        if(shooterState.equals(ShooterState.STOP))
+            return false;
+        return isOnTarget();
+    }
+
+    public boolean flapsArrived(double leftPos, double rightPos) {
+        double dL = Math.abs(leftPos - lFlapEncoder.getPosition()),
+                dR = Math.abs(rightPos - rFlapEncoder.getPosition());
+        return dL < kFlapTolerance && dR < kFlapTolerance;
+    }
+
+    public boolean shooterPitchArrived(double pos) {
+        return Math.abs(pos - getShooterPitch()) < kPitchTolerance;
+    }
+
     public void resetFlaps() {
         leftHomeFlag = false;
         rightHomeFlag = false;
         flapState = FlapState.RESET;
+    }
+
+    public double getShooterPitch() {
+        return shooterPitchEncoder.getPosition();
     }
 
     public ShooterState getShooterState() {
@@ -251,6 +292,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
         SmartDashboard.putString("Shooter State", shooterState.name());
         SmartDashboard.putString("Flap State", flapState.name());
+
+        SmartDashboard.putNumber("Shooter Pitch", shooterPitchEncoder.getPosition());
 
 //        dashboardVerbose();
 
