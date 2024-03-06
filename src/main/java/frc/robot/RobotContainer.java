@@ -38,7 +38,7 @@ public class RobotContainer {
     private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
     private final IntakeSubsystem m_intakeSubsystem = IntakeSubsystem.getInstance();
     private final ElevatorSubsystem m_elevatorSubsystem = ElevatorSubsystem.getInstance();
-//    private final PoseSubsystem m_poseSubsystem = PoseSubsystem.getInstance();
+    private final PoseSubsystem m_poseSubsystem = PoseSubsystem.getInstance();
     // Drive controllers
     CommandXboxController driverXbox = new CommandXboxController(0);
     CommandXboxController operatorXbox = new CommandXboxController(1);
@@ -56,15 +56,12 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND),
             () -> true);
 
-        m_shooterSubsystem.setDefaultCommand(new ShootCommand(m_shooterSubsystem, drivebase, operatorXbox.rightTrigger(0.5)));
-//
-        m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(m_intakeSubsystem, driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
-//
+        m_shooterSubsystem.setDefaultCommand(new ShootCommand(operatorXbox.rightTrigger(0.5)));
+        m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
         m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(m_elevatorSubsystem, () -> -operatorXbox.getLeftY()));
-//
-//        m_poseSubsystem.setDefaultCommand(new PoseUpdateCommand(m_poseSubsystem));
-//
-//        m_poseSubsystem.initialize(drivebase, m_shooterSubsystem, new PhotonCamera("photonVision"));
+
+        m_poseSubsystem.setDefaultCommand(new PoseUpdateCommand(m_poseSubsystem));
+        m_poseSubsystem.initialize(drivebase, m_shooterSubsystem, new PhotonCamera("photonVision"));
 
         drivebase.setDefaultCommand(closedFieldRel);
     }

@@ -11,13 +11,12 @@ import static frc.robot.Constants.kIntakeMaxSpeed;
 import static frc.robot.Constants.kOuttakeMaxSpeed;
 
 public class IntakeControlCommand extends Command {
-    private final IntakeSubsystem m_subsystem;
+    private final IntakeSubsystem m_subsystem = IntakeSubsystem.getInstance();
     private final DoubleSupplier m_rightTrigger, m_leftTrigger;
-    public IntakeControlCommand(IntakeSubsystem subsystem, DoubleSupplier rightTrigger, DoubleSupplier leftTrigger) {
-        m_subsystem = subsystem;
+    public IntakeControlCommand(DoubleSupplier rightTrigger, DoubleSupplier leftTrigger) {
         m_rightTrigger = rightTrigger;
         m_leftTrigger = leftTrigger;
-        addRequirements(subsystem);
+        addRequirements(m_subsystem);
     }
 
     @Override

@@ -65,6 +65,12 @@ public class IntakeSubsystem extends SubsystemBase {
         return intakeLimitSwitch.get();
     }
 
+    @Override
+    public void periodic() {
+        super.periodic();
+        SmartDashboard.putBoolean("Intake Beam Break", getIntakeLimitSwitch());
+    }
+
     /**
      * Get an instance of the intake subsystem.
      * @return An instance of the intake subsystem.

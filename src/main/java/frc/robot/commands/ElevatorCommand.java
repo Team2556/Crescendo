@@ -28,13 +28,9 @@ public class ElevatorCommand extends Command {
     @Override
     public void execute() {
         super.execute();
-        //ToDo Test PID + FF Control to hold the climb's position.
-//        if(m_leftStick.getAsDouble() > Constants.ElevatorConstants.kClimbDeadband) {
-//            m_elevatorSubsystem.set(m_leftStick.getAsDouble() * Constants.ElevatorConstants.kMaxSpeed);
-//        } else
-//            m_elevatorSubsystem.holdPosition();
-        SmartDashboard.putNumber("Climb Speed", m_leftStick.getAsDouble() * Constants.ElevatorConstants.kMaxSpeed);
-        m_elevatorSubsystem.setClimbSpeed(m_leftStick.getAsDouble() * Constants.ElevatorConstants.kMaxSpeed);
+        double speed = m_leftStick.getAsDouble() * Constants.kElevatorMaxSpeed;
+        SmartDashboard.putNumber("Climb Speed", speed);
+        m_elevatorSubsystem.setClimbSpeed(speed);
     }
 
     @Override

@@ -58,10 +58,4 @@ public class TeleopDrive extends Command {
                 angVelocity * controller.config.maxAngularVelocity,
                 driveMode.getAsBoolean());
     }
-
-    // Returns true when the command should end.
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
 }

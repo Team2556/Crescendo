@@ -93,24 +93,5 @@ public final class Constants {
 
     public static final double kIntakeMaxSpeed = 0.8;
     public static final double kOuttakeMaxSpeed = -0.5;
-
-    // ToDo Get proper values.
-    public static final class ElevatorConstants {
-        // Max speed for manual speed control; percent speed.
-        public static final double kMaxSpeed = 1.0;
-        public static final double kClimbDeadband = 0.25;
-        public static final double kDt = 0.02; // loop time
-        public static final double kMaxVelocity = 1.75;
-        public static final double kMaxAcceleration = 0.75;
-        public static final double kP = 0.1;
-        public static final double kI = 0.0;
-        public static final double kD = 0.01;
-        public static final double kS = 1.1;
-        public static final double kG = 1.2;
-        public static final double kV = 1.3;
-        // ToDo Apply proper conversions to climb encoder & get the fully climbed position.
-        public static final double climbGoal = 0;
-        public static final double downGoal = 0;
-        public static final double climbGoalTolerance = 0.1;
-    }
+    public static final double kElevatorMaxSpeed = 1.0;
 }

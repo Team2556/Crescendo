@@ -2,9 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.photonvision.PhotonCamera;
@@ -46,6 +44,22 @@ public class PoseSubsystem extends SubsystemBase {
             var est = tagUpdate.get();
             swerveSubsystem.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
         }
+    }
+
+    public Pose2d getPose() {
+        return swerveSubsystem.getPose();
+    }
+
+    public double getX() {
+        return getPose().getX();
+    }
+
+    public double getY() {
+        return getPose().getY();
+    }
+
+    public Rotation2d getRotation() {
+        return getPose().getRotation();
     }
 
     public static PoseSubsystem getInstance() {

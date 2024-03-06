@@ -7,10 +7,10 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.Constants.ShooterConstants.FlapState;
 import frc.robot.Constants.ShooterConstants.ShooterState;
-import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.ShooterInterpolation;
 
 import java.util.function.BooleanSupplier;
@@ -19,17 +19,15 @@ import static frc.robot.Constants.ShooterConstants.*;
 
 public class ShootCommand extends Command {
     /** Creates a new ShootCommand. */
-    private final ShooterSubsystem m_shooterSubsystem;
-    private SwerveSubsystem swerveSubsystem;
+    private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
+    private final PoseSubsystem poseSubsystem = PoseSubsystem.getInstance();
     private final ShooterInterpolation interpolation;
     private final BooleanSupplier m_rightTrigger;
 
-    public ShootCommand(ShooterSubsystem shooterSubsystem, SwerveSubsystem swerveSubsystem, BooleanSupplier rightTrigger) {
-        m_shooterSubsystem = shooterSubsystem;
-        this.swerveSubsystem = swerveSubsystem;
+    public ShootCommand(BooleanSupplier rightTrigger) {
         m_rightTrigger = rightTrigger;
         interpolation = new ShooterInterpolation();
-        addRequirements(shooterSubsystem);
+        addRequirements(m_shooterSubsystem);
     }
 
     @Override
@@ -41,32 +39,30 @@ public class ShootCommand extends Command {
     @Override
     public void execute() {
         //ToDo Add calculations for auto-alignment with flaps
-//        switch (m_shooterSubsystem.getFlapState()) {
-//            case RESET -> m_shooterSubsystem.flapHome();
-//            case STRAIGHT -> m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
-//            case AUTO -> {
-//                Pose2d pose = swerveSubsystem.getPose();
-//                double flapLeftAngle, flapRightAngle;
-//                double speakerY = 5.5;
-//
-//                double deltaY = pose.getY() - speakerY;
-//                double hyp = Math.sqrt(deltaY * deltaY + pose.getX() * pose.getX());
-//                double sin = Math.sin(deltaY / hyp);
-//                double flapCenter = sin - pose.getRotation().getRadians();
-//                SmartDashboard.putNumber("Flap Center", Math.toDegrees(flapCenter));
-//
-//
-//            }
-//        }
+        switch (m_shooterSubsystem.getFlapState()) {
+            case RESET -> m_shooterSubsystem.flapHome();
+            case STRAIGHT -> m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
+            case AUTO -> {
+                Pose2d pose = poseSubsystem.getPose();
+                double flapLeftAngle, flapRightAngle;
+                double speakerY = 5.5;
 
-//        m_shooterSubsystem.setPitchPosition(300.0);
+                double deltaY = pose.getY() - speakerY;
+                double hyp = Math.sqrt(deltaY * deltaY + pose.getX() * pose.getX());
+                double sin = Math.sin(deltaY / hyp);
+                double flapCenter = sin - pose.getRotation().getRadians();
+                SmartDashboard.putNumber("Flap Center", Math.toDegrees(flapCenter));
+
+
+            }
+        }
 
         if(m_rightTrigger.getAsBoolean())
             m_shooterSubsystem.setShooterVelocity(m_shooterSubsystem.getShooterState().getVelocity());
         else
             m_shooterSubsystem.stop();
 
-        SmartDashboard.putNumber("Shooter Angle", interpolation.calculate(swerveSubsystem.getPose().getX(), swerveSubsystem.getPose().getY()));
+        SmartDashboard.putNumber("Shooter Angle", interpolation.calculate(poseSubsystem.getX(), poseSubsystem.getY()));
     }
 
     @Override
