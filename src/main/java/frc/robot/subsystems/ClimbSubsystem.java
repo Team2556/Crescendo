@@ -20,8 +20,8 @@ public class ClimbSubsystem extends SubsystemBase {
   private final CANSparkMax climbMotor = new CANSparkMax(Ports.climbMotoPort, CANSparkMaxLowLevel.MotorType.kBrushless);
   private final RelativeEncoder climbEncoder = climbMotor.getEncoder();
 
-  private final DigitalInput LeftLimit = new DigitalInput(0);
-  private final DigitalInput RightLimit = new DigitalInput(1);
+  private final DigitalInput LeftLimit = new DigitalInput(Ports.LClimbLS);
+  private final DigitalInput RightLimit = new DigitalInput(Ports.RClimbLS);
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {

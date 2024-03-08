@@ -22,7 +22,7 @@ public class RobotContainer {
   private final ClimbSubsystem climbSubsystem = ClimbSubsystem.getInstance();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController xbox2 = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController xbox2 = new CommandXboxController(OperatorConstants.SecondXbox);
   // new ClimbCommand(xbox2.a(), xbox2.b(), xbox2.y());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
