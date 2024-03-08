@@ -102,7 +102,8 @@ public class RobotContainer {
                         .alongWith(new InstantCommand(() -> shot.set(false)))
         );
 
-        driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand);
+        driverXbox.rightBumper().onTrue(pressCommand).onFalse(
+                new ConditionalCommand(releaseCommand, new InstantCommand(() -> shot.set(false)), shot::get));
 
         Command ampScore = new SequentialCommandGroup(
                 new RunCommand(() -> {

@@ -114,16 +114,16 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterPitchEncoder.setPositionConversionFactor(360.0);
         shooterPitchEncoder.setVelocityConversionFactor(6.0);
 
-        shooterPitchPID.setFeedbackDevice(shooterPitchEncoder);
-        shooterPitchPID.setP(0.009);
-        shooterPitchPID.setI(0.0);
-        shooterPitchPID.setD(0);
-        shooterPitchPID.setFF(0);
-        shooterPitchPID.setIZone(0);
-
         shooterPitchPID.setPositionPIDWrappingEnabled(true);
         shooterPitchPID.setPositionPIDWrappingMaxInput(360.0);
         shooterPitchPID.setPositionPIDWrappingMinInput(0.0);
+
+        shooterPitchPID.setP(pitchShooterPIDF.p);
+        shooterPitchPID.setI(pitchShooterPIDF.i);
+        shooterPitchPID.setIZone(pitchShooterPIDF.iz);
+        shooterPitchPID.setD(pitchShooterPIDF.d);
+        shooterPitchPID.setFF(pitchShooterPIDF.f);
+        shooterPitchPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
 
         stop();
 
@@ -256,6 +256,10 @@ public class ShooterSubsystem extends SubsystemBase {
         leftHomeFlag = false;
         rightHomeFlag = false;
         flapState = FlapState.RESET;
+    }
+
+    public double getShooterPitchCompensated() {
+        return getShooterPitch() - kPitchMinimumAngle;
     }
 
     public double getShooterPitch() {

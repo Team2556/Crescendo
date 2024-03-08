@@ -37,7 +37,6 @@ public final class Constants {
         public static final int kLeftFlap = 14;
         public static final int kRightFlap = 15;
 
-
         // Digital Inputs
         public static final int kLeftFlapLimitSwitch = 0;
         public static final int kRightFlapLimitSwitch = 1;
@@ -49,6 +48,7 @@ public final class Constants {
     public static class ShooterConstants {
         public static final PIDFConfig leftShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000175, 0.0);
         public static final PIDFConfig rightShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000170, 0.0);
+        public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(0.01, 0.0, 0.0, 0.0, 0.0);
         public static final double kMaxPIDOutput = 1.0;
         public static final double kMinPIDOutput = -1.0;
 
@@ -56,7 +56,13 @@ public final class Constants {
 
         public static final double kFlapTolerance = 1.0;
         public static final double kPitchTolerance = 1.0;
-        public static final double kPitchAmpPosition = 80.0;
+        // Raw absolute encoder value
+        public static final double kPitchAmpPosition = 350;
+        // Raw absolute encoder value
+        public static final double kPitchSpeakerPosition = 290;
+        public static final double kPitchMinimumAngle = 280;
+        // Degrees
+        public static final double kMaxFlapAngle = 30.0;
 
         public enum ShooterState {
             STOP(0.0),
@@ -87,6 +93,14 @@ public final class Constants {
             NONE,
             RESET,
             STRAIGHT,
+            AUTO
+        }
+
+        public enum ShooterPitchState {
+            NONE,
+            VERTICAL,
+            SPEAKER,
+            AMP,
             AUTO
         }
     }
