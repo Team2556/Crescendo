@@ -38,25 +38,22 @@ public class ShootCommand extends Command {
 
     @Override
     public void execute() {
+        //ToDo Add calculations for auto-alignment with flaps
         switch (m_shooterSubsystem.getFlapState()) {
             case RESET -> m_shooterSubsystem.flapHome();
             case STRAIGHT -> m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
             case AUTO -> {
                 Pose2d pose = poseSubsystem.getPose();
-                double flapLeftAngle = kLeft90, flapRightAngle = kRight90;
+                double flapLeftAngle, flapRightAngle;
                 double speakerY = 5.5;
 
                 double deltaY = pose.getY() - speakerY;
                 double hyp = Math.sqrt(deltaY * deltaY + pose.getX() * pose.getX());
                 double sin = Math.sin(deltaY / hyp);
-                double flapCenter = Math.toDegrees(sin - pose.getRotation().getRadians());
-                SmartDashboard.putNumber("Flap Center", flapCenter);
-                // Verify robot's angle is not outside the max angle the flaps should align at.
-                if(!(Math.abs(flapCenter) > kMaxFlapAngle)) {
-                    flapLeftAngle = (90 + 78.0 * Math.sin(Math.toRadians(flapCenter))) * leftFlapDegrees;
-                    flapRightAngle = (90 - 78.0 * Math.sin(Math.toRadians(flapCenter))) * rightFlapDegrees;
-                }
-                m_shooterSubsystem.setFlapPosition(flapLeftAngle, flapRightAngle);
+                double flapCenter = sin - pose.getRotation().getRadians();
+                SmartDashboard.putNumber("Flap Center", Math.toDegrees(flapCenter));
+
+
             }
         }
 

@@ -37,7 +37,7 @@ public class RobotContainer {
                                                                             "swerve"));
     private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
     private final IntakeSubsystem m_intakeSubsystem = IntakeSubsystem.getInstance();
-    private final ElevatorSubsystem m_elevatorSubsystem = ElevatorSubsystem.getInstance();
+   private final ElevatorSubsystem m_elevatorSubsystem = ElevatorSubsystem.getInstance();
     private final PoseSubsystem m_poseSubsystem = PoseSubsystem.getInstance();
     // Drive controllers
     CommandXboxController driverXbox = new CommandXboxController(0);
@@ -58,7 +58,7 @@ public class RobotContainer {
 
         m_shooterSubsystem.setDefaultCommand(new ShootCommand(operatorXbox.rightTrigger(0.5)));
         m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
-        m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(m_elevatorSubsystem, () -> -operatorXbox.getLeftY()));
+        m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(m_elevatorSubsystem, () -> -operatorXbox.getLeftY(), () -> operatorXbox.getLeftTriggerAxis()));
 
         m_poseSubsystem.setDefaultCommand(new PoseUpdateCommand(m_poseSubsystem));
         m_poseSubsystem.initialize(drivebase, m_shooterSubsystem, new PhotonCamera("photonVision"));
@@ -102,15 +102,14 @@ public class RobotContainer {
                         .alongWith(new InstantCommand(() -> shot.set(false)))
         );
 
-        driverXbox.rightBumper().onTrue(pressCommand).onFalse(
-                new ConditionalCommand(releaseCommand, new InstantCommand(() -> shot.set(false)), shot::get));
+        driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand);
 
         Command ampScore = new SequentialCommandGroup(
                 new RunCommand(() -> {
                     m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
 //                    m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
                 }, m_shooterSubsystem)
-                        .andThen(new WaitUntilCommand(() -> m_shooterSubsystem.flapsArrived(kLeft90, kRight90)))
+                       // .andThen(new WaitUntilCommand(() -> m_shooterSubsystem.flapsArrived(kLeft90, kRight90)))
                         .andThen(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem))
                         .andThen(new WaitUntilCommand(() -> m_shooterSubsystem.shooterPitchArrived(kPitchAmpPosition)))
         );
@@ -124,6 +123,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("Basic");
+        return new PathPlannerAuto("5 note middle");
     }
 }

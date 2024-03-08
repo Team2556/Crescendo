@@ -24,9 +24,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         rightClimbLimitSwitch = new DigitalInput(Constants.Ports.kRightClimbLimitSwitch);
     }
 
-    public void setClimbSpeed(double speed) {
+    public void setClimbSpeedOr(double speed) {
         // Verify set speed is attempting to go down, and whether it is touching one of the limit switches. If so, stop.
-        if(speed < 0 && (leftClimbLimitSwitch.get() || rightClimbLimitSwitch.get()))
+        if (speed < 0 && (!leftClimbLimitSwitch.get() || !rightClimbLimitSwitch.get()))
+            stop();
+        else
+            set(speed);
+    }
+
+    public void setClimbSpeedAnd(double speed) {
+        if (speed < 0 && (!leftClimbLimitSwitch.get() && !rightClimbLimitSwitch.get()))
             stop();
         else
             set(speed);

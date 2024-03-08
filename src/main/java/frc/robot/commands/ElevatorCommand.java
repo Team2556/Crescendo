@@ -10,11 +10,12 @@ import java.util.function.DoubleSupplier;
 public class ElevatorCommand extends Command {
 
     private final ElevatorSubsystem m_elevatorSubsystem;
-    private final DoubleSupplier m_leftStick;
+    private final DoubleSupplier m_leftStick, m_leftTrigger;
 
-    public ElevatorCommand(ElevatorSubsystem elevatorSubsystem, DoubleSupplier leftStick) {
+    public ElevatorCommand(ElevatorSubsystem elevatorSubsystem, DoubleSupplier leftStick, DoubleSupplier leftTrigger) {
         m_elevatorSubsystem = elevatorSubsystem;
         m_leftStick = leftStick;
+        m_leftTrigger = leftTrigger;
 
         addRequirements(m_elevatorSubsystem);
     }
@@ -30,7 +31,11 @@ public class ElevatorCommand extends Command {
         super.execute();
         double speed = m_leftStick.getAsDouble() * Constants.kElevatorMaxSpeed;
         SmartDashboard.putNumber("Climb Speed", speed);
-        m_elevatorSubsystem.setClimbSpeed(speed);
+        if (m_leftTrigger.getAsDouble() > 0.5) {
+            m_elevatorSubsystem.setClimbSpeedAnd(speed);
+        } else {
+            m_elevatorSubsystem.setClimbSpeedOr(speed);
+        }
     }
 
     @Override
