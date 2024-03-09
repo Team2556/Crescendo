@@ -25,6 +25,7 @@ public static double targetRotation;
 public static double shootAngle;
 public int targetID;
 double xSquared;
+double speakerHeightSquared;
 double speakerHeight = Units.inchesToMeters(78);
 double speakerHypt;
   public PhotonSubsystem() {
@@ -47,12 +48,16 @@ double speakerHypt;
       SmartDashboard.putNumber("Xdistance", targetX); 
       SmartDashboard.putNumber("Ydistance", targetY);
       SmartDashboard.putNumber("targetRotation", targetRotation);
-
+      SmartDashboard.putNumber("Target ID", targetID);
 
       xSquared = (targetX * targetX);
-      speakerHeight = (speakerHeight * speakerHeight);
-      speakerHypt = Math.sqrt(xSquared + speakerHeight);
+      speakerHeightSquared = (speakerHeight * speakerHeight);
+      speakerHypt = Math.sqrt(xSquared + speakerHeightSquared);
       shootAngle = Math.atan(speakerHeight / targetX);
+      SmartDashboard.putNumber("Shoot Angle", shootAngle);
+      SmartDashboard.putNumber("arctanned", Math.atan(shootAngle));
+      // SmartDashboard.putNumber("intermediate", ((shootAngle / (2 * Math.PI)) * 360));
+      SmartDashboard.putNumber("Adjusted Shoot Angle", 360 - ((shootAngle / (2 * Math.PI)) * 360));
 
 
   

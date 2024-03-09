@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
@@ -34,7 +35,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public RelativeEncoder rFlapEncoder;
   private RelativeEncoder leftShooterEncoder;
   private RelativeEncoder rightShooterEncoder;
-  private RelativeEncoder shooterAimEncoder;
+  private AbsoluteEncoder shooterAimEncoder;
 
   private SparkPIDController leftShooterPID;
   private SparkPIDController rightShooterPID;
@@ -52,7 +53,7 @@ public class ShooterSubsystem extends SubsystemBase {
   
   public boolean leftHomeFlag = false;
   public boolean rightHomeFlag = false;
-  public boolean aimHomeFlag = false;
+  public boolean aimFlag = false;
   
   private final static ShooterSubsystem instance = ShooterSubsystem.getInstance();
 
@@ -125,7 +126,7 @@ public class ShooterSubsystem extends SubsystemBase {
     rFlapPID.setFF(FlapValues.kRightFlapFF);
     rFlapPID.setOutputRange(ShooterConstants.kMinPIDOutput, ShooterConstants.kMaxPIDOutput);
 
-    shooterAimEncoder = shooterAim.getEncoder();
+    shooterAimEncoder = shooterAim.getAbsoluteEncoder();
 
     shooterAimPID = shooterAim.getPIDController();
 
@@ -148,7 +149,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     leftHomeFlag = false;
     rightHomeFlag = false;
-    aimHomeFlag = false;
+    aimFlag = false;
   }
 
   //Uses PID to bring rpm of shooter to parameter
@@ -293,7 +294,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
   //Will be tested to determine scale factor
   public double angleToAimTicks(double angle) {
-    return 360 - angle;
+    double adjustedAngle = angle * 360 / (2 * Math.PI);
+    return 360 - adjustedAngle;
   }
 
   //Uses vertical angle to april tag to determine angle
@@ -303,8 +305,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
   //Moves flaps to 90 degrees and then moves aim to amp position
   public void goToAmpPosition() {
-    setFlapPosition(Constants.FlapValues.kLeft90, Constants.FlapValues.kRight90);
+    // setFlapPosition(Constants.FlapValues.kLeft90, Constants.FlapValues.kRight90);
     setAimPosition(Constants.AimValues.kAmpAim);
+    if (rearLimitSwitch.get()) {
+      shooterAim.set(0.1);
+    } else {
+      shooterAim.set(0.0);
+    }
   }
   
   @Override
@@ -330,6 +337,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // SmartDashboard.putBoolean("Right Limit Switch", rightLimitSwitch.get());
     SmartDashboard.putBoolean("Front Limit Switch", frontLimitSwitch.get());
     SmartDashboard.putBoolean("Rear Limit Switch", rearLimitSwitch.get());
+    SmartDashboard.putNumber("Aimer value", shooterAimEncoder.getPosition());
 
     SmartDashboard.putBoolean("L Home", leftHomeFlag);
     SmartDashboard.putBoolean("R Home", rightHomeFlag);
@@ -341,9 +349,11 @@ public class ShooterSubsystem extends SubsystemBase {
     // if (rightLimitSwitch.get()) {
     //   rFlapEncoder.setPosition(0);
     // }
-    if (!frontLimitSwitch.get() || !rearLimitSwitch.get()) {
-      shooterAim.set(0.0);
+    if ((!frontLimitSwitch.get() || !rearLimitSwitch.get()) && !aimFlag) {
       shooterAimPID.setReference(shooterAimEncoder.getPosition(), CANSparkBase.ControlType.kPosition);
+      aimFlag = true;
+    } else if (frontLimitSwitch.get() && rearLimitSwitch.get()) {
+      aimFlag = false;
     }
   }
 

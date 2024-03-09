@@ -127,16 +127,16 @@ public final class Constants {
     
     
       public static class ShooterConstants {
-        public static final double kLeftShooterP = 0.0002;
+        public static final double kLeftShooterP = 0.00022;
         public static final double kLeftShooterI = 0;
         public static final double kLeftShooterIZone = 0;
-        public static final double kLeftShooterD = 0.0;
+        public static final double kLeftShooterD = 0.01;
         public static final double kLeftShooterFF = 0.000175;
     
-        public static final double kRightShooterP = 0.0002;
+        public static final double kRightShooterP = 0.0003;
         public static final double kRightShooterI = 0;
         public static final double kRightShooterIZone = 0;
-        public static final double kRighthooterD = 0.0;
+        public static final double kRighthooterD = 0.03;
         public static final double kRightShooterFF = 0.000170;
     
         public static final double kMinPIDOutput = -1.0;
@@ -188,10 +188,10 @@ public final class Constants {
       }
 
       public static class AimValues {
-        public static double kAimP = 0.1;
+        public static double kAimP = 0.02;
         public static double kAimI = 0.0;
         public static double kAimIZone = 0.0;
-        public static double kAimD = 0.0;
+        public static double kAimD = 0.01;
         public static double kAimFF = 0.0;
         public static double kAmpAim = 20.0;
       }
