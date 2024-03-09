@@ -22,7 +22,7 @@ import frc.robot.Constants.Ports;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final static IntakeSubsystem instance = getInstance();
-    private final static CANSparkMax intake = new CANSparkMax(intakeMotorPort, CANSparkLowLevel.MotorType.kBrushless);
+    private static CANSparkMax intake;
    // private final CANSparkFlex intake2 = new CANSparkFlex(intakeMotorPort2, CANSparkLowLevel.MotorType.kBrushless);
     
     /*LS stands for limit switch*/
@@ -34,6 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
     Timer timer = new Timer();
 
     public IntakeSubsystem() {
+        intake = new CANSparkMax(intakeMotorPort, CANSparkLowLevel.MotorType.kBrushless);
         //intake1.restoreFactoryDefaults();
         //intake2.restoreFactoryDefaults();
         intake.setIdleMode(CANSparkMax.IdleMode.kBrake);

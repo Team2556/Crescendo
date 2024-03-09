@@ -44,7 +44,8 @@ public class ShooterSubsystem extends SubsystemBase {
   
   // public final DigitalInput leftLimitSwitch;
   // public final DigitalInput rightLimitSwitch;
-
+  public final DigitalInput frontLimitSwitch;
+  public final DigitalInput rearLimitSwitch;
 
   private double targetVelocity = 0;
   private int rollingAverage = 0;
@@ -62,10 +63,12 @@ public class ShooterSubsystem extends SubsystemBase {
     leftFlap = new CANSparkMax(MotorPorts.kLeftFlap, MotorType.kBrushless);
     rightFlap = new CANSparkMax(MotorPorts.kRightFlap, MotorType.kBrushless);
 
-    shooterAim = new CANSparkMax(1, MotorType.kBrushless);
+    shooterAim = new CANSparkMax(11, MotorType.kBrushless);
 
     // leftLimitSwitch = new DigitalInput(Constants.DigitalInputs.kLeftLimitSwitch);
     // rightLimitSwitch = new DigitalInput(Constants.DigitalInputs.kRightLimitSwitch);
+    frontLimitSwitch = new DigitalInput(Constants.DigitalInputs.kFrontLimitSwitch);
+    rearLimitSwitch = new DigitalInput(Constants.DigitalInputs.kRearLimitSwitch);
 
     leftShooter.clearFaults();
     rightShooter.clearFaults();
@@ -290,7 +293,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   //Will be tested to determine scale factor
   public double angleToAimTicks(double angle) {
-    return angle;
+    return 360 - angle;
   }
 
   //Uses vertical angle to april tag to determine angle
@@ -325,6 +328,8 @@ public class ShooterSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Right Encoder", rFlapEncoder.getPosition());
     // SmartDashboard.putBoolean("Left Limit Switch", leftLimitSwitch.get());
     // SmartDashboard.putBoolean("Right Limit Switch", rightLimitSwitch.get());
+    SmartDashboard.putBoolean("Front Limit Switch", frontLimitSwitch.get());
+    SmartDashboard.putBoolean("Rear Limit Switch", rearLimitSwitch.get());
 
     SmartDashboard.putBoolean("L Home", leftHomeFlag);
     SmartDashboard.putBoolean("R Home", rightHomeFlag);
@@ -336,6 +341,10 @@ public class ShooterSubsystem extends SubsystemBase {
     // if (rightLimitSwitch.get()) {
     //   rFlapEncoder.setPosition(0);
     // }
+    if (!frontLimitSwitch.get() || !rearLimitSwitch.get()) {
+      shooterAim.set(0.0);
+      shooterAimPID.setReference(shooterAimEncoder.getPosition(), CANSparkBase.ControlType.kPosition);
+    }
   }
 
   public static ShooterSubsystem getInstance() {

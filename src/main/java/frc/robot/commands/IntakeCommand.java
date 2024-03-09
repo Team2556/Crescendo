@@ -6,19 +6,20 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class IntakeCommand extends Command {
   private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
-  private final BooleanEvent rightTrigger, leftTrigger;
+  private final Trigger rightTrigger, leftTrigger;
 
   /** Creates a new IntakeCommand. */
-  public IntakeCommand(IntakeSubsystem intakeSubsystem, BooleanEvent rightTrigger, BooleanEvent leftTrigger) {
+  public IntakeCommand(IntakeSubsystem intakeSubsystem, Trigger trigger, Trigger trigger2) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(intakeSubsystem);
 
-    this.rightTrigger = rightTrigger;
-    this.leftTrigger = leftTrigger;
+    this.rightTrigger = trigger;
+    this.leftTrigger = trigger2;
   }
 
   // Called when the command is initially scheduled.

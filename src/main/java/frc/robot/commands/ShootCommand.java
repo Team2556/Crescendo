@@ -22,18 +22,18 @@ import frc.robot.Constants.ShooterConstants;
 public class ShootCommand extends Command {
   /** Creates a new ShootCommand. */
   private final ShooterSubsystem m_shooterSubsystem;
-  BooleanEvent m_start;
-  BooleanEvent m_left;
-  BooleanEvent m_right;
-  BooleanEvent m_up;
-  BooleanEvent m_down;
-  BooleanEvent m_x;
-  BooleanEvent m_a;
-  BooleanEvent m_b;
-  BooleanEvent m_rBumper;
-  BooleanEvent m_lBumper;
-  private final BooleanEvent m_rightTrigger;
-  BooleanEvent m_leftTrigger;
+  Trigger m_start;
+  Trigger m_left;
+  Trigger m_right;
+  Trigger m_up;
+  Trigger m_down;
+  Trigger m_x;
+  Trigger m_a;
+  Trigger m_b;
+  Trigger m_rBumper;
+  Trigger m_lBumper;
+  private final Trigger m_rightTrigger;
+  Trigger m_leftTrigger;
   private final DoubleSupplier m_leftY;
   private double targetInput;
   private double lFlapEncoder;
@@ -57,23 +57,23 @@ public class ShootCommand extends Command {
     LEFT,
     RIGHT
   }
-  public ShootCommand(ShooterSubsystem shooterSubsystem, BooleanEvent booleanEvent, BooleanEvent booleanEvent2, BooleanEvent booleanEvent3, BooleanEvent booleanEvent4, BooleanEvent booleanEvent5, DoubleSupplier leftY, BooleanEvent booleanEvent6, BooleanEvent booleanEvent7, BooleanEvent booleanEvent8, BooleanEvent booleanEvent9, BooleanEvent booleanEvent10, BooleanEvent booleanEvent11, BooleanEvent booleanEvent12) {
+  public ShootCommand(ShooterSubsystem shooterSubsystem, Trigger trigger, Trigger trigger2, Trigger trigger3, Trigger trigger4, Trigger trigger5, DoubleSupplier leftY, Trigger trigger6, Trigger trigger7, Trigger trigger8, Trigger trigger9, Trigger trigger10, Trigger trigger11, Trigger trigger12) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooterSubsystem = shooterSubsystem;
     // lFlapEncoder = m_shooterSubsystem.getlFlapEncoderValue();
-    m_start = booleanEvent;
-    m_left = booleanEvent2;
-    m_right = booleanEvent3;
-    m_up = booleanEvent4;
-    m_down = booleanEvent5;
+    m_start = trigger;
+    m_left = trigger2;
+    m_right = trigger3;
+    m_up = trigger4;
+    m_down = trigger5;
     m_leftY = leftY;
-    m_leftTrigger = booleanEvent6;
-    m_rightTrigger = booleanEvent7;
-    m_x = booleanEvent8;
-    m_a = booleanEvent9;
-    m_b = booleanEvent10;
-    m_rBumper = booleanEvent11;
-    m_lBumper = booleanEvent12;
+    m_leftTrigger = trigger6;
+    m_rightTrigger = trigger7;
+    m_x = trigger8;
+    m_a = trigger9;
+    m_b = trigger10;
+    m_rBumper = trigger11;
+    m_lBumper = trigger12;
     addRequirements(shooterSubsystem);
   }
 
@@ -130,7 +130,7 @@ public class ShootCommand extends Command {
     }
 
     if (m_a.getAsBoolean()) {
-      m_shooterSubsystem.setFlapPositionByTags(PhotonSubsystem.targetRotation);
+      m_shooterSubsystem.setAimPosition(315);
     }
 
     if (m_b.getAsBoolean()) {

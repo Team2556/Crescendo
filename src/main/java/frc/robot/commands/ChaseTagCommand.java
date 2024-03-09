@@ -41,6 +41,7 @@ public class ChaseTagCommand extends Command {
           new Translation3d(1.5, 0.0, 0.0),
           new Rotation3d(0.0, 0.0, Math.PI));
 
+  private int targetID;
   private final PhotonCamera photonCamera;
   private final PhotonPoseEstimator estimator;
   private final SwerveSubsystem swerveSubsystem;
@@ -106,6 +107,8 @@ public class ChaseTagCommand extends Command {
       PhotonTrackedTarget target = photonRes.getBestTarget();
 
       Transform3d goalPose = target.getBestCameraToTarget();
+
+      targetID = target.getFiducialId();
       // Find the tag we want to chase
       // var targetOpt = photonRes.getTargets().stream()
       //     .filter(t -> t.getFiducialId() == TAG_TO_CHASE)
@@ -162,9 +165,11 @@ public class ChaseTagCommand extends Command {
         omegaSpeed = 0; 
       }
 
+      if (targetID == 7 || targetID == 4) {
       swerveSubsystem.drive(
         ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose2d.getRotation()));
         // ChassisSpeeds.fromFieldRelativeSpeeds(-xSpeed, -ySpeed, omegaSpeed, robotPose2d.getRotation()));
+      }
     }
   }
  

@@ -183,14 +183,16 @@ public final class Constants {
         public static final int kRightLimitSwitch = 1;
         public static final int kLClimbLimitSwitch = 2;
         public static final int kRClimbLimitSwitch = 3;
+        public static final int kFrontLimitSwitch = 6;
+        public static final int kRearLimitSwitch = 7;
       }
 
       public static class AimValues {
-        public static double kAimP = 0.0;
+        public static double kAimP = 0.1;
         public static double kAimI = 0.0;
         public static double kAimIZone = 0.0;
         public static double kAimD = 0.0;
         public static double kAimFF = 0.0;
-        public static double kAmpAim = 0.0;
+        public static double kAmpAim = 20.0;
       }
     }

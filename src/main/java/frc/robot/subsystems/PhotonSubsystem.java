@@ -23,6 +23,7 @@ public static double targetX;
 public static double targetY;
 public static double targetRotation;
 public static double shootAngle;
+public int targetID;
 double xSquared;
 double speakerHeight = Units.inchesToMeters(78);
 double speakerHypt;
@@ -37,16 +38,19 @@ double speakerHypt;
     if (hasTargets){
       SmartDashboard.putBoolean("hasTargets", hasTargets);
       PhotonTrackedTarget target = result.getBestTarget();
-      int targetID = target.getFiducialId();
+      targetID = target.getFiducialId();
       double poseAmbiguity = target.getPoseAmbiguity();
       Transform3d bestCameraToTarget = target.getBestCameraToTarget();
       targetX = bestCameraToTarget.getX(); 
       targetY = bestCameraToTarget.getY(); 
-      targetRotation = bestCameraToTarget.getRotation().getAngle(); 
+      targetRotation = bestCameraToTarget.getRotation().getAngle();
+      SmartDashboard.putNumber("Xdistance", targetX); 
+      SmartDashboard.putNumber("Ydistance", targetY);
+      SmartDashboard.putNumber("targetRotation", targetRotation);
 
 
       xSquared = (targetX * targetX);
-      speakerHeight = ( speakerHeight * speakerHeight);
+      speakerHeight = (speakerHeight * speakerHeight);
       speakerHypt = Math.sqrt(xSquared + speakerHeight);
       shootAngle = Math.atan(speakerHeight / targetX);
 
