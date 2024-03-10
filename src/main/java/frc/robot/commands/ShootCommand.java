@@ -34,6 +34,7 @@ public class ShootCommand extends Command {
     public void initialize() {
         m_shooterSubsystem.setShooterState(ShooterState.STOP);
         m_shooterSubsystem.setFlapState(FlapState.RESET);
+        SmartDashboard.putNumber("Shooter Pitch Angle Input", 340);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class ShootCommand extends Command {
             m_shooterSubsystem.setShooterVelocity(m_shooterSubsystem.getShooterState().getVelocity());
         else
             m_shooterSubsystem.stop();
-
+        m_shooterSubsystem.setPitchPosition(SmartDashboard.getNumber("Shooter Pitch Angle Input", 340));
         SmartDashboard.putNumber("Shooter Angle", interpolation.calculate(poseSubsystem.getX(), poseSubsystem.getY()));
     }
 

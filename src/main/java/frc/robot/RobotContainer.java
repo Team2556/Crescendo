@@ -108,7 +108,7 @@ public class RobotContainer {
         Command ampScore = new SequentialCommandGroup(
                 new RunCommand(() -> {
                     m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
-//                    m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
+                    m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
                 }, m_shooterSubsystem)
                         .andThen(new WaitUntilCommand(() -> m_shooterSubsystem.flapsArrived(kLeft90, kRight90)))
                         .andThen(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem))
