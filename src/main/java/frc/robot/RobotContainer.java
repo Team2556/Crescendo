@@ -4,9 +4,15 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.*;
@@ -53,17 +59,26 @@ public class RobotContainer {
             drivebase,
             () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-            () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND),
-            () -> true);
+            () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND));
 
         m_shooterSubsystem.setDefaultCommand(new ShootCommand(operatorXbox.rightTrigger(0.5)));
         m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
         m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(m_elevatorSubsystem, () -> -operatorXbox.getLeftY()));
 
         m_poseSubsystem.setDefaultCommand(new PoseUpdateCommand(m_poseSubsystem));
-        m_poseSubsystem.initialize(drivebase, m_shooterSubsystem, new PhotonCamera("photonVision"));
+        m_poseSubsystem.initialize(drivebase, new PhotonCamera("photonVision"));
 
         drivebase.setDefaultCommand(closedFieldRel);
+
+        SmartDashboard.putData("Pathfind to Scoring Pos", AutoBuilder.pathfindToPose(
+                new Pose2d(2.8, 5.0, Rotation2d.fromDegrees(0.0)),
+                new PathConstraints(
+                        0.6, 1.0,
+                        Units.degreesToRadians(360), Units.degreesToRadians(540)
+                ),
+                0,
+                0
+        ));
     }
 
     /**
@@ -75,17 +90,20 @@ public class RobotContainer {
      */
     private void configureBindings() {
         driverXbox.leftStick().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
-        driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
         driverXbox.a().onTrue(new InstantCommand(() -> {
             drivebase.setMaximumSpeed(TeleopDrive.slowMode ? SLOW_MAX_SPEED : SWERVE_MAX_SPEED);
             TeleopDrive.slowMode = !TeleopDrive.slowMode;
         }));
+        driverXbox.b().onTrue(new InstantCommand(() -> TeleopDrive.fieldOriented = !TeleopDrive.fieldOriented));
+        driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
 
         operatorXbox.start().onTrue(new InstantCommand(m_shooterSubsystem::resetFlaps));
         operatorXbox.rightBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
         operatorXbox.leftBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.AMP)));
+        operatorXbox.a().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.INTAKE)));
         operatorXbox.y().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.AUTO)));
         operatorXbox.x().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.STRAIGHT)));
+        operatorXbox.b().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.AMP)));
 
         AtomicBoolean shot = new AtomicBoolean(false);
         // Command to execute when right bumper is pressed
@@ -114,6 +132,7 @@ public class RobotContainer {
                         .andThen(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem))
                         .andThen(new WaitUntilCommand(() -> m_shooterSubsystem.shooterPitchArrived(kPitchAmpPosition)))
         );
+
 
         driverXbox.leftBumper().onTrue(ampScore).onFalse(new IntakeSetCommand(0.4).withTimeout(1.0));
    }

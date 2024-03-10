@@ -28,13 +28,16 @@ public class ShootCommand extends Command {
         m_rightTrigger = rightTrigger;
         interpolation = new ShooterInterpolation();
         addRequirements(m_shooterSubsystem);
+        SmartDashboard.putNumber("Shooter Amp Speed", .1);
+        SmartDashboard.putNumber("Shooter Pitch Angle Input", 20);
+        SmartDashboard.putNumber("Shooter Amp Angle", 5);
+        SmartDashboard.putNumber("Shooter Intake Speed", -0.3);
     }
 
     @Override
     public void initialize() {
         m_shooterSubsystem.setShooterState(ShooterState.STOP);
-        m_shooterSubsystem.setFlapState(FlapState.RESET);
-        SmartDashboard.putNumber("Shooter Pitch Angle Input", 340);
+        m_shooterSubsystem.resetFlaps();
     }
 
     @Override
@@ -54,18 +57,29 @@ public class ShootCommand extends Command {
                 SmartDashboard.putNumber("Flap Center", flapCenter);
                 // Verify robot's angle is not outside the max angle the flaps should align at.
                 if(!(Math.abs(flapCenter) > kMaxFlapAngle)) {
-                    flapLeftAngle = (90 + 78.0 * Math.sin(Math.toRadians(flapCenter))) * leftFlapDegrees;
-                    flapRightAngle = (90 - 78.0 * Math.sin(Math.toRadians(flapCenter))) * rightFlapDegrees;
+                    flapRightAngle = (90 + 78.0 * Math.sin(Math.toRadians(flapCenter))) * leftFlapDegrees;
+                    flapLeftAngle = (90 - 78.0 * Math.sin(Math.toRadians(flapCenter))) * rightFlapDegrees;
                 }
+                m_shooterSubsystem.setFlapPosition(flapLeftAngle, flapRightAngle);
+            }
+            case AMP -> {
+                double angle = SmartDashboard.getNumber("Shooter Amp Angle", 5);
+                double flapRightAngle = (90 + angle) * leftFlapDegrees;
+                double flapLeftAngle = (90 + angle) * rightFlapDegrees;
                 m_shooterSubsystem.setFlapPosition(flapLeftAngle, flapRightAngle);
             }
         }
 
-        if(m_rightTrigger.getAsBoolean())
-            m_shooterSubsystem.setShooterVelocity(m_shooterSubsystem.getShooterState().getVelocity());
-        else
+        if(m_rightTrigger.getAsBoolean()) {
+            if(m_shooterSubsystem.getShooterState().equals(ShooterState.AMP)) {
+                m_shooterSubsystem.setShooter(SmartDashboard.getNumber("Shooter Amp Speed", 0.15));
+            } else if(m_shooterSubsystem.getShooterState().equals(ShooterState.INTAKE)) {
+                m_shooterSubsystem.setShooter(SmartDashboard.getNumber("Shooter Intake Speed", -0.1));
+            } else
+                m_shooterSubsystem.setShooterVelocity(m_shooterSubsystem.getShooterState().getVelocity());
+        } else
             m_shooterSubsystem.stop();
-        m_shooterSubsystem.setPitchPosition(SmartDashboard.getNumber("Shooter Pitch Angle Input", 340));
+//        m_shooterSubsystem.setPitchPosition(SmartDashboard.getNumber("Shooter Pitch Angle Input", 340));
         SmartDashboard.putNumber("Shooter Angle", interpolation.calculate(poseSubsystem.getX(), poseSubsystem.getY()));
     }
 

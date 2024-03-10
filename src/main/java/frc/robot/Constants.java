@@ -59,9 +59,9 @@ public final class Constants {
         public static final double kFlapTolerance = 1.0;
         public static final double kPitchTolerance = 1.0;
         // Raw absolute encoder value
-        public static final double kPitchAmpPosition = 360;
+        public static final double kPitchAmpPosition = 8;
         // Raw absolute encoder value
-        public static final double kPitchSpeakerPosition = 290;
+        public static final double kPitchSpeakerPosition = 340;
         public static final double kPitchMinimumAngle = 270;
         // Degrees
         public static final double kMaxFlapAngle = 30.0;
@@ -95,6 +95,7 @@ public final class Constants {
             NONE,
             RESET,
             STRAIGHT,
+            AMP,
             AUTO
         }
 
