@@ -65,6 +65,8 @@ public final class Constants {
         // Raw absolute encoder value
         public static final double kPitchSpeakerPosition = 340;
         public static final double kPitchMinimumAngle = 270;
+        public static final double kPitchForwardLimit = 290;
+        public static final double kPitchBackwardLimit = 20;
         // Degrees
         public static final double kMaxFlapAngle = 30.0;
 

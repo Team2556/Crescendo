@@ -165,20 +165,24 @@ public class ShooterSubsystem extends SubsystemBase {
         rightShooter.set(speed);
     }
 
+    /**
+     * Set the shooter angle.
+     * @param position Position in degrees to set the shooter angle to.
+     */
+    //ToDo Add angle bounding to verify the inputted position is within the physically possible range.
     public void setPitchPosition(double position) {
-        if((!forwardLimitSwitch.get() || !backwardLimitSwitch.get())) {
+        double pid = shooterPitchPID.calculate(getShooterPitch(), position);
+        if((!forwardLimitSwitch.get() && pid > 0) || (!backwardLimitSwitch.get() && pid < 0)) {
             shooterPitch.setVoltage(0.0);
-        } else {
-            double pos = position - kPitchMinimumAngle;
-            if(pos < 0) {
-                pos = position + 90.0;
-            }
-            double ff = shooterFeedforward.calculate(Math.toRadians(pos), 0);
-            double pid = shooterPitchPID.calculate(getShooterPitch(), position);
-            SmartDashboard.putNumber("PID Pitch", pid);
-            SmartDashboard.putNumber("FF Pitch", ff);
-            shooterPitch.setVoltage(pid + ff);
+            return;
         }
+        // Convert position to the proper frame of reference for the feedforward cosine.
+        double pos = position - kPitchMinimumAngle;
+        if(pos < 0) {
+            pos = position + 90.0;
+        }
+        double ff = shooterFeedforward.calculate(Math.toRadians(pos), 0);
+        shooterPitch.setVoltage(pid + ff);
     }
 
     /**
