@@ -14,18 +14,16 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.*;
-import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.ShooterConstants.*;
+import frc.robot.commands.*;
+import frc.robot.subsystems.*;
+import org.photonvision.PhotonCamera;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import frc.robot.Constants.ShooterConstants.ShooterState;
-import frc.robot.Constants.ShooterConstants.FlapState;
-import org.photonvision.PhotonCamera;
 
 import static frc.robot.Constants.SLOW_MAX_SPEED;
 import static frc.robot.Constants.SWERVE_MAX_SPEED;
@@ -63,7 +61,7 @@ public class RobotContainer {
 
         m_shooterSubsystem.setDefaultCommand(new ShootCommand(operatorXbox.rightTrigger(0.5)));
         m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
-        m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(m_elevatorSubsystem, () -> -operatorXbox.getLeftY(), () -> operatorXbox.getLeftTriggerAxis()));
+        m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(() -> -operatorXbox.getLeftY(), () -> operatorXbox.getLeftTriggerAxis()));
 
         m_poseSubsystem.setDefaultCommand(new PoseUpdateCommand(m_poseSubsystem));
         m_poseSubsystem.initialize(drivebase, new PhotonCamera("photonVision"));

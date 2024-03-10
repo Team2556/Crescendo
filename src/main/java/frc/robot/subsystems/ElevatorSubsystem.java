@@ -40,6 +40,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private void set(double speed) {
+        SmartDashboard.putNumber("Climb Speed", speed);
         climbMotor.set(speed);
     }
 

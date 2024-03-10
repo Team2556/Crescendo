@@ -16,8 +16,6 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FlapState;
 import frc.robot.Constants.ShooterConstants.ShooterState;
 
-import javax.sound.sampled.Port;
-
 import static frc.robot.Constants.ShooterConstants.*;
 
 public class ShooterSubsystem extends SubsystemBase {
@@ -33,8 +31,9 @@ public class ShooterSubsystem extends SubsystemBase {
     private final RelativeEncoder lFlapEncoder, rFlapEncoder, leftShooterEncoder, rightShooterEncoder;
     private final SparkAbsoluteEncoder shooterPitchEncoder;
     // Spark max/flex pid controllers
-    private final SparkPIDController leftShooterPID, rightShooterPID, lFlapPID, rFlapPID, shooterPitchPID;
-    private final PIDController pidController = new PIDController(0.2, 0.0, 0.008);
+    private final SparkPIDController leftShooterPID, rightShooterPID, lFlapPID, rFlapPID;
+    private final PIDController shooterPitchPID = new PIDController(pitchShooterPIDF.p, pitchShooterPIDF.i, pitchShooterPIDF.d);
+    private final ArmFeedforward shooterFeedforward = new ArmFeedforward(kS, kG, kV);
     // Whether flaps have been zeroed with their limit switches.
     public boolean leftHomeFlag = false, rightHomeFlag = false;
     // Target velocity instance variable.
@@ -43,7 +42,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private int rollingAverage = 0;
     private ShooterState shooterState = ShooterState.STOP;
     private FlapState flapState = FlapState.NONE;
-    private final ArmFeedforward shooterFeedforward = new ArmFeedforward(0.3, 1.0, 3.22);
 
     /**
      * Constructor to handle the initialization and configuration of motors,
@@ -75,8 +73,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
         leftShooterPID = leftShooter.getPIDController();
         rightShooterPID = rightShooter.getPIDController();
-
-        shooterPitchPID = shooterPitch.getPIDController();
 
         leftShooterPID.setFeedbackDevice(leftShooterEncoder);
         rightShooterPID.setFeedbackDevice(rightShooterEncoder);
@@ -123,18 +119,9 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterPitchEncoder.setPositionConversionFactor(360.0);
         shooterPitchEncoder.setVelocityConversionFactor(6.0);
 
-        shooterPitchPID.setFeedbackDevice(shooterPitchEncoder);
-        shooterPitchPID.setP(0.009);
-        shooterPitchPID.setI(0.0);
-        shooterPitchPID.setD(0);
-        shooterPitchPID.setFF(0);
-        shooterPitchPID.setIZone(0);
+        shooterPitchPID.enableContinuousInput(0, 360.0);
+        shooterPitchPID.setTolerance(1.0);
 
-        shooterPitchPID.setPositionPIDWrappingEnabled(true);
-        shooterPitchPID.setPositionPIDWrappingMaxInput(360.0);
-        shooterPitchPID.setPositionPIDWrappingMinInput(0.0);
-
-        pidController.enableContinuousInput(0, 360.0);
         stop();
 
         leftShooter.burnFlash();
@@ -180,15 +167,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setPitchPosition(double position) {
         if((!forwardLimitSwitch.get() || !backwardLimitSwitch.get())) {
-            shooterPitchPID.setReference(0.0, CANSparkBase.ControlType.kVoltage);
+            shooterPitch.setVoltage(0.0);
         } else {
             double pos = position - kPitchMinimumAngle;
             if(pos < 0) {
-                pos = position+90;
+                pos = position + 90.0;
             }
             double ff = shooterFeedforward.calculate(Math.toRadians(pos), 0);
-//            shooterPitchPID.setReference(position, CANSparkBase.ControlType.kPosition, 0);
-            double pid = pidController.calculate(getShooterPitch(), position);
+            double pid = shooterPitchPID.calculate(getShooterPitch(), position);
             SmartDashboard.putNumber("PID Pitch", pid);
             SmartDashboard.putNumber("FF Pitch", ff);
             shooterPitch.setVoltage(pid + ff);
@@ -225,9 +211,9 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public boolean isOnTargetAverage(int percent) {
         if (percent > 10) {
-          percent = 10;
+            percent = 10;
         } else if (percent < 0) {
-          percent = 0;
+            percent = 0;
         }
 
         return rollingAverage > percent;
@@ -286,6 +272,10 @@ public class ShooterSubsystem extends SubsystemBase {
         flapState = FlapState.RESET;
     }
 
+    public double getShooterPitchCompensated() {
+        return getShooterPitch() - kPitchMinimumAngle;
+    }
+
     public double getShooterPitch() {
         return shooterPitchEncoder.getPosition();
     }
@@ -305,12 +295,12 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setFlapState(FlapState flapState) {
         this.flapState = flapState;
     }
-    private boolean aimFlag = false;
+
     @Override
     public void periodic() {
         if (isOnTarget()) {
-          if (rollingAverage < 10)
-            rollingAverage++;
+            if (rollingAverage < 10)
+                rollingAverage++;
         } else if (rollingAverage > 0)
             rollingAverage--;
 

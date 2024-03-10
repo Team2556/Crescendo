@@ -9,8 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.Constants.ShooterConstants.FlapState;
-import frc.robot.Constants.ShooterConstants.ShooterState;
 import frc.robot.util.ShooterInterpolation;
 
 import java.util.function.BooleanSupplier;
@@ -42,13 +40,12 @@ public class ShootCommand extends Command {
 
     @Override
     public void execute() {
-        //ToDo Add calculations for auto-alignment with flaps
         switch (m_shooterSubsystem.getFlapState()) {
             case RESET -> m_shooterSubsystem.flapHome();
             case STRAIGHT -> m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
             case AUTO -> {
                 Pose2d pose = poseSubsystem.getPose();
-                double flapLeftAngle, flapRightAngle;
+                double flapLeftAngle = kLeft90, flapRightAngle = kRight90;
                 double speakerY = 5.5;
 
                 double deltaY = pose.getY() - speakerY;
