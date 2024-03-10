@@ -21,18 +21,17 @@ public class TeleopDrive extends Command {
     private final DoubleSupplier   vX;
     private final DoubleSupplier   vY;
     private final DoubleSupplier   omega;
-    private final BooleanSupplier  driveMode;
     private final SwerveController controller;
 
     public static boolean slowMode = false;
+    public static boolean fieldOriented = true;
 
     public TeleopDrive(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY,
-                     DoubleSupplier omega, BooleanSupplier driveMode) {
+                     DoubleSupplier omega) {
         this.swerve = swerve;
         this.vX = vX;
         this.vY = vY;
         this.omega = omega;
-        this.driveMode = driveMode;
         this.controller = swerve.getSwerveController();
 
         addRequirements(swerve);
@@ -56,6 +55,6 @@ public class TeleopDrive extends Command {
         // Drive using raw values.
         swerve.drive(new Translation2d(xVelocity * swerve.maximumSpeed, yVelocity * swerve.maximumSpeed),
                 angVelocity * controller.config.maxAngularVelocity,
-                driveMode.getAsBoolean());
+                fieldOriented);
     }
 }

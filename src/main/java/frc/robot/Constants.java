@@ -39,16 +39,19 @@ public final class Constants {
 
 
         // Digital Inputs
-        public static final int kLeftFlapLimitSwitch = 0;
-        public static final int kRightFlapLimitSwitch = 1;
+        public static final int kLeftFlapLimitSwitch = 1;
+        public static final int kRightFlapLimitSwitch = 0;
         public static final int kLeftClimbLimitSwitch = 2;
         public static final int kRightClimbLimitSwitch = 3;
         public static final int kIntakeBreakBeam = 4;
+        public static final int kForwardLimitSwitch = 6;
+        public static final int kBackwardLimitSwitch = 7;
     }
 
     public static class ShooterConstants {
         public static final PIDFConfig leftShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000175, 0.0);
         public static final PIDFConfig rightShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000170, 0.0);
+        public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(2.0, 0.0, 0.07, 0.0, 0.0);
         public static final double kMaxPIDOutput = 1.0;
         public static final double kMinPIDOutput = -1.0;
 
@@ -56,7 +59,13 @@ public final class Constants {
 
         public static final double kFlapTolerance = 1.0;
         public static final double kPitchTolerance = 1.0;
-        public static final double kPitchAmpPosition = 315.0;
+        // Raw absolute encoder value
+        public static final double kPitchAmpPosition = 8;
+        // Raw absolute encoder value
+        public static final double kPitchSpeakerPosition = 340;
+        public static final double kPitchMinimumAngle = 270;
+        // Degrees
+        public static final double kMaxFlapAngle = 30.0;
 
         public enum ShooterState {
             STOP(0.0),
@@ -77,8 +86,8 @@ public final class Constants {
         public static final PIDFConfig leftFlapPIDF = new PIDFConfig(0.07, 0.0, 0.0, 0.000170, 0.0);
         public static final PIDFConfig rightFlapPIDF = new PIDFConfig(0.07, 0.0, 0.0, 0.000170, 0.0);
         // Encoder positions
-        public static final double kLeft90 = 17.880909;
-        public static final double kRight90 = 18.523756;
+        public static final double kLeft90 = 15.5;
+        public static final double kRight90 = 15.5;
         // Conversion factors
         public static final double leftFlapDegrees = kLeft90 / 90.0;
         public static final double rightFlapDegrees = kRight90 / 90.0;
@@ -87,6 +96,7 @@ public final class Constants {
             NONE,
             RESET,
             STRAIGHT,
+            AMP,
             AUTO
         }
     }

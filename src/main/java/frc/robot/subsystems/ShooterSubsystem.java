@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import com.revrobotics.*;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -13,6 +15,8 @@ import frc.robot.Constants.Ports;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FlapState;
 import frc.robot.Constants.ShooterConstants.ShooterState;
+
+import javax.sound.sampled.Port;
 
 import static frc.robot.Constants.ShooterConstants.*;
 
@@ -24,12 +28,13 @@ public class ShooterSubsystem extends SubsystemBase {
     // Flap motors
     public final CANSparkMax leftFlap, rightFlap, shooterPitch;
     // Limit switches for flaps
-    public final DigitalInput leftLimitSwitch, rightLimitSwitch;
+    public final DigitalInput leftLimitSwitch, rightLimitSwitch, forwardLimitSwitch, backwardLimitSwitch;
     // Spark max/flex encoders
     private final RelativeEncoder lFlapEncoder, rFlapEncoder, leftShooterEncoder, rightShooterEncoder;
     private final SparkAbsoluteEncoder shooterPitchEncoder;
     // Spark max/flex pid controllers
     private final SparkPIDController leftShooterPID, rightShooterPID, lFlapPID, rFlapPID, shooterPitchPID;
+    private final PIDController pidController = new PIDController(0.2, 0.0, 0.008);
     // Whether flaps have been zeroed with their limit switches.
     public boolean leftHomeFlag = false, rightHomeFlag = false;
     // Target velocity instance variable.
@@ -38,6 +43,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private int rollingAverage = 0;
     private ShooterState shooterState = ShooterState.STOP;
     private FlapState flapState = FlapState.NONE;
+    private final ArmFeedforward shooterFeedforward = new ArmFeedforward(0.3, 1.0, 3.22);
 
     /**
      * Constructor to handle the initialization and configuration of motors,
@@ -54,6 +60,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
         leftLimitSwitch = new DigitalInput(Ports.kLeftFlapLimitSwitch);
         rightLimitSwitch = new DigitalInput(Ports.kRightFlapLimitSwitch);
+
+        forwardLimitSwitch = new DigitalInput(Ports.kForwardLimitSwitch);
+        backwardLimitSwitch = new DigitalInput(Ports.kBackwardLimitSwitch);
 
         leftShooter.clearFaults();
         rightShooter.clearFaults();
@@ -125,6 +134,7 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterPitchPID.setPositionPIDWrappingMaxInput(360.0);
         shooterPitchPID.setPositionPIDWrappingMinInput(0.0);
 
+        pidController.enableContinuousInput(0, 360.0);
         stop();
 
         leftShooter.burnFlash();
@@ -169,7 +179,20 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setPitchPosition(double position) {
-        shooterPitchPID.setReference(position, CANSparkBase.ControlType.kPosition);
+        if((!forwardLimitSwitch.get() || !backwardLimitSwitch.get())) {
+            shooterPitchPID.setReference(0.0, CANSparkBase.ControlType.kVoltage);
+        } else {
+            double pos = position - kPitchMinimumAngle;
+            if(pos < 0) {
+                pos = position+90;
+            }
+            double ff = shooterFeedforward.calculate(Math.toRadians(pos), 0);
+//            shooterPitchPID.setReference(position, CANSparkBase.ControlType.kPosition, 0);
+            double pid = pidController.calculate(getShooterPitch(), position);
+            SmartDashboard.putNumber("PID Pitch", pid);
+            SmartDashboard.putNumber("FF Pitch", ff);
+            shooterPitch.setVoltage(pid + ff);
+        }
     }
 
     /**
@@ -219,7 +242,7 @@ public class ShooterSubsystem extends SubsystemBase {
             return;
         }
 
-        if (!rightLimitSwitch.get()) {
+        if (rightLimitSwitch.get()) {
             rightFlap.set(-.05);
         } else {
             rFlapEncoder.setPosition(0);
@@ -227,13 +250,18 @@ public class ShooterSubsystem extends SubsystemBase {
             rightHomeFlag = true;
         }
 
-        if (!leftLimitSwitch.get()) {
+        if (leftLimitSwitch.get()) {
             leftFlap.set(-.05);
         } else {
             lFlapEncoder.setPosition(0);
             leftFlap.set(0);
             leftHomeFlag = true;
         }
+    }
+
+    public void setShooter(double speed) {
+        leftShooter.set(speed);
+        rightShooter.set(speed);
     }
 
     public boolean shouldShoot() {
@@ -277,7 +305,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setFlapState(FlapState flapState) {
         this.flapState = flapState;
     }
-
+    private boolean aimFlag = false;
     @Override
     public void periodic() {
         if (isOnTarget()) {
@@ -295,12 +323,15 @@ public class ShooterSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Shooter Pitch", shooterPitchEncoder.getPosition());
 
-//        dashboardVerbose();
+        SmartDashboard.putBoolean("Front Limit Switch", forwardLimitSwitch.get());
+        SmartDashboard.putBoolean("Back Limit Switch", backwardLimitSwitch.get());
+
+        dashboardVerbose();
 
         // If limit switch is ever tripped, zeroes the encoders
-        if (leftLimitSwitch.get())
+        if (!leftLimitSwitch.get())
             lFlapEncoder.setPosition(0);
-        if (rightLimitSwitch.get())
+        if (!rightLimitSwitch.get())
             rFlapEncoder.setPosition(0);
     }
 
@@ -315,6 +346,8 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Right Encoder", rFlapEncoder.getPosition());
         SmartDashboard.putBoolean("Left Limit Switch", leftLimitSwitch.get());
         SmartDashboard.putBoolean("Right Limit Switch", rightLimitSwitch.get());
+
+        SmartDashboard.putNumber("Shooter Pitch Comp", getShooterPitchCompensated());
 
         SmartDashboard.putBoolean("L Home", leftHomeFlag);
         SmartDashboard.putBoolean("R Home", rightHomeFlag);

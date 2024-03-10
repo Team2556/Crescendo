@@ -11,33 +11,24 @@ import org.photonvision.PhotonPoseEstimator;
 public class PoseSubsystem extends SubsystemBase {
     private static final PoseSubsystem instance = getInstance();
     private SwerveSubsystem swerveSubsystem;
-    private ShooterSubsystem shooterSubsystem;
     private PhotonPoseEstimator photonPoseEstimator;
     private PhotonCamera photonCamera;
-    private Pose3d camConstant =
-            new Pose3d(Units.inchesToMeters(3.5), 0.0, Units.inchesToMeters(6.0), new Rotation3d());
+    private Transform3d camConstant =
+            new Transform3d(Units.inchesToMeters(-14.0), 0.0, Units.inchesToMeters(7.8), new Rotation3d(0.0, 0.0, Math.toRadians(180)));
 
-    public void initialize(SwerveSubsystem swerveSubsystem, ShooterSubsystem shooterSubsystem,  PhotonCamera photonCamera) {
+    public void initialize(SwerveSubsystem swerveSubsystem, PhotonCamera photonCamera) {
         this.swerveSubsystem = swerveSubsystem;
-        this.shooterSubsystem = shooterSubsystem;
         this.photonCamera = photonCamera;
 
         photonPoseEstimator = new PhotonPoseEstimator(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo),
                 PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
-                photonCamera, new Transform3d());
+                photonCamera, camConstant);
     }
 
     @Override
     public void periodic() {
         super.periodic();
-
-        double c = Units.inchesToMeters(21.5);
-        double camX = c * Math.cos(Math.toRadians(shooterSubsystem.getShooterPitch())) + camConstant.getX();
-        double camZ = c * Math.sin(Math.toRadians(shooterSubsystem.getShooterPitch())) + camConstant.getZ();
-        Transform3d robotToCam = new Transform3d(camX, camConstant.getY(), camZ, new Rotation3d());
-
-        photonPoseEstimator.setRobotToCameraTransform(robotToCam);
 
         var tagUpdate = photonPoseEstimator.update();
         if(tagUpdate.isPresent()) {
