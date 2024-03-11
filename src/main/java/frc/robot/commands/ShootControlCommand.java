@@ -68,9 +68,24 @@ public class ShootControlCommand extends Command {
         }
 
         switch (m_shooterSubsystem.getShooterState()) {
-            case INTAKE -> m_shooterSubsystem.setSpeed(kShooterIntakeSpeed);
-            case AMP -> m_shooterSubsystem.setSpeed(kAmpSpeed);
-            case SPEAKER -> m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity - leftVelocity, kSpeakerVelocity - rightVelocity);
+            case INTAKE -> {
+                if(m_rightTrigger.getAsBoolean() || m_rightBumper.getAsBoolean())
+                    m_shooterSubsystem.setSpeed(kShooterIntakeSpeed);
+                else
+                    m_shooterSubsystem.stop();
+            }
+            case AMP -> {
+                if(m_rightTrigger.getAsBoolean() || m_rightBumper.getAsBoolean())
+                    m_shooterSubsystem.setSpeed(kAmpSpeed);
+                else
+                    m_shooterSubsystem.stop();
+            }
+            case SPEAKER -> {
+                if(m_rightTrigger.getAsBoolean() || m_rightBumper.getAsBoolean())
+                    m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity - leftVelocity, kSpeakerVelocity - rightVelocity);
+                else
+                    m_shooterSubsystem.stop();
+            }
             case STOP -> m_shooterSubsystem.stop();
         }
 
