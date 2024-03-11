@@ -1,0 +1,43 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.67,
+      "y": 6.66
+    },
+    "rotation": 60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StartAmpToAmpNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpNoteToCenterNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterNoteToStageNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StageNoteToLeave"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Amp",
+  "choreoAuto": false
+}
