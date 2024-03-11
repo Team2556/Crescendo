@@ -58,7 +58,7 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND));
 
-        m_shooterSubsystem.setDefaultCommand(new ShootCommand(operatorXbox.rightTrigger(0.5), driverXbox.rightBumper()));
+        m_shooterSubsystem.setDefaultCommand(new ShootControlCommand(operatorXbox.rightTrigger(0.5), driverXbox.rightBumper()));
         m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
         m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(() -> -operatorXbox.getLeftY(), () -> operatorXbox.getLeftTriggerAxis()));
 
@@ -125,14 +125,22 @@ public class RobotContainer {
 
         operatorXbox.start().onTrue(new InstantCommand(m_shooterSubsystem::resetFlaps));
         operatorXbox.rightBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
-        operatorXbox.leftBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.AMP)));
+        operatorXbox.leftBumper().onTrue(new InstantCommand(() -> {
+            m_shooterSubsystem.setShooterState(ShooterState.AMP);
+            m_shooterSubsystem.setPitchState(PitchState.AMP);
+            m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
+        }));
         operatorXbox.a().onTrue(new InstantCommand(() -> {
             m_shooterSubsystem.setShooterState(ShooterState.INTAKE);
             m_shooterSubsystem.setFlapState(FlapState.INTAKE);
+            m_shooterSubsystem.setPitchState(PitchState.INTAKE);
         }));
-        operatorXbox.y().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.AUTO)));
+        operatorXbox.b().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.SPEAKER)));
         operatorXbox.x().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.STRAIGHT)));
-//        operatorXbox.b().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.TEST)));
+        operatorXbox.y().onTrue(new InstantCommand(() -> {
+            m_shooterSubsystem.setFlapState(FlapState.AUTO);
+            m_shooterSubsystem.setPitchState(PitchState.AUTO);
+        }));
 
         AtomicBoolean shot = new AtomicBoolean(false);
         // Command to execute when right bumper is pressed
