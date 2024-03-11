@@ -29,6 +29,7 @@ public class ShootControlCommand extends Command {
         addRequirements(m_shooterSubsystem);
         SmartDashboard.putNumber("Shooter Pitch Angle Input", 0);
         SmartDashboard.putNumber("Flap Test Angle", 5);
+        SmartDashboard.putNumber("Flap Speed Scalar", 0.8);
     }
 
     @Override
@@ -40,12 +41,18 @@ public class ShootControlCommand extends Command {
 
     @Override
     public void execute() {
+        double leftVelocity = kSpeakerVelocity, rightVelocity = kSpeakerVelocity;
         switch (m_shooterSubsystem.getFlapState()) {
             case RESET -> m_shooterSubsystem.flapHome();
             case STRAIGHT -> m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
             case AUTO -> {
                 Pair<Double, Double> flapAngles = m_shooterSubsystem.getFlapCalculatedAngle(poseSubsystem.getPose());
                 m_shooterSubsystem.setFlapPosition(flapAngles.getFirst(), flapAngles.getSecond());
+                double scalar = SmartDashboard.getNumber("Flap Speed Scalar", 0.8);
+                leftVelocity *= ((flapAngles.getFirst() - kLeft90) / kLeft90) * scalar;
+                rightVelocity *= ((flapAngles.getSecond() - kRight90) / kRight90) * scalar;
+                leftVelocity = Math.max(leftVelocity, 0);
+                rightVelocity = Math.max(rightVelocity, 0);
             }
             case INTAKE -> {
                 double flapRightAngle = 45 * rightFlapDegrees;
@@ -63,7 +70,7 @@ public class ShootControlCommand extends Command {
         switch (m_shooterSubsystem.getShooterState()) {
             case INTAKE -> m_shooterSubsystem.setSpeed(kShooterIntakeSpeed);
             case AMP -> m_shooterSubsystem.setSpeed(kAmpSpeed);
-            case SPEAKER -> m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
+            case SPEAKER -> m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity - leftVelocity, kSpeakerVelocity - rightVelocity);
             case STOP -> m_shooterSubsystem.stop();
         }
 

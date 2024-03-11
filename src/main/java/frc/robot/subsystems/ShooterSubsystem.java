@@ -152,6 +152,18 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /**
+     * Set shooter velocity.
+     * Updates targetVelocity.
+     * @param leftVelo Left target velocity.
+     * @param rightVelo Right target velocity
+     */
+    public void setShooterVelocity(double leftVelo, double rightVelo) {
+        targetVelocity = (leftVelo + rightVelo) / 2.0;
+        leftShooterPID.setReference(leftVelo, CANSparkBase.ControlType.kVelocity);
+        rightShooterPID.setReference(rightVelo, CANSparkBase.ControlType.kVelocity);
+    }
+
+    /**
      * Sets flap to position.
      * @param leftPosition position of left flap.
      * @param rightPosition position of right flap.
