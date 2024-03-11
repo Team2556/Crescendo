@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -67,6 +66,9 @@ public class ChaseTagCommand extends Command {
     xController.setTolerance(0.35);
     yController.setTolerance(0.35);
     omegaController.setTolerance(Units.degreesToRadians(5));
+
+
+    
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
 
     addRequirements(drivetrainSubsystem);

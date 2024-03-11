@@ -6,16 +6,30 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import java.util.List;
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.PixycamSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
+import swervelib.SwerveController;
+import swervelib.SwerveDrive;
+import swervelib.math.SwerveMath;
 
 public class PixySwerve extends Command {
   private boolean check = false;
   private String[] objLocation;
-  private float[] XandY= {0,0};
+  private float[] XandY = { 0, 0 };
+  private final SwerveSubsystem swerve;
+  private final DoubleSupplier vX, vY, heading;
   private final PixycamSubsystem m_vision = PixycamSubsystem.getInstance();
-  private Trigger btnPress; //controller button
+  private Trigger btnPress; // controller button
+  private Translation2d translation = new Translation2d(0, 0);
 
   public void PixycamSubsystem(Trigger bs) {
     addRequirements(m_vision);
@@ -28,16 +42,38 @@ public class PixySwerve extends Command {
     check = false;
   }
 
+  public PixySwerve(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY,
+      DoubleSupplier heading) {
+    this.swerve = swerve;
+    this.vX = vX;
+    this.vY = vY;
+    this.heading = heading;
+
+    addRequirements(swerve);
+  }
+
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    try { //Call pixy values, convert them into a new array
+    try { // Call pixy values, convert them into a new array
       objLocation = m_vision.getPixyValue();
       if (btnPress.getAsBoolean()) {
         SmartDashboard.putString("X", objLocation[0]);
         SmartDashboard.putString("Y", objLocation[1]);
-        XandY[1]= Float.parseFloat(objLocation[1]);
+        XandY[1] = Float.parseFloat(objLocation[1]);
         SmartDashboard.putNumber("Number array Y", XandY[1]);
+        if ((-8 > m_vision.pixy_center) || (m_vision.pixy_center > 8)){
+          PixycamSubsystem.readData();
+          PixycamSubsystem.calculateAngle();
+
+          swerve.drive(translation, frc.robot.subsystems.PixycamSubsystem.calculateAngle(), true);
+        }
+      else{
+        swerve.drive(translation ,0 , true);
+      }
+
+
+       
 
       } else {
         SmartDashboard.getString("error", "Button not found");

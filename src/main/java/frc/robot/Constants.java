@@ -51,7 +51,12 @@ public final class Constants {
         public static final double downGoal = 0;
         public static final double climbGoalTolerance = 0.1;
     }
-
+    public static final class PixyValues{ //values are in milimeters
+        public static double ff = 1.8;
+        public static double pixy_Height = 25.6;
+        public static double ring_Height = 50;
+        public static double turn_speed = 1.5;
+    }
     public enum ShooterState {
         STOP(0.0),
         AMP(100.0),
