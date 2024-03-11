@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.ShooterConstants.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import org.photonvision.PhotonCamera;
@@ -41,7 +40,7 @@ public class RobotContainer {
                                                                             "swerve"));
     private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
     private final IntakeSubsystem m_intakeSubsystem = IntakeSubsystem.getInstance();
-   private final ElevatorSubsystem m_elevatorSubsystem = ElevatorSubsystem.getInstance();
+    private final ElevatorSubsystem m_elevatorSubsystem = ElevatorSubsystem.getInstance();
     private final PoseSubsystem m_poseSubsystem = PoseSubsystem.getInstance();
     // Drive controllers
     CommandXboxController driverXbox = new CommandXboxController(0);
@@ -59,7 +58,7 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND));
 
-        m_shooterSubsystem.setDefaultCommand(new ShootCommand(operatorXbox.rightTrigger(0.5)));
+        m_shooterSubsystem.setDefaultCommand(new ShootCommand(operatorXbox.rightTrigger(0.5), driverXbox.rightBumper()));
         m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
         m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(() -> -operatorXbox.getLeftY(), () -> operatorXbox.getLeftTriggerAxis()));
 
@@ -67,16 +66,6 @@ public class RobotContainer {
         m_poseSubsystem.initialize(drivebase, new PhotonCamera("photonVision"));
 
         drivebase.setDefaultCommand(closedFieldRel);
-
-        SmartDashboard.putData("Pathfind to Scoring Pos", AutoBuilder.pathfindToPose(
-                new Pose2d(2.8, 5.0, Rotation2d.fromDegrees(0.0)),
-                new PathConstraints(
-                        0.6, 1.0,
-                        Units.degreesToRadians(360), Units.degreesToRadians(540)
-                ),
-                0,
-                0
-        ));
     }
 
     /**
@@ -95,13 +84,55 @@ public class RobotContainer {
         driverXbox.b().onTrue(new InstantCommand(() -> TeleopDrive.fieldOriented = !TeleopDrive.fieldOriented));
         driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
 
+        //ToDo Get pose for red side
+        driverXbox.povUp().onTrue(
+                AutoBuilder.pathfindToPose(
+                        new Pose2d(3.3, 4.8, Rotation2d.fromDegrees(0.0)),
+                        new PathConstraints(
+                                2.0, 1.0,
+                                Units.degreesToRadians(360), Units.degreesToRadians(540)
+                        ),
+                        0,
+                        0
+                )
+        );
+
+        //ToDo Get pose for red side
+        driverXbox.povLeft().onTrue(
+                AutoBuilder.pathfindToPose(
+                        new Pose2d(1.8, 7.6, Rotation2d.fromDegrees(0.0)),
+                        new PathConstraints(
+                                2.0, 1.0,
+                                Units.degreesToRadians(360), Units.degreesToRadians(540)
+                        ),
+                        0,
+                        0
+                )
+        );
+
+        //ToDo Get pose for red side
+        driverXbox.povRight().onTrue(
+                AutoBuilder.pathfindToPose(
+                        new Pose2d(15.5, 1.0, Rotation2d.fromDegrees(300)),
+                        new PathConstraints(
+                                2.0, 1.0,
+                                Units.degreesToRadians(360), Units.degreesToRadians(540)
+                        ),
+                        0,
+                        0
+                )
+        );
+
         operatorXbox.start().onTrue(new InstantCommand(m_shooterSubsystem::resetFlaps));
         operatorXbox.rightBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
         operatorXbox.leftBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.AMP)));
-        operatorXbox.a().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.INTAKE)));
+        operatorXbox.a().onTrue(new InstantCommand(() -> {
+            m_shooterSubsystem.setShooterState(ShooterState.INTAKE);
+            m_shooterSubsystem.setFlapState(FlapState.INTAKE);
+        }));
         operatorXbox.y().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.AUTO)));
         operatorXbox.x().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.STRAIGHT)));
-        operatorXbox.b().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.AMP)));
+//        operatorXbox.b().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.TEST)));
 
         AtomicBoolean shot = new AtomicBoolean(false);
         // Command to execute when right bumper is pressed
@@ -124,14 +155,16 @@ public class RobotContainer {
                 new RunCommand(() -> {
                     m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
                     m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
-                }, m_shooterSubsystem)
-                       // .andThen(new WaitUntilCommand(() -> m_shooterSubsystem.flapsArrived(kLeft90, kRight90)))
-                        .andThen(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem))
-                        .andThen(new WaitUntilCommand(() -> m_shooterSubsystem.shooterPitchArrived(kPitchAmpPosition)))
+                }, m_shooterSubsystem),
+                new WaitUntilCommand(() -> m_shooterSubsystem.flapsArrived(kLeft90, kRight90)),
+                new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchVerticalPosition), m_shooterSubsystem),
+                new WaitUntilCommand(m_shooterSubsystem::shooterPitchArrived),
+                new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem)
+                        .alongWith(new IntakeSetCommand(0.4).withTimeout(1.0)),
+                new WaitCommand(2.0)
         );
 
-
-        driverXbox.leftBumper().onTrue(ampScore).onFalse(new IntakeSetCommand(0.4).withTimeout(1.0));
+        driverXbox.leftBumper().onTrue(ampScore);
    }
 
     /**
@@ -140,6 +173,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("5 note middle");
+        return new PathPlannerAuto("StartAmp3Leave");
     }
 }

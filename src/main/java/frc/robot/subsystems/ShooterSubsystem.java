@@ -42,6 +42,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private int rollingAverage = 0;
     private ShooterState shooterState = ShooterState.STOP;
     private FlapState flapState = FlapState.NONE;
+    private PitchState pitchState = PitchState.NONE;
 
     /**
      * Constructor to handle the initialization and configuration of motors,
@@ -185,6 +186,10 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterPitch.setVoltage(pid + ff);
     }
 
+    public void stopPitch() {
+        shooterPitch.setVoltage(0.0);
+    }
+
     /**
      * Stop shooter motors.
      */
@@ -266,8 +271,8 @@ public class ShooterSubsystem extends SubsystemBase {
         return dL < kFlapTolerance && dR < kFlapTolerance;
     }
 
-    public boolean shooterPitchArrived(double pos) {
-        return Math.abs(pos - getShooterPitch()) < kPitchTolerance;
+    public boolean shooterPitchArrived() {
+        return shooterPitchPID.atSetpoint();
     }
 
     public void resetFlaps() {
@@ -300,6 +305,14 @@ public class ShooterSubsystem extends SubsystemBase {
         this.flapState = flapState;
     }
 
+    public PitchState getPitchState() {
+        return pitchState;
+    }
+
+    public void setPitchState(PitchState pitchState) {
+        this.pitchState = pitchState;
+    }
+
     @Override
     public void periodic() {
         if (isOnTarget()) {
@@ -314,11 +327,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
         SmartDashboard.putString("Shooter State", shooterState.name());
         SmartDashboard.putString("Flap State", flapState.name());
+        SmartDashboard.putString("Shooter Angle State", pitchState.name());
 
         SmartDashboard.putNumber("Shooter Pitch", shooterPitchEncoder.getPosition());
-
-        SmartDashboard.putBoolean("Front Limit Switch", forwardLimitSwitch.get());
-        SmartDashboard.putBoolean("Back Limit Switch", backwardLimitSwitch.get());
 
         dashboardVerbose();
 
@@ -336,15 +347,20 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Left Velocity", leftShooterEncoder.getVelocity());
         SmartDashboard.putNumber("Right Velocity", rightShooterEncoder.getVelocity());
         SmartDashboard.putBoolean("Avg Launcher On Target", isOnTargetAverage(7));
-        SmartDashboard.putNumber("Left Encoder", lFlapEncoder.getPosition());
-        SmartDashboard.putNumber("Right Encoder", rFlapEncoder.getPosition());
-        SmartDashboard.putBoolean("Left Limit Switch", leftLimitSwitch.get());
-        SmartDashboard.putBoolean("Right Limit Switch", rightLimitSwitch.get());
+
+        SmartDashboard.putNumber("Left Flap Encoder", lFlapEncoder.getPosition());
+        SmartDashboard.putNumber("Right Flap Encoder", rFlapEncoder.getPosition());
+
+        SmartDashboard.putBoolean("Left Flap Limit Switch", leftLimitSwitch.get());
+        SmartDashboard.putBoolean("Right Flap Limit Switch", rightLimitSwitch.get());
+
+        SmartDashboard.putBoolean("Left Flap Home", leftHomeFlag);
+        SmartDashboard.putBoolean("Right Flap Home", rightHomeFlag);
+
+        SmartDashboard.putBoolean("Front Limit Switch", forwardLimitSwitch.get());
+        SmartDashboard.putBoolean("Back Limit Switch", backwardLimitSwitch.get());
 
         SmartDashboard.putNumber("Shooter Pitch Comp", getShooterPitchCompensated());
-
-        SmartDashboard.putBoolean("L Home", leftHomeFlag);
-        SmartDashboard.putBoolean("R Home", rightHomeFlag);
     }
 
     /**

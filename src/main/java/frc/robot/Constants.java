@@ -61,29 +61,29 @@ public final class Constants {
         public static final double kFlapTolerance = 1.0;
         public static final double kPitchTolerance = 1.0;
         // Raw absolute encoder value
-        public static final double kPitchAmpPosition = 8;
+        public static final double kPitchAmpPosition = 18;
+        public static final double kPitchVerticalPosition = 0;
+        public static final double kPitchIntakePosition = 18;
+
         // Raw absolute encoder value
         public static final double kPitchSpeakerPosition = 340;
         public static final double kPitchMinimumAngle = 270;
         public static final double kPitchForwardLimit = 290;
         public static final double kPitchBackwardLimit = 20;
         // Degrees
-        public static final double kMaxFlapAngle = 30.0;
+        public static final double kMaxFlapAngle = 35.0;
 
         public enum ShooterState {
-            STOP(0.0),
-            INTAKE(-1500.0),
-            AMP(100.0),
-            SPEAKER(6700.0);
-            private final double velocity;
-            ShooterState(double velocity) {
-                this.velocity = velocity;
-            }
-
-            public double getVelocity() {
-                return velocity;
-            }
+            STOP,
+            INTAKE,
+            AMP,
+            SPEAKER
         }
+
+        public static final double kSpeakerVelocity = 6700;
+        public static final double kShooterIntakeSpeed = -0.1;
+        public static final double kAmpSpeed = 0.15;
+
 
         // Flap constants
         public static final PIDFConfig leftFlapPIDF = new PIDFConfig(0.07, 0.0, 0.0, 0.000170, 0.0);
@@ -92,15 +92,26 @@ public final class Constants {
         public static final double kLeft90 = 15.5;
         public static final double kRight90 = 15.5;
         // Conversion factors
-        public static final double leftFlapDegrees = kLeft90 / 90.0;
-        public static final double rightFlapDegrees = kRight90 / 90.0;
+        public static final double rightFlapDegrees = kLeft90 / 90.0;
+        public static final double leftFlapDegrees = kRight90 / 90.0;
 
         public enum FlapState {
             NONE,
             RESET,
             STRAIGHT,
-            AMP,
+            INTAKE,
+            TEST,
             AUTO
+        }
+
+        public enum PitchState {
+            NONE,
+            VERTICAL,
+            INTAKE,
+            SPEAKER,
+            AMP,
+            AUTO,
+            TEST
         }
     }
 
