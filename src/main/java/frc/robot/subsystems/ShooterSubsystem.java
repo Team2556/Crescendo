@@ -6,15 +6,20 @@ package frc.robot.subsystems;
 
 import com.revrobotics.*;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.ShooterConstants.FlapState;
-import frc.robot.Constants.ShooterConstants.ShooterState;
+import frc.robot.Constants.ShooterConstants.*;
 
 import static frc.robot.Constants.ShooterConstants.*;
 
@@ -279,6 +284,41 @@ public class ShooterSubsystem extends SubsystemBase {
         leftHomeFlag = false;
         rightHomeFlag = false;
         flapState = FlapState.RESET;
+    }
+
+    public Pair<Double, Double> getFlapCalculatedAngle(Pose2d pose) {
+        double flapLeftAngle = kLeft90, flapRightAngle = kRight90;
+        double speakerY = 5.5;
+
+        double deltaY = pose.getY() - speakerY;
+        double hyp = Math.sqrt(deltaY * deltaY + pose.getX() * pose.getX());
+        double sin = Math.sin(deltaY / hyp);
+        double flapCenter = Math.toDegrees(sin - pose.getRotation().getRadians());
+        SmartDashboard.putNumber("Flap Center", flapCenter);
+        // Verify robot's angle is not outside the max angle the flaps should align at.
+        if(!(Math.abs(flapCenter) > kMaxFlapAngle)) {
+            double v = 78.0 * Math.sin(Math.toRadians(flapCenter));
+            flapRightAngle = (90 + v) * rightFlapDegrees;
+            flapLeftAngle = (90 - v) * leftFlapDegrees;
+        }
+        return new Pair<>(flapLeftAngle, flapRightAngle);
+    }
+
+    public double getShooterCalculatedAngle(Pose2d pose) {
+        // Get speaker pose constant.
+        Pose3d speaker = new Pose3d(0.3, 5.5, Units.inchesToMeters(78.0), new Rotation3d());
+        // Get shooter pivot location relative to the center of the robot.
+        Transform3d shooterPivot = new Transform3d(Units.inchesToMeters(3.5), 0.0, Units.inchesToMeters(6.0), new Rotation3d());
+        // Convert robot pose to shooter pivot pose relative to the field.
+        Pose3d deltaPose = new Pose3d(pose).plus(shooterPivot);
+        // Delta X and Delta Y variables to calculate distance from the speaker.
+        double deltaX = deltaPose.getX() - speaker.getX(), deltaY = deltaPose.getY() - speaker.getY();
+        // Calculate hypotenuse to get the distance from the speaker & the height of the speaker relative to the pivot.
+        double b = Math.sqrt(deltaX * deltaX + deltaY * deltaY), a = speaker.getZ() - shooterPivot.getZ();
+        // Calculate angle using arc-tangent.
+        double angle = Math.toDegrees(Math.atan(a / b));
+        SmartDashboard.putNumber("Shooter Pivot Calculated Angle", angle);
+        return angle;
     }
 
     public double getShooterPitchCompensated() {

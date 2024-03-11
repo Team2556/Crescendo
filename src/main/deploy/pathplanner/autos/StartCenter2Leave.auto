@@ -2,42 +2,36 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.67,
-      "y": 6.66
+      "x": 1.3116774650097067,
+      "y": 5.579042530410311
     },
-    "rotation": 60.0
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Shoot Preload"
+            "pathName": "StartCenterToCenterNote"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "StartAmpToAmpNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
+            "pathName": "CenterNoteToStageNote"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "AmpNoteToLeave"
+            "pathName": "StageNoteToLeave"
           }
         }
       ]
     }
   },
-  "folder": "Amp",
+  "folder": "Center",
   "choreoAuto": false
 }

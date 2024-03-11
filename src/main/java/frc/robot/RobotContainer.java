@@ -5,27 +5,28 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import org.photonvision.PhotonCamera;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static frc.robot.Constants.SLOW_MAX_SPEED;
-import static frc.robot.Constants.SWERVE_MAX_SPEED;
+import static frc.robot.Constants.*;
 import static frc.robot.Constants.ShooterConstants.*;
 
 /**
@@ -45,6 +46,10 @@ public class RobotContainer {
     // Drive controllers
     CommandXboxController driverXbox = new CommandXboxController(0);
     CommandXboxController operatorXbox = new CommandXboxController(1);
+
+    Command shootPreload;
+    Command intake;
+    Command shoot;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -66,6 +71,69 @@ public class RobotContainer {
         m_poseSubsystem.initialize(drivebase, new PhotonCamera("photonVision"));
 
         drivebase.setDefaultCommand(closedFieldRel);
+
+        shootPreload = new SequentialCommandGroup(
+                new InstantCommand(m_shooterSubsystem::resetFlaps),
+                new WaitUntilCommand(() -> m_shooterSubsystem.getFlapState().equals(FlapState.NONE))
+                        .alongWith(new RepeatCommand(new RunCommand(m_shooterSubsystem::flapHome, m_shooterSubsystem))),
+                new InstantCommand(() -> {
+                    m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
+                    m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
+                    m_shooterSubsystem.setPitchState(PitchState.SPEAKER);
+                }),
+                new WaitUntilCommand(() -> (m_shooterSubsystem.flapsArrived(kLeft90, kRight90) && m_shooterSubsystem.shooterPitchArrived()))
+                        .alongWith(new RepeatCommand(new RunCommand(() -> {
+                            m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
+                            m_shooterSubsystem.setPitchPosition(kPitchSpeakerPosition);
+                        }, m_shooterSubsystem))),
+                new InstantCommand(() -> m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity)),
+                new WaitUntilCommand(m_shooterSubsystem::isOnTarget)
+                        .alongWith(new RepeatCommand(new RunCommand(() -> m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity)))),
+                new IntakeSetCommand(0.4).withTimeout(0.5),
+                new InstantCommand(() -> {
+                    m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
+                    m_shooterSubsystem.setShooterState(ShooterState.STOP);
+                    m_shooterSubsystem.setPitchState(PitchState.DRIVE);
+                    m_shooterSubsystem.stop();
+                    m_intakeSubsystem.stop();
+                }, m_intakeSubsystem, m_shooterSubsystem)
+        );
+
+        NamedCommands.registerCommand("Shoot Preload", shootPreload);
+
+        intake = new SequentialCommandGroup(
+                new WaitUntilCommand(() -> !m_intakeSubsystem.getIntakeLimitSwitch())
+                        .alongWith(new RepeatCommand(new RunCommand(() -> m_intakeSubsystem.setIntakeMotor(kIntakeMaxSpeed), m_intakeSubsystem)))
+        );
+
+        NamedCommands.registerCommand("Intake", intake.withTimeout(2.0));
+
+        shoot = new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    m_shooterSubsystem.setFlapState(FlapState.AUTO);
+                    m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
+                    m_shooterSubsystem.setPitchState(PitchState.AUTO);
+                    m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
+                }),
+                new WaitUntilCommand(() -> (m_shooterSubsystem.isOnTarget() && m_shooterSubsystem.shooterPitchArrived()))
+                        .alongWith(new RepeatCommand(new RunCommand(() -> {
+                            m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
+                            Pair<Double, Double> flapAngles = m_shooterSubsystem.getFlapCalculatedAngle(m_poseSubsystem.getPose());
+                            m_shooterSubsystem.setFlapPosition(flapAngles.getFirst(), flapAngles.getSecond());
+                            m_shooterSubsystem.setPitchPosition(m_shooterSubsystem.getShooterCalculatedAngle(m_poseSubsystem.getPose()) + kPitchMinimumAngle);
+                        }, m_shooterSubsystem))
+                ),
+                new RepeatCommand(new IntakeSetCommand(0.4)).withTimeout(0.5),
+                new InstantCommand(() -> {
+                    m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
+                    m_shooterSubsystem.setShooterState(ShooterState.STOP);
+                    m_shooterSubsystem.setPitchState(PitchState.DRIVE);
+                    m_shooterSubsystem.stop();
+                    m_intakeSubsystem.stop();
+                }, m_intakeSubsystem, m_shooterSubsystem)
+        );
+
+        NamedCommands.registerCommand("Shoot", shoot);
     }
 
     /**
@@ -84,10 +152,17 @@ public class RobotContainer {
         driverXbox.b().onTrue(new InstantCommand(() -> TeleopDrive.fieldOriented = !TeleopDrive.fieldOriented));
         driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
 
-        //ToDo Get pose for red side
+        Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+        Pose2d speakerPose = blueSpeakerScore, ampPose = blueAmp, intakePose = blueIntake;
+        if(alliance.isPresent()) {
+            speakerPose = alliance.get().equals(DriverStation.Alliance.Red) ? redSpeakerScore : blueSpeakerScore;
+            ampPose = alliance.get().equals(DriverStation.Alliance.Red) ? redAmp : blueAmp;
+            intakePose = alliance.get().equals(DriverStation.Alliance.Red) ? redIntake : blueIntake;
+        }
+
         driverXbox.povUp().onTrue(
                 AutoBuilder.pathfindToPose(
-                        new Pose2d(3.3, 4.8, Rotation2d.fromDegrees(0.0)),
+                        speakerPose,
                         new PathConstraints(
                                 2.0, 1.0,
                                 Units.degreesToRadians(360), Units.degreesToRadians(540)
@@ -97,10 +172,9 @@ public class RobotContainer {
                 )
         );
 
-        //ToDo Get pose for red side
         driverXbox.povLeft().onTrue(
                 AutoBuilder.pathfindToPose(
-                        new Pose2d(1.8, 7.6, Rotation2d.fromDegrees(0.0)),
+                        ampPose,
                         new PathConstraints(
                                 2.0, 1.0,
                                 Units.degreesToRadians(360), Units.degreesToRadians(540)
@@ -110,10 +184,9 @@ public class RobotContainer {
                 )
         );
 
-        //ToDo Get pose for red side
         driverXbox.povRight().onTrue(
                 AutoBuilder.pathfindToPose(
-                        new Pose2d(15.5, 1.0, Rotation2d.fromDegrees(300)),
+                        intakePose,
                         new PathConstraints(
                                 2.0, 1.0,
                                 Units.degreesToRadians(360), Units.degreesToRadians(540)
@@ -181,6 +254,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("StartAmp3Leave");
+        return new PathPlannerAuto("StartAmp1Leave");
     }
 }

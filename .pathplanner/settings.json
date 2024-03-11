@@ -1,13 +1,16 @@
 {
-  "robotWidth": 0.76,
-  "robotLength": 0.762,
+  "robotWidth": 0.77,
+  "robotLength": 0.77,
   "holonomicMode": true,
   "pathFolders": [
-    "Amp Start",
+    "Alliance Note",
+    "Leave",
+    "Start",
     "Test"
   ],
   "autoFolders": [
-    "Amp"
+    "Amp",
+    "Center"
   ],
   "defaultMaxVel": 4.0,
   "defaultMaxAccel": 6.0,
