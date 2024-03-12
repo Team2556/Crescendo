@@ -7,6 +7,9 @@ package frc.robot.commands;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ShooterConstants.FlapState;
+import frc.robot.Constants.ShooterConstants.PitchState;
+import frc.robot.Constants.ShooterConstants.ShooterState;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.ShooterInterpolation;
@@ -21,6 +24,7 @@ public class ShootControlCommand extends Command {
     private final PoseSubsystem poseSubsystem = PoseSubsystem.getInstance();
     private final ShooterInterpolation interpolation;
     private final BooleanSupplier m_rightTrigger, m_rightBumper;
+    private boolean dashboardFlag = false;
 
     public ShootControlCommand(BooleanSupplier rightTrigger, BooleanSupplier rightBumper) {
         m_rightTrigger = rightTrigger;
@@ -30,6 +34,7 @@ public class ShootControlCommand extends Command {
         SmartDashboard.putNumber("Shooter Pitch Angle Input", 0);
         SmartDashboard.putNumber("Flap Test Angle", 5);
         SmartDashboard.putNumber("Flap Speed Scalar", 0.8);
+        dashboardFlag = true;
     }
 
     @Override
@@ -41,6 +46,10 @@ public class ShootControlCommand extends Command {
 
     @Override
     public void execute() {
+        if (!dashboardFlag) {
+            SmartDashboard.putNumber("speaker height", 92);
+            dashboardFlag = true;
+        }
         double leftVelocity = kSpeakerVelocity, rightVelocity = kSpeakerVelocity;
         switch (m_shooterSubsystem.getFlapState()) {
             case RESET -> m_shooterSubsystem.flapHome();

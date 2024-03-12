@@ -190,7 +190,7 @@ public class ShooterSubsystem extends SubsystemBase {
     //ToDo Add angle bounding to verify the inputted position is within the physically possible range.
     public void setPitchPosition(double position) {
         double pid = shooterPitchPID.calculate(getShooterPitch(), position);
-        if((!forwardLimitSwitch.get() && pid > 0) || (!backwardLimitSwitch.get() && pid < 0)) {
+        if((!forwardLimitSwitch.get() && pid < 0) || (!backwardLimitSwitch.get() && pid > 0)) {
             shooterPitch.setVoltage(0.0);
             return;
         }
@@ -317,8 +317,9 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getShooterCalculatedAngle(Pose2d pose) {
+        double speakerHeight = SmartDashboard.getNumber("speaker height", 92);
         // Get speaker pose constant.
-        Pose3d speaker = new Pose3d(0.3, 5.5, Units.inchesToMeters(78.0), new Rotation3d());
+        Pose3d speaker = new Pose3d(0.3, 5.5, Units.inchesToMeters(speakerHeight), new Rotation3d());
         // Get shooter pivot location relative to the center of the robot.
         Transform3d shooterPivot = new Transform3d(Units.inchesToMeters(3.5), 0.0, Units.inchesToMeters(6.0), new Rotation3d());
         // Convert robot pose to shooter pivot pose relative to the field.
