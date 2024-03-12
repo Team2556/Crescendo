@@ -214,6 +214,8 @@ public class RobotContainer {
             m_shooterSubsystem.setFlapState(FlapState.AUTO);
             m_shooterSubsystem.setPitchState(PitchState.AUTO);
         }));
+        operatorXbox.povUp().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.VERTICAL)));
+        operatorXbox.povDown().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)));
 
         AtomicBoolean shot = new AtomicBoolean(false);
         // Command to execute when right bumper is pressed
@@ -230,7 +232,7 @@ public class RobotContainer {
                         .alongWith(new InstantCommand(() -> shot.set(false)))
         );
 
-        driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand);
+        driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand.andThen(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)));
 
         Command ampScore = new SequentialCommandGroup(
                 new InstantCommand(() -> {
@@ -241,8 +243,18 @@ public class RobotContainer {
                 }),
                 new WaitUntilCommand(m_shooterSubsystem::shooterPitchArrived)
                         .alongWith(new RepeatCommand(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchVerticalPosition), m_shooterSubsystem))),
-                new RepeatCommand(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem)
-                        .alongWith(new IntakeSetCommand(0.4).withTimeout(1.0))).withTimeout(2.0)
+                new InstantCommand(() -> {
+                    m_shooterSubsystem.setPitchPosition(kPitchAmpPosition);
+                    m_shooterSubsystem.setPitchState(PitchState.AMP);
+                }),
+                new WaitUntilCommand(m_shooterSubsystem::shooterPitchArrived)
+                        .alongWith(new RepeatCommand(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem))
+                                .alongWith(new RepeatCommand(new IntakeSetCommand(0.4)))),
+                new InstantCommand(() -> {
+                    m_shooterSubsystem.stop();
+                    m_intakeSubsystem.stop();
+                    m_shooterSubsystem.setPitchState(PitchState.DRIVE);
+                }, m_intakeSubsystem, m_shooterSubsystem)
         );
 
         driverXbox.leftBumper().onTrue(ampScore);

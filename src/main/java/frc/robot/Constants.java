@@ -73,7 +73,7 @@ public final class Constants {
         public static final double kPitchAmpPosition = 18;
         public static final double kPitchVerticalPosition = 0;
         public static final double kPitchIntakePosition = 18;
-        public static final double kPitchDrivePosition = 330;
+        public static final double kPitchDrivePosition = 320;
 
         // Raw absolute encoder value
         public static final double kPitchSpeakerPosition = 340;
