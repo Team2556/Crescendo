@@ -233,16 +233,16 @@ public class RobotContainer {
         driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand);
 
         Command ampScore = new SequentialCommandGroup(
-                new RunCommand(() -> {
+                new InstantCommand(() -> {
                     m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
                     m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
-                }, m_shooterSubsystem),
-                new WaitUntilCommand(() -> m_shooterSubsystem.flapsArrived(kLeft90, kRight90)),
-                new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchVerticalPosition), m_shooterSubsystem),
-                new WaitUntilCommand(m_shooterSubsystem::shooterPitchArrived),
-                new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem)
-                        .alongWith(new IntakeSetCommand(0.4).withTimeout(1.0)),
-                new WaitCommand(2.0)
+                    m_shooterSubsystem.setShooterState(ShooterState.AMP);
+                    m_shooterSubsystem.setPitchState(PitchState.VERTICAL);
+                }),
+                new WaitUntilCommand(m_shooterSubsystem::shooterPitchArrived)
+                        .alongWith(new RepeatCommand(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchVerticalPosition), m_shooterSubsystem))),
+                new RepeatCommand(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem)
+                        .alongWith(new IntakeSetCommand(0.4).withTimeout(1.0))).withTimeout(2.0)
         );
 
         driverXbox.leftBumper().onTrue(ampScore);

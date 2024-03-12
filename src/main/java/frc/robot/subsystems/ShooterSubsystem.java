@@ -318,6 +318,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public double getShooterCalculatedAngle(Pose2d pose) {
         double speakerHeight = SmartDashboard.getNumber("speaker height", 92);
+        Pair<Double, Double> closeZone = new Pair<>(2.1, Units.inchesToMeters(72.0)),
+                mediumZone = new Pair<>(3.96, Units.inchesToMeters(78.0));
         // Get speaker pose constant.
         Pose3d speaker = new Pose3d(0.3, 5.5, Units.inchesToMeters(speakerHeight), new Rotation3d());
         // Get shooter pivot location relative to the center of the robot.
