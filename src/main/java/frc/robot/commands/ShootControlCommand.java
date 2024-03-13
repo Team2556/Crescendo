@@ -33,7 +33,7 @@ public class ShootControlCommand extends Command {
         addRequirements(m_shooterSubsystem);
         SmartDashboard.putNumber("Shooter Pitch Angle Input", 0);
         SmartDashboard.putNumber("Flap Test Angle", 5);
-        SmartDashboard.putNumber("Flap Speed Scalar", 0.8);
+        SmartDashboard.putNumber("Flap Speed Scalar", 0.0);
         dashboardFlag = true;
     }
 
@@ -50,16 +50,16 @@ public class ShootControlCommand extends Command {
             SmartDashboard.putNumber("speaker height", 92);
             dashboardFlag = true;
         }
-        double leftVelocity = kSpeakerVelocity, rightVelocity = kSpeakerVelocity;
+        double leftVelocity = 0, rightVelocity = 0;
         switch (m_shooterSubsystem.getFlapState()) {
             case RESET -> m_shooterSubsystem.flapHome();
             case STRAIGHT -> m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
             case AUTO -> {
                 Pair<Double, Double> flapAngles = m_shooterSubsystem.getFlapCalculatedAngle(poseSubsystem.getPose());
                 m_shooterSubsystem.setFlapPosition(flapAngles.getFirst(), flapAngles.getSecond());
-                double scalar = SmartDashboard.getNumber("Flap Speed Scalar", 0.8);
-                leftVelocity *= ((flapAngles.getFirst() - kLeft90) / kLeft90) * scalar;
-                rightVelocity *= ((flapAngles.getSecond() - kRight90) / kRight90) * scalar;
+                double scalar = SmartDashboard.getNumber("Flap Speed Scalar", 0.0);
+                leftVelocity = (((flapAngles.getFirst() - kLeft90) / kLeft90) * scalar) * kSpeakerVelocity;
+                rightVelocity = (((flapAngles.getSecond() - kRight90) / kRight90) * scalar) * kSpeakerVelocity;
                 leftVelocity = Math.max(leftVelocity, 0);
                 rightVelocity = Math.max(rightVelocity, 0);
             }
@@ -73,6 +73,9 @@ public class ShootControlCommand extends Command {
                 double flapRightAngle = (90 + angle) * rightFlapDegrees;
                 double flapLeftAngle = (90 + angle) * leftFlapDegrees;
                 m_shooterSubsystem.setFlapPosition(flapLeftAngle, flapRightAngle);
+            }
+            case SIDE -> {
+                m_shooterSubsystem.setFlapPosition(1.5, 1.5);
             }
         }
 

@@ -14,11 +14,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.*;
 import frc.robot.commands.*;
+import frc.robot.commands.auto.*;
 import frc.robot.subsystems.*;
 import org.photonvision.PhotonCamera;
 
@@ -43,6 +46,7 @@ public class RobotContainer {
     private final IntakeSubsystem m_intakeSubsystem = IntakeSubsystem.getInstance();
     private final ElevatorSubsystem m_elevatorSubsystem = ElevatorSubsystem.getInstance();
     private final PoseSubsystem m_poseSubsystem = PoseSubsystem.getInstance();
+    private final SendableChooser<Command> autoChooser;
     // Drive controllers
     CommandXboxController driverXbox = new CommandXboxController(0);
     CommandXboxController operatorXbox = new CommandXboxController(1);
@@ -73,30 +77,10 @@ public class RobotContainer {
         drivebase.setDefaultCommand(closedFieldRel);
 
         shootPreload = new SequentialCommandGroup(
-                new InstantCommand(m_shooterSubsystem::resetFlaps),
-                new WaitUntilCommand(() -> m_shooterSubsystem.getFlapState().equals(FlapState.NONE))
-                        .alongWith(new RepeatCommand(new RunCommand(m_shooterSubsystem::flapHome, m_shooterSubsystem))),
-                new InstantCommand(() -> {
-                    m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
-                    m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
-                    m_shooterSubsystem.setPitchState(PitchState.SPEAKER);
-                }),
-                new WaitUntilCommand(() -> (m_shooterSubsystem.flapsArrived(kLeft90, kRight90) && m_shooterSubsystem.shooterPitchArrived()))
-                        .alongWith(new RepeatCommand(new RunCommand(() -> {
-                            m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
-                            m_shooterSubsystem.setPitchPosition(kPitchSpeakerPosition);
-                        }, m_shooterSubsystem))),
-                new InstantCommand(() -> m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity)),
-                new WaitUntilCommand(m_shooterSubsystem::isOnTarget)
-                        .alongWith(new RepeatCommand(new RunCommand(() -> m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity)))),
-                new IntakeSetCommand(0.4).withTimeout(0.5),
-                new InstantCommand(() -> {
-                    m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
-                    m_shooterSubsystem.setShooterState(ShooterState.STOP);
-                    m_shooterSubsystem.setPitchState(PitchState.DRIVE);
-                    m_shooterSubsystem.stop();
-                    m_intakeSubsystem.stop();
-                }, m_intakeSubsystem, m_shooterSubsystem)
+                new ResetFlaps(),
+                new PreparePreload(),
+                new CanShootPreload(),
+                new ShootPreload().withTimeout(1.5)
         );
 
         NamedCommands.registerCommand("Shoot Preload", shootPreload);
@@ -109,24 +93,11 @@ public class RobotContainer {
         NamedCommands.registerCommand("Intake", intake.withTimeout(2.0));
 
         shoot = new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    m_shooterSubsystem.setFlapState(FlapState.AUTO);
-                    m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
-                    m_shooterSubsystem.setPitchState(PitchState.AUTO);
-                    m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
-                }),
-                new WaitUntilCommand(() -> (m_shooterSubsystem.isOnTarget() && m_shooterSubsystem.shooterPitchArrived()))
-                        .alongWith(new RepeatCommand(new RunCommand(() -> {
-                            m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
-                            Pair<Double, Double> flapAngles = m_shooterSubsystem.getFlapCalculatedAngle(m_poseSubsystem.getPose());
-                            m_shooterSubsystem.setFlapPosition(flapAngles.getFirst(), flapAngles.getSecond());
-                            m_shooterSubsystem.setPitchPosition(m_shooterSubsystem.getShooterCalculatedAngle(m_poseSubsystem.getPose()) + kPitchMinimumAngle);
-                        }, m_shooterSubsystem))
-                ),
-                new RepeatCommand(new IntakeSetCommand(0.4)).withTimeout(0.5),
+                new ShootCommand(),
+                new IntakeSetCommand(0.4).withTimeout(0.5),
                 new InstantCommand(() -> {
                     m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
-                    m_shooterSubsystem.setShooterState(ShooterState.STOP);
+                    m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
                     m_shooterSubsystem.setPitchState(PitchState.DRIVE);
                     m_shooterSubsystem.stop();
                     m_intakeSubsystem.stop();
@@ -134,6 +105,16 @@ public class RobotContainer {
         );
 
         NamedCommands.registerCommand("Shoot", shoot);
+
+        autoChooser = AutoBuilder.buildAutoChooser();
+
+        new PathPlannerAuto("StartCenter1Middle1");
+        new PathPlannerAuto("StartCenter2Leave");
+        new PathPlannerAuto("StartAmp1Leave");
+        new PathPlannerAuto("StartAmp2Leave");
+        new PathPlannerAuto("StartAmp3Leave");
+
+        SmartDashboard.putData("Auto Mode", autoChooser);
     }
 
     /**
@@ -200,8 +181,8 @@ public class RobotContainer {
         operatorXbox.rightBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
         operatorXbox.leftBumper().onTrue(new InstantCommand(() -> {
             m_shooterSubsystem.setShooterState(ShooterState.AMP);
-            m_shooterSubsystem.setPitchState(PitchState.AMP);
-            m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
+//            m_shooterSubsystem.setPitchState(PitchState.VERTICAL);
+            m_shooterSubsystem.setFlapState(FlapState.SIDE);
         }));
         operatorXbox.a().onTrue(new InstantCommand(() -> {
             m_shooterSubsystem.setShooterState(ShooterState.INTAKE);
@@ -235,26 +216,8 @@ public class RobotContainer {
         driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand.andThen(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)));
 
         Command ampScore = new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
-                    m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
-                    m_shooterSubsystem.setShooterState(ShooterState.AMP);
-                    m_shooterSubsystem.setPitchState(PitchState.VERTICAL);
-                }),
-                new WaitUntilCommand(m_shooterSubsystem::shooterPitchArrived)
-                        .alongWith(new RepeatCommand(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchVerticalPosition), m_shooterSubsystem))),
-                new InstantCommand(() -> {
-                    m_shooterSubsystem.setPitchPosition(kPitchAmpPosition);
-                    m_shooterSubsystem.setPitchState(PitchState.AMP);
-                }),
-                new WaitUntilCommand(m_shooterSubsystem::shooterPitchArrived)
-                        .alongWith(new RepeatCommand(new RunCommand(() -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition), m_shooterSubsystem))
-                                .alongWith(new RepeatCommand(new IntakeSetCommand(0.4)))),
-                new InstantCommand(() -> {
-                    m_shooterSubsystem.stop();
-                    m_intakeSubsystem.stop();
-                    m_shooterSubsystem.setPitchState(PitchState.DRIVE);
-                }, m_intakeSubsystem, m_shooterSubsystem)
+                new AmpVertical(),
+                new AmpScore()
         );
 
         driverXbox.leftBumper().onTrue(ampScore);
@@ -266,6 +229,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("StartAmp1Leave");
+        return autoChooser.getSelected();
     }
 }

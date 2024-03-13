@@ -12,12 +12,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot Preload"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "StartAmpToAmpNote"
@@ -26,13 +20,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "AmpNoteToLeave"
+            "name": "Intake"
           }
         }
       ]

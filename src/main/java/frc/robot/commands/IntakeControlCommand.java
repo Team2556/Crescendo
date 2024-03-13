@@ -31,7 +31,7 @@ public class IntakeControlCommand extends Command {
         if(m_rightTrigger.getAsDouble() > RIGHT_TRIGGER_DEADBAND)
             m_subsystem.setIntakeMotor(kIntakeMaxSpeed * m_rightTrigger.getAsDouble());
         else if(m_leftTrigger.getAsDouble() > LEFT_TRIGGER_DEADBAND)
-            m_subsystem.setIntakeMotor(kOuttakeMaxSpeed);
+            m_subsystem.set(kOuttakeMaxSpeed);
         else
             m_subsystem.stop();
     }

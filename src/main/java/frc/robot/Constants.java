@@ -65,18 +65,18 @@ public final class Constants {
         public static final double kMaxPIDOutput = 1.0;
         public static final double kMinPIDOutput = -1.0;
 
-        public static final double kVelocityTolerance = 30;
+        public static final double kVelocityTolerance = 400;
 
         public static final double kFlapTolerance = 1.0;
         public static final double kPitchTolerance = 1.0;
         // Raw absolute encoder value
-        public static final double kPitchAmpPosition = 18;
+        public static final double kPitchAmpPosition = 22;
         public static final double kPitchVerticalPosition = 0;
-        public static final double kPitchIntakePosition = 18;
-        public static final double kPitchDrivePosition = 320;
+        public static final double kPitchIntakePosition = 22;
+        public static final double kPitchDrivePosition = 330;
 
         // Raw absolute encoder value
-        public static final double kPitchSpeakerPosition = 340;
+        public static final double kPitchSpeakerPosition = 325;
         public static final double kPitchMinimumAngle = 270;
         public static final double kPitchForwardLimit = 290;
         public static final double kPitchBackwardLimit = 20;
@@ -90,9 +90,9 @@ public final class Constants {
             SPEAKER
         }
 
-        public static final double kSpeakerVelocity = 6700;
+        public static final double kSpeakerVelocity = 5900;
         public static final double kShooterIntakeSpeed = -0.1;
-        public static final double kAmpSpeed = 0.15;
+        public static final double kAmpSpeed = 0.125;
 
 
         // Flap constants
@@ -111,7 +111,8 @@ public final class Constants {
             STRAIGHT,
             INTAKE,
             TEST,
-            AUTO
+            AUTO,
+            SIDE
         }
 
         public enum PitchState {

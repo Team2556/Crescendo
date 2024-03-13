@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -126,7 +127,7 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterPitchEncoder.setVelocityConversionFactor(6.0);
 
         shooterPitchPID.enableContinuousInput(0, 360.0);
-        shooterPitchPID.setTolerance(1.0);
+        shooterPitchPID.setTolerance(5.0);
 
         stop();
 
@@ -189,6 +190,11 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     //ToDo Add angle bounding to verify the inputted position is within the physically possible range.
     public void setPitchPosition(double position) {
+        SmartDashboard.putNumber("Commanded pivot position", position);
+        if(position > 18 && position < 180)
+            position = 18;
+        else if(position > 18 && position < 295)
+            position = 295;
         double pid = shooterPitchPID.calculate(getShooterPitch(), position);
         if((!forwardLimitSwitch.get() && pid < 0) || (!backwardLimitSwitch.get() && pid > 0)) {
             shooterPitch.setVoltage(0.0);
@@ -317,11 +323,17 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getShooterCalculatedAngle(Pose2d pose) {
-        double speakerHeight = SmartDashboard.getNumber("speaker height", 92);
-        Pair<Double, Double> closeZone = new Pair<>(2.1, Units.inchesToMeters(72.0)),
-                mediumZone = new Pair<>(3.96, Units.inchesToMeters(78.0));
+        double speakerHeight = SmartDashboard.getNumber("speaker height", Units.inchesToMeters(92));
+        Pair<Double, Double> closeZone = new Pair<>(Units.inchesToMeters(72), Units.inchesToMeters(92.0-6.0)),
+                mediumZone = new Pair<>(3.96, Units.inchesToMeters(90.0-2.0)), farZone = new Pair<>(6.0, Units.inchesToMeters(100.0 + 5.0 + 12.0 + 6.0 - 3.0));
+        if(pose.getX() <= closeZone.getFirst())
+            speakerHeight = closeZone.getSecond();
+        else if(pose.getX() <= mediumZone.getFirst())
+            speakerHeight = mediumZone.getSecond();
+        else
+            speakerHeight = farZone.getSecond();
         // Get speaker pose constant.
-        Pose3d speaker = new Pose3d(0.3, 5.5, Units.inchesToMeters(speakerHeight), new Rotation3d());
+        Pose3d speaker = new Pose3d(0.3, 5.5, speakerHeight, new Rotation3d());
         // Get shooter pivot location relative to the center of the robot.
         Transform3d shooterPivot = new Transform3d(Units.inchesToMeters(3.5), 0.0, Units.inchesToMeters(6.0), new Rotation3d());
         // Convert robot pose to shooter pivot pose relative to the field.
@@ -381,7 +393,7 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Target Velocity", targetVelocity);
 
         SmartDashboard.putString("Shooter State", shooterState.name());
-        SmartDashboard.putString("Flap State", flapState.name());
+        SmartDashboard.putString("Flap State", getFlapState().name());
         SmartDashboard.putString("Shooter Angle State", pitchState.name());
 
         SmartDashboard.putNumber("Shooter Pitch", shooterPitchEncoder.getPosition());
@@ -427,5 +439,9 @@ public class ShooterSubsystem extends SubsystemBase {
             return new ShooterSubsystem();
         }
         return instance;
+    }
+
+    public boolean flapsHomed() {
+        return leftHomeFlag && rightHomeFlag;
     }
 }

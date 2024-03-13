@@ -3,38 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.6343658458682073,
-        "y": 4.159722059732688
+        "x": 3.15,
+        "y": 5.527389345566705
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0101955409238235,
-        "y": 1.6813987901005765
+        "x": 1.85876628445963,
+        "y": 6.663465994549679
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.608862052352296,
-        "y": 1.718114690391423
+        "x": 3.15,
+        "y": 6.99
       },
       "prevControl": {
-        "x": 4.800603963028126,
-        "y": 1.7548305906822685
+        "x": 1.7596821805055864,
+        "y": 7.038212764014687
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.1,
-      "rotationDegrees": -14.740000000000009,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -49,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Leave",
+  "folder": "Alliance Note",
   "previewStartingState": null,
   "useDefaultConstraints": true
 }

@@ -4,24 +4,24 @@
     {
       "anchor": {
         "x": 3.15,
-        "y": 6.986846382127837
+        "y": 5.562647359246215
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5642354852523248,
-        "y": 5.2703780435307825
+        "x": 2.8560930608598136,
+        "y": 5.562647359246215
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.15,
-        "y": 5.527389345566705
+        "x": 2.379705757984981,
+        "y": 5.539225686154654
       },
       "prevControl": {
-        "x": 2.18620761736529,
-        "y": 5.5824631960029745
+        "x": 2.6267461255525006,
+        "y": 5.539225686154654
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,7 +30,25 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 2.0,
     "maxAcceleration": 2.0,
@@ -40,10 +58,10 @@
   "goalEndState": {
     "velocity": 0,
     "rotation": 0,
-    "rotateFast": true
+    "rotateFast": false
   },
   "reversed": false,
-  "folder": "Alliance Note",
+  "folder": "Start",
   "previewStartingState": null,
   "useDefaultConstraints": true
 }

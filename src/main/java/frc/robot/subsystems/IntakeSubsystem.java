@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -13,7 +14,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // Subsystem instance
     private final static IntakeSubsystem instance = getInstance();
     // Intake motor
-    private final CANSparkFlex intakeMotor;
+    private final CANSparkMax intakeMotor;
     // Break beam sensor
     private final DigitalInput intakeLimitSwitch;
 
@@ -21,7 +22,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * Constructor to configure and initialize the motor, and break beam sensor.
      */
     public IntakeSubsystem() {
-        intakeMotor = new CANSparkFlex(kIntakePort, CANSparkLowLevel.MotorType.kBrushless);
+        intakeMotor = new CANSparkMax(kIntakePort, CANSparkLowLevel.MotorType.kBrushless);
         intakeMotor.restoreFactoryDefaults();
         intakeMotor.clearFaults();
         intakeMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
