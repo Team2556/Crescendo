@@ -24,6 +24,7 @@ public class TeleopDrive extends Command {
 
     public static boolean slowMode = false;
     public static boolean fieldOriented = true;
+    private static final double slowModeScalar = 0.3;
 
     public TeleopDrive(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY,
                      DoubleSupplier omega) {
@@ -50,7 +51,9 @@ public class TeleopDrive extends Command {
         SmartDashboard.putNumber("vX", xVelocity);
         SmartDashboard.putNumber("vY", yVelocity);
         SmartDashboard.putNumber("omega", angVelocity);
-
+        xVelocity *= slowMode ? slowModeScalar : 1;
+        yVelocity *= slowMode ? slowModeScalar : 1;
+        angVelocity *= slowMode ? slowModeScalar : 1;
         // Drive using raw values.
         swerve.drive(new Translation2d(xVelocity * swerve.maximumSpeed, yVelocity * swerve.maximumSpeed),
                 angVelocity * controller.config.maxAngularVelocity,

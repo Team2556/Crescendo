@@ -9,10 +9,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -49,6 +46,10 @@ public class ShooterSubsystem extends SubsystemBase {
     private ShooterState shooterState = ShooterState.STOP;
     private FlapState flapState = FlapState.NONE;
     private PitchState pitchState = PitchState.NONE;
+
+    private Pose2d blueSpeaker = new Pose2d(0.3, 5.5, new Rotation2d());
+    private Pose2d redSpeaker = new Pose2d(16.2, 5.5, new Rotation2d());
+    public static boolean red = false;
 
     /**
      * Constructor to handle the initialization and configuration of motors,
@@ -311,31 +312,57 @@ public class ShooterSubsystem extends SubsystemBase {
         double deltaY = pose.getY() - speakerY;
         double hyp = Math.sqrt(deltaY * deltaY + pose.getX() * pose.getX());
         double sin = Math.sin(deltaY / hyp);
-        double flapCenter = Math.toDegrees(sin - pose.getRotation().getRadians());
+        double rot = red ? pose.getRotation().minus(new Rotation2d(Math.toRadians(180.0))).getRadians() : pose.getRotation().getRadians();
+        double flapCenter = Math.toDegrees(sin - rot);
         SmartDashboard.putNumber("Flap Center", flapCenter);
         // Verify robot's angle is not outside the max angle the flaps should align at.
         if(!(Math.abs(flapCenter) > kMaxFlapAngle)) {
             double v = 78.0 * Math.sin(Math.toRadians(flapCenter));
             flapRightAngle = (90 + v) * rightFlapDegrees;
             flapLeftAngle = (90 - v) * leftFlapDegrees;
+            SmartDashboard.putNumber("Flap left encoder auto", flapLeftAngle);
+            SmartDashboard.putNumber("Flap right encoder auto", flapRightAngle);
         }
         return new Pair<>(flapLeftAngle, flapRightAngle);
     }
 
     public double getShooterCalculatedAngle(Pose2d pose) {
-        double speakerHeight = SmartDashboard.getNumber("speaker height", Units.inchesToMeters(92));
-        Pair<Double, Double> closeZone = new Pair<>(Units.inchesToMeters(72), Units.inchesToMeters(92.0-6.0)),
-                mediumZone = new Pair<>(3.96, Units.inchesToMeters(90.0-2.0)), farZone = new Pair<>(6.0, Units.inchesToMeters(100.0 + 5.0 + 12.0 + 6.0 - 3.0));
-        if(pose.getX() <= closeZone.getFirst())
-            speakerHeight = closeZone.getSecond();
-        else if(pose.getX() <= mediumZone.getFirst())
-            speakerHeight = mediumZone.getSecond();
-        else
-            speakerHeight = farZone.getSecond();
-        // Get speaker pose constant.
-        Pose3d speaker = new Pose3d(0.3, 5.5, speakerHeight, new Rotation3d());
+        SmartDashboard.putBoolean("Red", red);
+        double closeZoneX = Units.inchesToMeters(72.0), closeZoneHeight = Units.inchesToMeters(92.0-6.0);
+        double mediumZoneX = 3.96, mediumZoneHeight = Units.inchesToMeters(90.0-2.0);
+        double farZoneX = 6.0, farZoneHeight = Units.inchesToMeters(120.0);
+
+        double speakerHeight;
+
+        if(red) {
+            closeZoneX = redSpeaker.getX() - closeZoneX + blueSpeaker.getX();
+            mediumZoneX = redSpeaker.getX() - mediumZoneX + blueSpeaker.getX();
+            farZoneX = redSpeaker.getX() - farZoneX + blueSpeaker.getX();
+            if(pose.getX() >= closeZoneX)
+                speakerHeight = closeZoneHeight;
+            else if(pose.getX() >= mediumZoneX)
+                speakerHeight = mediumZoneHeight;
+            else
+                speakerHeight = farZoneHeight;
+        } else {
+            if(pose.getX() <= closeZoneX)
+                speakerHeight = closeZoneHeight;
+            else if(pose.getX() <= mediumZoneX)
+                speakerHeight = mediumZoneHeight;
+            else
+                speakerHeight = farZoneHeight;
+        }
+
+        Pose3d speaker;
+        if(red) {
+            speaker = new Pose3d(redSpeaker).plus(new Transform3d(0, 0, speakerHeight, new Rotation3d()));
+        } else {
+            speaker = new Pose3d(blueSpeaker).plus(new Transform3d(0, 0, speakerHeight, new Rotation3d()));
+        }
         // Get shooter pivot location relative to the center of the robot.
         Transform3d shooterPivot = new Transform3d(Units.inchesToMeters(3.5), 0.0, Units.inchesToMeters(6.0), new Rotation3d());
+        if(red)
+            shooterPivot.plus(new Transform3d(0, 0, 0, new Rotation3d(0, 0, Math.toRadians(180.0))));
         // Convert robot pose to shooter pivot pose relative to the field.
         Pose3d deltaPose = new Pose3d(pose).plus(shooterPivot);
         // Delta X and Delta Y variables to calculate distance from the speaker.

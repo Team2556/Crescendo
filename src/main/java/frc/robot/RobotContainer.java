@@ -184,8 +184,8 @@ public class RobotContainer {
         operatorXbox.rightBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
         operatorXbox.leftBumper().onTrue(new InstantCommand(() -> {
             m_shooterSubsystem.setShooterState(ShooterState.AMP);
-//            m_shooterSubsystem.setPitchState(PitchState.VERTICAL);
-            m_shooterSubsystem.setFlapState(FlapState.SIDE);
+            m_shooterSubsystem.setPitchState(PitchState.AMP);
+            m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
         }));
         operatorXbox.a().onTrue(new InstantCommand(() -> {
             m_shooterSubsystem.setShooterState(ShooterState.INTAKE);
@@ -205,14 +205,14 @@ public class RobotContainer {
         // Command to execute when right bumper is pressed
         Command pressCommand = new SequentialCommandGroup(
                 new WaitUntilCommand(m_shooterSubsystem::shouldShoot), // Wait until shooter is ready
-                new IntakeSetCommand(0.4).withTimeout(1.0), // Run intake command
+                new IntakeSetCommand(1.0).withTimeout(1.0), // Run intake command
                 new InstantCommand(() -> shot.set(true)) // Set 'shot' to true
         );
 
         // Command to execute when right bumper is released
         Command releaseCommand = new SequentialCommandGroup(
                 // Run intake command and set 'shot' to false
-                new IntakeSetCommand(0.4).withTimeout(1.0)
+                new IntakeSetCommand(1.0).withTimeout(1.0)
                         .alongWith(new InstantCommand(() -> shot.set(false)))
         );
 

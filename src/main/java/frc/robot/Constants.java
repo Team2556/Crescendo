@@ -127,7 +127,7 @@ public final class Constants {
         }
     }
 
-    public static final double kIntakeMaxSpeed = 0.8;
-    public static final double kOuttakeMaxSpeed = -0.5;
+    public static final double kIntakeMaxSpeed = 1.0;
+    public static final double kOuttakeMaxSpeed = -1.0;
     public static final double kElevatorMaxSpeed = 1.0;
 }
