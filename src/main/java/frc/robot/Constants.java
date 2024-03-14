@@ -30,8 +30,10 @@ public final class Constants {
     public static final double SLOW_MAX_SPEED = Units.feetToMeters(4.0);
     public static final double SWERVE_MAX_SPEED = Units.feetToMeters(16.0);
 
-    public static final Pose2d blueSpeakerScore = new Pose2d(3.3, 4.8, Rotation2d.fromDegrees(0.0));
-    public static final Pose2d redSpeakerScore = new Pose2d(13.3, 4.8, Rotation2d.fromDegrees(180.0));
+    public static final Pose2d blueSubwoofer = new Pose2d(1.35, 5.5, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d redSubwoofer = new Pose2d(15.1, 5.5, Rotation2d.fromDegrees(-180.0));
+    public static final Pose2d blueSpeakerScore = new Pose2d(3.3, 4.8, Rotation2d.fromDegrees(-15.0));
+    public static final Pose2d redSpeakerScore = new Pose2d(13.3, 4.8, Rotation2d.fromDegrees(180.0 + 15.0));
     public static final Pose2d blueAmp = new Pose2d(1.8, 7.6, Rotation2d.fromDegrees(90.0));
     public static final Pose2d redAmp = new Pose2d(14.7, 4.8, Rotation2d.fromDegrees(90.0));
     public static final Pose2d blueIntake = new Pose2d(15.5, 1.0, Rotation2d.fromDegrees(-60.0));

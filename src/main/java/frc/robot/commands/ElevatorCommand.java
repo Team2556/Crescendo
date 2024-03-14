@@ -27,7 +27,9 @@ public class ElevatorCommand extends Command {
     @Override
     public void execute() {
         super.execute();
-        double speed = m_leftStick.getAsDouble() * Constants.kElevatorMaxSpeed;
+        double stick = m_leftStick.getAsDouble();
+        stick = stick > 0.2 ? stick : 0.0;
+        double speed = stick * Constants.kElevatorMaxSpeed;
         if (m_leftTrigger.getAsDouble() > 0.5) {
             m_elevatorSubsystem.setClimbSpeedAnd(speed);
         } else {

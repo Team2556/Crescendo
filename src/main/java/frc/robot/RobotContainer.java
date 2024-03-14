@@ -137,18 +137,19 @@ public class RobotContainer {
         driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
 
         Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
-        Pose2d speakerPose = blueSpeakerScore, ampPose = blueAmp, intakePose = blueIntake;
+        Pose2d speakerPose = blueSpeakerScore, ampPose = blueAmp, intakePose = blueIntake, subwooferPose = blueSubwoofer;
         if(alliance.isPresent()) {
             speakerPose = alliance.get().equals(DriverStation.Alliance.Red) ? redSpeakerScore : blueSpeakerScore;
             ampPose = alliance.get().equals(DriverStation.Alliance.Red) ? redAmp : blueAmp;
             intakePose = alliance.get().equals(DriverStation.Alliance.Red) ? redIntake : blueIntake;
+            subwooferPose = alliance.get().equals(DriverStation.Alliance.Red) ? redSubwoofer : blueSubwoofer;
         }
 
         driverXbox.povUp().onTrue(
                 AutoBuilder.pathfindToPose(
                         speakerPose,
                         new PathConstraints(
-                                2.0, 1.0,
+                                3.0, 2.0,
                                 Units.degreesToRadians(360), Units.degreesToRadians(540)
                         ),
                         0,
@@ -160,7 +161,7 @@ public class RobotContainer {
                 AutoBuilder.pathfindToPose(
                         ampPose,
                         new PathConstraints(
-                                2.0, 1.0,
+                                3.0, 2.0,
                                 Units.degreesToRadians(360), Units.degreesToRadians(540)
                         ),
                         0,
@@ -172,7 +173,19 @@ public class RobotContainer {
                 AutoBuilder.pathfindToPose(
                         intakePose,
                         new PathConstraints(
-                                2.0, 1.0,
+                                3.0, 2.0,
+                                Units.degreesToRadians(360), Units.degreesToRadians(540)
+                        ),
+                        0,
+                        0
+                )
+        );
+
+        driverXbox.povDown().onTrue(
+                AutoBuilder.pathfindToPose(
+                        subwooferPose,
+                        new PathConstraints(
+                                3.0, 2.0,
                                 Units.degreesToRadians(360), Units.degreesToRadians(540)
                         ),
                         0,
@@ -200,13 +213,15 @@ public class RobotContainer {
         }));
         operatorXbox.povUp().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.VERTICAL)));
         operatorXbox.povDown().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)));
+        operatorXbox.povLeft().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.AMP)));
 
         AtomicBoolean shot = new AtomicBoolean(false);
         // Command to execute when right bumper is pressed
         Command pressCommand = new SequentialCommandGroup(
                 new WaitUntilCommand(m_shooterSubsystem::shouldShoot), // Wait until shooter is ready
                 new IntakeSetCommand(1.0).withTimeout(1.0), // Run intake command
-                new InstantCommand(() -> shot.set(true)) // Set 'shot' to true
+                new InstantCommand(() -> shot.set(true)), // Set 'shot' to true
+                new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE))
         );
 
         // Command to execute when right bumper is released
