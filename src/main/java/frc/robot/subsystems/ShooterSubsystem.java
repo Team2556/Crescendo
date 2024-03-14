@@ -321,8 +321,8 @@ public class ShooterSubsystem extends SubsystemBase {
         if(!(Math.abs(flapCenter) > kMaxFlapAngle)) {
             double v = 78.0 * Math.sin(Math.toRadians(flapCenter));
             if(red) {
-                flapRightAngle = (90 - v) * rightFlapDegrees;
-                flapLeftAngle = (90 + v) * leftFlapDegrees;
+                flapRightAngle = (90 + v) * rightFlapDegrees;
+                flapLeftAngle = (90 - v) * leftFlapDegrees;
             } else {
                 flapRightAngle = (90 + v) * rightFlapDegrees;
                 flapLeftAngle = (90 - v) * leftFlapDegrees;
@@ -335,7 +335,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public double getShooterCalculatedAngle(Pose2d pose) {
         SmartDashboard.putBoolean("Red", red);
-        double closeZoneX = Units.inchesToMeters(72.0), closeZoneHeight = Units.inchesToMeters(92.0-6.0);
+        double closeZoneX = Units.inchesToMeters(72.0), closeZoneHeight = Units.inchesToMeters(92.0-6.0-6.0-4.0-4.0);
         double mediumZoneX = 3.96, mediumZoneHeight = Units.inchesToMeters(90.0-2.0);
         double farZoneX = 6.0, farZoneHeight = Units.inchesToMeters(120.0);
 

@@ -5,11 +5,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveController;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -21,10 +24,12 @@ public class TeleopDrive extends Command {
     private final DoubleSupplier   vY;
     private final DoubleSupplier   omega;
     private final SwerveController controller;
-
+    private static boolean red = false;
     public static boolean slowMode = false;
     public static boolean fieldOriented = true;
     private static final double slowModeScalar = 0.3;
+    double xVelocity;
+    double yVelocity;
 
     public TeleopDrive(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY,
                      DoubleSupplier omega) {
@@ -41,12 +46,19 @@ public class TeleopDrive extends Command {
     public void initialize() {
         super.initialize();
         slowMode = false;
+        Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+        alliance.ifPresent(value -> red = value.equals(DriverStation.Alliance.Red));
     }
 
     @Override
     public void execute() {
-        double xVelocity   = Math.pow(-vX.getAsDouble(), 3);
-        double yVelocity   = Math.pow(-vY.getAsDouble(), 3);
+        if (red) {
+            xVelocity   = Math.pow(vX.getAsDouble(), 3);
+            yVelocity   = Math.pow(vY.getAsDouble(), 3);
+        } else {
+            xVelocity   = Math.pow(-vX.getAsDouble(), 3);
+            yVelocity   = Math.pow(-vY.getAsDouble(), 3);
+        }
         double angVelocity = Math.pow(-omega.getAsDouble(), 3);
         SmartDashboard.putNumber("vX", xVelocity);
         SmartDashboard.putNumber("vY", yVelocity);
