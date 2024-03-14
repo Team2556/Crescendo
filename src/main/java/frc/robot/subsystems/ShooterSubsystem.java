@@ -307,10 +307,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public Pair<Double, Double> getFlapCalculatedAngle(Pose2d pose) {
         double flapLeftAngle = kLeft90, flapRightAngle = kRight90;
-        double speakerY = 5.5;
+        double speakerY = red ? redSpeaker.getY() : 5.5;
+        double speakerX = red ? redSpeaker.getX() : 0.0;
 
         double deltaY = pose.getY() - speakerY;
-        double hyp = Math.sqrt(deltaY * deltaY + pose.getX() * pose.getX());
+        double deltaX = pose.getX() - speakerX;
+        double hyp = Math.sqrt(deltaY * deltaY + deltaX * deltaX);
         double sin = Math.sin(deltaY / hyp);
         double rot = red ? pose.getRotation().minus(new Rotation2d(Math.toRadians(180.0))).getRadians() : pose.getRotation().getRadians();
         double flapCenter = Math.toDegrees(sin - rot);
@@ -318,8 +320,13 @@ public class ShooterSubsystem extends SubsystemBase {
         // Verify robot's angle is not outside the max angle the flaps should align at.
         if(!(Math.abs(flapCenter) > kMaxFlapAngle)) {
             double v = 78.0 * Math.sin(Math.toRadians(flapCenter));
-            flapRightAngle = (90 + v) * rightFlapDegrees;
-            flapLeftAngle = (90 - v) * leftFlapDegrees;
+            if(red) {
+                flapRightAngle = (90 - v) * rightFlapDegrees;
+                flapLeftAngle = (90 + v) * leftFlapDegrees;
+            } else {
+                flapRightAngle = (90 + v) * rightFlapDegrees;
+                flapLeftAngle = (90 - v) * leftFlapDegrees;
+            }
             SmartDashboard.putNumber("Flap left encoder auto", flapLeftAngle);
             SmartDashboard.putNumber("Flap right encoder auto", flapRightAngle);
         }
