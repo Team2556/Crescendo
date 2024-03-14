@@ -39,7 +39,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // Spark max/flex pid controllers
     private final SparkPIDController leftShooterPID, rightShooterPID, lFlapPID, rFlapPID;
     private final PIDController shooterPitchPID = new PIDController(pitchShooterPIDF.p, pitchShooterPIDF.i, pitchShooterPIDF.d);
-    private final ArmFeedforward shooterFeedforward = new ArmFeedforward(kS, kG, kV);
+    private ArmFeedforward shooterFeedforward = new ArmFeedforward(kS, kG, kV);
     // Whether flaps have been zeroed with their limit switches.
     public boolean leftHomeFlag = false, rightHomeFlag = false;
     // Target velocity instance variable.
@@ -405,6 +405,15 @@ public class ShooterSubsystem extends SubsystemBase {
             lFlapEncoder.setPosition(0);
         if (!rightLimitSwitch.get())
             rFlapEncoder.setPosition(0);
+    }
+
+    public void setPitchPID(double p, double i, double d) {
+        shooterPitchPID.setPID(p, i, d);
+        shooterPitchPID.reset();
+    }
+
+    public void setPitchFeedforward(double kS, double kG, double kV) {
+        shooterFeedforward = new ArmFeedforward(kS, kG, kV);
     }
 
     /**

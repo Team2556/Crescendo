@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.*;
 import frc.robot.commands.*;
 import frc.robot.commands.auto.*;
+import frc.robot.commands.test.ShooterAngleTest;
 import frc.robot.subsystems.*;
 import org.photonvision.PhotonCamera;
 
@@ -66,6 +67,8 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND));
+
+//        m_shooterSubsystem.setDefaultCommand(new ShooterAngleTest());
 
         m_shooterSubsystem.setDefaultCommand(new ShootControlCommand(operatorXbox.rightTrigger(0.5), driverXbox.rightBumper()));
         m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
