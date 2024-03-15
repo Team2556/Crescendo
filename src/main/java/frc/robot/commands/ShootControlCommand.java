@@ -110,6 +110,7 @@ public class ShootControlCommand extends Command {
             case AMP -> m_shooterSubsystem.setPitchPosition(kPitchAmpPosition);
             case INTAKE -> m_shooterSubsystem.setPitchPosition(kPitchIntakePosition);
             case DRIVE -> m_shooterSubsystem.setPitchPosition(kPitchDrivePosition);
+            case SUBWOOFER -> m_shooterSubsystem.setPitchPosition(kPitchSubwooferPosition);
             case NONE -> m_shooterSubsystem.stopPitch();
             case TEST -> m_shooterSubsystem.setPitchPosition(SmartDashboard.getNumber("Shooter Pitch Angle Input", 0));
         }

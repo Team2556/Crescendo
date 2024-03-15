@@ -62,7 +62,7 @@ public final class Constants {
     public static class ShooterConstants {
         public static final PIDFConfig leftShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000175, 0.0);
         public static final PIDFConfig rightShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000170, 0.0);
-        public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(0.2, 0.0, 0.008, 0.0, 0.0);
+        public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(0.2, 0.0, 0.025, 0.0, 0.0);
         public static final double kS = 0.3, kG = 1.0, kV = 3.22;
         public static final double kMaxPIDOutput = 1.0;
         public static final double kMinPIDOutput = -1.0;
@@ -75,7 +75,8 @@ public final class Constants {
         public static final double kPitchAmpPosition = 22;
         public static final double kPitchVerticalPosition = 0;
         public static final double kPitchIntakePosition = 22;
-        public static final double kPitchDrivePosition = 330;
+        public static final double kPitchDrivePosition = 310;
+        public static final double kPitchSubwooferPosition = 328;
 
         // Raw absolute encoder value
         public static final double kPitchSpeakerPosition = 325;
@@ -125,7 +126,8 @@ public final class Constants {
             AMP,
             AUTO,
             DRIVE,
-            TEST
+            TEST,
+            SUBWOOFER
         }
     }
 
