@@ -335,7 +335,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public double getShooterCalculatedAngle(Pose2d pose) {
         SmartDashboard.putBoolean("Red", red);
-        double closeZoneX = Units.inchesToMeters(72.0), closeZoneHeight = Units.inchesToMeters(72);
+        double closeZoneX = Units.inchesToMeters(72.0), closeZoneHeight = Units.inchesToMeters(90);
         double mediumZoneX = 3.96, mediumZoneHeight = Units.inchesToMeters(95);
         double farZoneX = 6.0, farZoneHeight = Units.inchesToMeters(120.0);
 

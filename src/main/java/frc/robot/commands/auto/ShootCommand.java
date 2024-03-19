@@ -22,7 +22,7 @@ public class ShootCommand extends Command {
         super.initialize();
         m_shooterSubsystem.setFlapState(Constants.ShooterConstants.FlapState.AUTO);
         m_shooterSubsystem.setShooterState(Constants.ShooterConstants.ShooterState.SPEAKER);
-        m_shooterSubsystem.setPitchState(Constants.ShooterConstants.PitchState.AUTO);
+        // m_shooterSubsystem.setPitchState(Constants.ShooterConstants.PitchState.AUTO);
         m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
     }
 
@@ -32,7 +32,7 @@ public class ShootCommand extends Command {
         m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
         Pair<Double, Double> flapAngles = m_shooterSubsystem.getFlapCalculatedAngle(poseSubsystem.getPose());
         m_shooterSubsystem.setFlapPosition(flapAngles.getFirst(), flapAngles.getSecond());
-        m_shooterSubsystem.setPitchPosition(m_shooterSubsystem.getShooterCalculatedAngle(poseSubsystem.getPose()) + kPitchMinimumAngle);
+        // m_shooterSubsystem.setPitchPosition(m_shooterSubsystem.getShooterCalculatedAngle(poseSubsystem.getPose()) + kPitchMinimumAngle);
     }
 
     @Override
@@ -40,12 +40,13 @@ public class ShootCommand extends Command {
         super.end(interrupted);
         m_shooterSubsystem.setFlapState(Constants.ShooterConstants.FlapState.STRAIGHT);
         m_shooterSubsystem.setShooterState(Constants.ShooterConstants.ShooterState.STOP);
-        m_shooterSubsystem.setPitchState(Constants.ShooterConstants.PitchState.DRIVE);
+        // m_shooterSubsystem.setPitchState(Constants.ShooterConstants.PitchState.DRIVE);
         m_shooterSubsystem.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return m_shooterSubsystem.isOnTarget() && m_shooterSubsystem.shooterPitchArrived();
+        // return m_shooterSubsystem.isOnTarget() && m_shooterSubsystem.shooterPitchArrived();
+        return m_shooterSubsystem.isOnTarget();
     }
 }

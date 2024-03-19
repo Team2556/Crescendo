@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -37,6 +38,11 @@ public class PoseSubsystem extends SubsystemBase {
         if(tagUpdate.isPresent()) {
             var est = tagUpdate.get();
             swerveSubsystem.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
+        }
+        if (photonCamera.getLatestResult().hasTargets()) {
+            SmartDashboard.putNumber("tag", photonCamera.getLatestResult().getBestTarget().getFiducialId());
+        } else {
+            SmartDashboard.putNumber("tag", 0);
         }
     }
 

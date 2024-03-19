@@ -101,7 +101,7 @@ public class RobotContainer {
                 new InstantCommand(() -> {
                     m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
                     m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
-                    m_shooterSubsystem.setPitchState(PitchState.DRIVE);
+                    m_shooterSubsystem.setPitchPosition(kPitchSpeakerPosition);
                     m_shooterSubsystem.stop();
                     m_intakeSubsystem.stop();
                 }, m_intakeSubsystem, m_shooterSubsystem)
@@ -116,6 +116,7 @@ public class RobotContainer {
         new PathPlannerAuto("StartAmp1Leave");
         new PathPlannerAuto("StartAmp2Leave");
         new PathPlannerAuto("StartAmp3Leave");
+        new PathPlannerAuto("Preload");
 
         SmartDashboard.putData("Auto Mode", autoChooser);
     }
