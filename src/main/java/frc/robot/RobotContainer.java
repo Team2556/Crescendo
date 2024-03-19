@@ -52,8 +52,8 @@ public class RobotContainer{
     private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
 
     // CommandJoystick driverController   = new CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
-    XboxController driverXbox = new XboxController(0);
-    XboxController operatorXbox = new XboxController(1);
+    CommandXboxController driverXbox = new CommandXboxController(0);
+    CommandXboxController operatorXbox = new CommandXboxController(1);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -63,19 +63,19 @@ public class RobotContainer{
         m_shooterSubsystem.setDefaultCommand(
       new ShootCommand(
         m_shooterSubsystem,
-        driverXbox.start(null),
-        driverXbox.povLeft(null),
-        driverXbox.povRight(null),
-        driverXbox.povUp(null),
-        driverXbox.povDown(null),
+        driverXbox.start(),
+        driverXbox.povLeft(),
+        driverXbox.povRight(),
+        driverXbox.povUp(),
+        driverXbox.povDown(),
         operatorXbox::getLeftY,
-        operatorXbox.leftTrigger(0.8, null),
-        operatorXbox.rightTrigger(0.8, null),
-        operatorXbox.x(null),
-        operatorXbox.a(null),
-        operatorXbox.b(null),
-        driverXbox.rightBumper(null),
-        driverXbox.leftBumper(null)
+        operatorXbox.leftTrigger(0.8),
+        operatorXbox.rightTrigger(0.8),
+        operatorXbox.x(),
+        operatorXbox.a(),
+        operatorXbox.b(),
+        driverXbox.rightBumper(),
+        driverXbox.leftBumper()
       )
     );
 
@@ -88,8 +88,8 @@ public class RobotContainer{
     intakeSubsystem.setDefaultCommand(
             new IntakeCommand(
                 intakeSubsystem,
-                driverXbox.rightTrigger(0.5, null),
-                driverXbox.leftTrigger(0.5, null)
+                driverXbox.rightTrigger(0.5),
+                driverXbox.leftTrigger(0.5)
                 )
         );
 
@@ -128,10 +128,10 @@ public class RobotContainer{
     private void configureBindings() {
         // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-        new JoystickButton(driverXbox, 4).onTrue((new InstantCommand(drivebase::zeroGyro)));
-        new JoystickButton(driverXbox, 2).onTrue(new InstantCommand(drivebase::addFakeVisionReading));
-        new JoystickButton(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
-        new JoystickButton(driverXbox, 1).whileTrue(chaseTagCommand);
+        driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
+        driverXbox.b().onTrue(new InstantCommand(drivebase::addFakeVisionReading));
+        driverXbox.x().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
+        driverXbox.a().whileTrue(chaseTagCommand);
         // A
         // new JoystickButton(operatorXbox, 1).onTrue(new InstantCommand(() -> shooter.setState(ShooterState.AMP)))
         //         .onFalse(new InstantCommand(shooter::stop));
