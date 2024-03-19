@@ -63,7 +63,7 @@ public class RobotContainer{
         m_shooterSubsystem.setDefaultCommand(
       new ShootCommand(
         m_shooterSubsystem,
-        driverXbox.start(),
+        driverXbox.start(null),
         driverXbox.povLeft(null),
         driverXbox.povRight(null),
         driverXbox.povUp(null),
