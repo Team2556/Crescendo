@@ -62,18 +62,14 @@ public class PixySwerve extends Command {
         SmartDashboard.putString("Y", objLocation[1]);
         XandY[1] = Float.parseFloat(objLocation[1]);
         SmartDashboard.putNumber("Number array Y", XandY[1]);
-        if ((-8 > m_vision.pixy_center) || (m_vision.pixy_center > 8)){
+        if ((-8 > m_vision.pixy_center) || (m_vision.pixy_center > 8)) {
           PixycamSubsystem.readData();
           PixycamSubsystem.calculateAngle();
 
           swerve.drive(translation, frc.robot.subsystems.PixycamSubsystem.calculateAngle(), true);
+        } else {
+          swerve.drive(translation, 0, true);
         }
-      else{
-        swerve.drive(translation ,0 , true);
-      }
-
-
-       
 
       } else {
         SmartDashboard.getString("error", "Button not found");

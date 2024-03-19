@@ -31,15 +31,18 @@ import org.photonvision.PhotonCamera;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
- * little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls).
- * Instead, the structure of the robot (including subsystems, commands, and trigger mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a "declarative" paradigm, very
+ * little robot logic should actually be handled in the {@link Robot} periodic
+ * methods (other than the scheduler calls).
+ * Instead, the structure of the robot (including subsystems, commands, and
+ * trigger mappings) should be declared here.
  */
-public class RobotContainer{
+public class RobotContainer {
 
     // The robot's subsystems and commands are defined here...
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-                                                                            "swerve"));
+            "swerve"));
 
     private final PhotonCamera camera = new PhotonCamera("photonVision");
 
@@ -51,7 +54,8 @@ public class RobotContainer{
 
     private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
 
-    // CommandJoystick driverController   = new CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
+    // CommandJoystick driverController = new
+    // CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
     CommandXboxController driverXbox = new CommandXboxController(0);
     CommandXboxController operatorXbox = new CommandXboxController(1);
 
@@ -61,57 +65,51 @@ public class RobotContainer{
     public RobotContainer() {
         // Configure the trigger bindings
         m_shooterSubsystem.setDefaultCommand(
-      new ShootCommand(
-        m_shooterSubsystem,
-        driverXbox.start(),
-        driverXbox.povLeft(),
-        driverXbox.povRight(),
-        driverXbox.povUp(),
-        driverXbox.povDown(),
-        operatorXbox::getLeftY,
-        operatorXbox.leftTrigger(0.8),
-        operatorXbox.rightTrigger(0.8),
-        operatorXbox.x(),
-        operatorXbox.a(),
-        operatorXbox.b(),
-        driverXbox.rightBumper(),
-        driverXbox.leftBumper()
-      )
-    );
+                new ShootCommand(
+                        m_shooterSubsystem,
+                        driverXbox.start(),
+                        driverXbox.povLeft(),
+                        driverXbox.povRight(),
+                        driverXbox.povUp(),
+                        driverXbox.povDown(),
+                        operatorXbox::getLeftY,
+                        operatorXbox.leftTrigger(0.8),
+                        operatorXbox.rightTrigger(0.8),
+                        operatorXbox.x(),
+                        operatorXbox.a(),
+                        operatorXbox.b(),
+                        driverXbox.rightBumper(),
+                        driverXbox.leftBumper()));
 
-    // m_photonSubsystem.setDefaultCommand(
-    //     new photonCommand(
-    //         m_photonSubsystem
-    //     )
-    // );
-    
-    intakeSubsystem.setDefaultCommand(
-            new IntakeCommand(
-                intakeSubsystem,
-                driverXbox.rightTrigger(0.5),
-                driverXbox.leftTrigger(0.5)
-                )
-        );
+        // m_photonSubsystem.setDefaultCommand(
+        // new photonCommand(
+        // m_photonSubsystem
+        // )
+        // );
 
+        intakeSubsystem.setDefaultCommand(
+                new IntakeCommand(
+                        intakeSubsystem,
+                        driverXbox.rightTrigger(0.5),
+                        driverXbox.leftTrigger(0.5)));
 
         configureBindings();
 
-        // AbsoluteFieldDrive closedFieldAbsoluteDrive = new AbsoluteFieldDrive(drivebase,
-        //                                                                      () ->
-        //                                                                          MathUtil.applyDeadband(driverXbox.getLeftY(),
-        //                                                                                                 OperatorConstants.LEFT_Y_DEADBAND),
-        //                                                                      () -> MathUtil.applyDeadband(driverXbox.getLeftX(),
-        //                                                                                                   OperatorConstants.LEFT_X_DEADBAND),
-        //                                                                      () -> driverXbox.getRawAxis(2));
+        // AbsoluteFieldDrive closedFieldAbsoluteDrive = new
+        // AbsoluteFieldDrive(drivebase,
+        // () ->
+        // MathUtil.applyDeadband(driverXbox.getLeftY(),
+        // OperatorConstants.LEFT_Y_DEADBAND),
+        // () -> MathUtil.applyDeadband(driverXbox.getLeftX(),
+        // OperatorConstants.LEFT_X_DEADBAND),
+        // () -> driverXbox.getRawAxis(2));
 
         TeleopDrive closedFieldRel = new TeleopDrive(
-            drivebase,
-            () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-            () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-            () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND), 
-            () -> true);
-
-
+                drivebase,
+                () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
+                () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
+                () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND),
+                () -> true);
 
         drivebase.setDefaultCommand(closedFieldRel);
 
@@ -119,11 +117,17 @@ public class RobotContainer{
     }
 
     /**
-     * Use this method to define your trigger->command mappings. Triggers can be created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the
-     * named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-     * {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
-     * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
+     * Use this method to define your trigger->command mappings. Triggers can be
+     * created via the
+     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+     * an arbitrary predicate, or via the
+     * named factories in
+     * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses
+     * for
+     * {@link CommandXboxController
+     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
+     * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick
+     * Flight joysticks}.
      */
     private void configureBindings() {
         // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
@@ -133,17 +137,21 @@ public class RobotContainer{
         driverXbox.x().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
         driverXbox.a().whileTrue(chaseTagCommand);
         // A
-        // new JoystickButton(operatorXbox, 1).onTrue(new InstantCommand(() -> shooter.setState(ShooterState.AMP)))
-        //         .onFalse(new InstantCommand(shooter::stop));
+        // new JoystickButton(operatorXbox, 1).onTrue(new InstantCommand(() ->
+        // shooter.setState(ShooterState.AMP)))
+        // .onFalse(new InstantCommand(shooter::stop));
         // // B
-        // new JoystickButton(operatorXbox, 2).onTrue(new InstantCommand(() -> shooter.setState(ShooterState.CLOSE)))
-        //         .onFalse(new InstantCommand(shooter::stop));
+        // new JoystickButton(operatorXbox, 2).onTrue(new InstantCommand(() ->
+        // shooter.setState(ShooterState.CLOSE)))
+        // .onFalse(new InstantCommand(shooter::stop));
         // // X
-        // new JoystickButton(operatorXbox, 3).onTrue(new InstantCommand(() -> shooter.setState(ShooterState.MIDDLE)))
-        //         .onFalse(new InstantCommand(shooter::stop));
+        // new JoystickButton(operatorXbox, 3).onTrue(new InstantCommand(() ->
+        // shooter.setState(ShooterState.MIDDLE)))
+        // .onFalse(new InstantCommand(shooter::stop));
         // // Y
-        // new JoystickButton(operatorXbox, 4).onTrue(new InstantCommand(() -> shooter.setState(ShooterState.FAR)))
-        //         .onFalse(new InstantCommand(shooter::stop));
+        // new JoystickButton(operatorXbox, 4).onTrue(new InstantCommand(() ->
+        // shooter.setState(ShooterState.FAR)))
+        // .onFalse(new InstantCommand(shooter::stop));
     }
 
     /**
@@ -158,7 +166,7 @@ public class RobotContainer{
     }
 
     public void setDriveMode() {
-        //drivebase.setDefaultCommand();
+        // drivebase.setDefaultCommand();
     }
 
     public void setMotorBrake(boolean brake) {

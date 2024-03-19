@@ -42,6 +42,7 @@ public class ShootCommand extends Command {
   Timer intakeTimer = new Timer();
 
   private static ShooterSpeeds shooterSpeeds = ShooterSpeeds.SPEAKER_MID;
+
   public enum ShooterSpeeds {
     AMP,
     SPEAKER_CLOSE,
@@ -50,6 +51,7 @@ public class ShootCommand extends Command {
   }
 
   private static FlapPositions flapPosition = FlapPositions.RESET;
+
   public enum FlapPositions {
     RESET,
     INTAKE,
@@ -57,7 +59,10 @@ public class ShootCommand extends Command {
     LEFT,
     RIGHT
   }
-  public ShootCommand(ShooterSubsystem shooterSubsystem, Trigger trigger, Trigger trigger2, Trigger trigger3, Trigger trigger4, Trigger trigger5, DoubleSupplier leftY, Trigger trigger6, Trigger trigger7, Trigger trigger8, Trigger trigger9, Trigger trigger10, Trigger trigger11, Trigger trigger12) {
+
+  public ShootCommand(ShooterSubsystem shooterSubsystem, Trigger trigger, Trigger trigger2, Trigger trigger3,
+      Trigger trigger4, Trigger trigger5, DoubleSupplier leftY, Trigger trigger6, Trigger trigger7, Trigger trigger8,
+      Trigger trigger9, Trigger trigger10, Trigger trigger11, Trigger trigger12) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooterSubsystem = shooterSubsystem;
     // lFlapEncoder = m_shooterSubsystem.getlFlapEncoderValue();
@@ -77,8 +82,6 @@ public class ShootCommand extends Command {
     addRequirements(shooterSubsystem);
   }
 
-  
-
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
@@ -87,12 +90,13 @@ public class ShootCommand extends Command {
     shooterSpeeds = ShooterSpeeds.AMP;
     flapPosition = FlapPositions.RESET;
 
-    //Flags for homing
+    // Flags for homing
     m_shooterSubsystem.rightHomeFlag = false;
     m_shooterSubsystem.leftHomeFlag = false;
-    //m_shooterSubsystem.aimHomeFlag = false;
+    // m_shooterSubsystem.aimHomeFlag = false;
     // m_shooterSubsystem.flapHome();
-    //SmartDashboard.putNumber("Init Left Encoder", m_shooterSubsystem.leftFlap.getEncoder());
+    // SmartDashboard.putNumber("Init Left Encoder",
+    // m_shooterSubsystem.leftFlap.getEncoder());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -101,20 +105,20 @@ public class ShootCommand extends Command {
     targetInput = SmartDashboard.getNumber("Shooter Target Input Speed", 0);
     // SmartDashboard.putBoolean("y", m_y.getAsBoolean());
 
-    //Homes flaps and aimer upon initialization
+    // Homes flaps and aimer upon initialization
     // m_shooterSubsystem.flapHome();
     // flapPosition = FlapPositions.RESET;
     // m_shooterSubsystem.aimHome();
 
-    if(m_rBumper.getAsBoolean()) {
+    if (m_rBumper.getAsBoolean()) {
       m_shooterSubsystem.setFlapPositionByTags(PhotonSubsystem.targetRotation);
-      m_shooterSubsystem.setVelocityByTags(PhotonSubsystem.targetX, 
-                                           m_shooterSubsystem.lFlapEncoder.getPosition(), 
-                                           m_shooterSubsystem.rFlapEncoder.getPosition());
+      m_shooterSubsystem.setVelocityByTags(PhotonSubsystem.targetX,
+          m_shooterSubsystem.lFlapEncoder.getPosition(),
+          m_shooterSubsystem.rFlapEncoder.getPosition());
       m_shooterSubsystem.setAimPositionByTags(PhotonSubsystem.shootAngle);
-      if (!m_rBumper.getAsBoolean() || m_shooterSubsystem.speedsOnTarget(PhotonSubsystem.targetX, 
-                                                                         m_shooterSubsystem.lFlapEncoder.getPosition(), 
-                                                                         m_shooterSubsystem.rFlapEncoder.getPosition())) {
+      if (!m_rBumper.getAsBoolean() || m_shooterSubsystem.speedsOnTarget(PhotonSubsystem.targetX,
+          m_shooterSubsystem.lFlapEncoder.getPosition(),
+          m_shooterSubsystem.rFlapEncoder.getPosition())) {
         intakeTimer.reset();
         intakeTimer.start();
         if (intakeTimer.get() < 1) {
@@ -134,16 +138,16 @@ public class ShootCommand extends Command {
     }
 
     if (m_b.getAsBoolean()) {
-      m_shooterSubsystem.setVelocityByTags(PhotonSubsystem.targetX, 
-                                           m_shooterSubsystem.lFlapEncoder.getPosition(), 
-                                           m_shooterSubsystem.rFlapEncoder.getPosition());
+      m_shooterSubsystem.setVelocityByTags(PhotonSubsystem.targetX,
+          m_shooterSubsystem.lFlapEncoder.getPosition(),
+          m_shooterSubsystem.rFlapEncoder.getPosition());
     }
 
     if (m_x.getAsBoolean()) {
       m_shooterSubsystem.setAimPositionByTags(PhotonSubsystem.shootAngle);
     }
 
-    //If start pressed, homes and zeros flaps
+    // If start pressed, homes and zeros flaps
     if (m_start.getAsBoolean()) {
       m_shooterSubsystem.rightHomeFlag = false;
       m_shooterSubsystem.leftHomeFlag = false;
@@ -151,7 +155,7 @@ public class ShootCommand extends Command {
       flapPosition = FlapPositions.RESET;
     }
 
-    //D-pads move flaps to intake, shoot, left aim, and right aim
+    // D-pads move flaps to intake, shoot, left aim, and right aim
     if (m_up.getAsBoolean()) {
       m_shooterSubsystem.setFlapPosition(FlapValues.kLeft90, FlapValues.kRight90);
       flapPosition = FlapPositions.STRAIGHT;
@@ -175,10 +179,10 @@ public class ShootCommand extends Command {
     switch (shooterSpeeds) {
       case AMP:
         if (m_rightTrigger.getAsBoolean()) {
-          m_shooterSubsystem.setAngledShoot(Constants.ShooterConstants.kAmpSpeed, 
-                                            m_shooterSubsystem.lFlapEncoder.getPosition(), 
-                                            m_shooterSubsystem.rFlapEncoder.getPosition());
-          
+          m_shooterSubsystem.setAngledShoot(Constants.ShooterConstants.kAmpSpeed,
+              m_shooterSubsystem.lFlapEncoder.getPosition(),
+              m_shooterSubsystem.rFlapEncoder.getPosition());
+
         } else if (m_leftTrigger.getAsBoolean()) {
           m_shooterSubsystem.setShooterVelocity(Constants.ShooterConstants.kIntakeSpeed);
         } else {
@@ -191,9 +195,9 @@ public class ShootCommand extends Command {
 
       case SPEAKER_CLOSE:
         if (m_rightTrigger.getAsBoolean()) {
-          m_shooterSubsystem.setAngledShoot(Constants.ShooterConstants.kSpeakerCloseSpeed, 
-                                            m_shooterSubsystem.lFlapEncoder.getPosition(), 
-                                            m_shooterSubsystem.rFlapEncoder.getPosition());
+          m_shooterSubsystem.setAngledShoot(Constants.ShooterConstants.kSpeakerCloseSpeed,
+              m_shooterSubsystem.lFlapEncoder.getPosition(),
+              m_shooterSubsystem.rFlapEncoder.getPosition());
         } else if (m_leftTrigger.getAsBoolean()) {
           m_shooterSubsystem.setShooterVelocity(Constants.ShooterConstants.kIntakeSpeed);
         } else {
@@ -209,9 +213,9 @@ public class ShootCommand extends Command {
 
       case SPEAKER_MID:
         if (m_rightTrigger.getAsBoolean()) {
-          m_shooterSubsystem.setAngledShoot(Constants.ShooterConstants.kSpeakerMidSpeed, 
-                                            m_shooterSubsystem.lFlapEncoder.getPosition(), 
-                                            m_shooterSubsystem.rFlapEncoder.getPosition());
+          m_shooterSubsystem.setAngledShoot(Constants.ShooterConstants.kSpeakerMidSpeed,
+              m_shooterSubsystem.lFlapEncoder.getPosition(),
+              m_shooterSubsystem.rFlapEncoder.getPosition());
         } else if (m_leftTrigger.getAsBoolean()) {
           m_shooterSubsystem.setShooterVelocity(Constants.ShooterConstants.kIntakeSpeed);
         } else {
@@ -227,9 +231,9 @@ public class ShootCommand extends Command {
 
       case SPEAKER_FAR:
         if (m_rightTrigger.getAsBoolean()) {
-          m_shooterSubsystem.setAngledShoot(Constants.ShooterConstants.kSpeakerFarSpeed, 
-                                            m_shooterSubsystem.lFlapEncoder.getPosition(), 
-                                            m_shooterSubsystem.rFlapEncoder.getPosition());
+          m_shooterSubsystem.setAngledShoot(Constants.ShooterConstants.kSpeakerFarSpeed,
+              m_shooterSubsystem.lFlapEncoder.getPosition(),
+              m_shooterSubsystem.rFlapEncoder.getPosition());
         } else if (m_leftTrigger.getAsBoolean()) {
           m_shooterSubsystem.setShooterVelocity(Constants.ShooterConstants.kIntakeSpeed);
         } else {
@@ -241,7 +245,7 @@ public class ShootCommand extends Command {
         break;
 
       default:
-      m_shooterSubsystem.setShooterVelocity(0);
+        m_shooterSubsystem.setShooterVelocity(0);
         break;
     }
     SmartDashboard.putString("Shooter Case", shooterSpeeds.toString());
@@ -249,7 +253,8 @@ public class ShootCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override

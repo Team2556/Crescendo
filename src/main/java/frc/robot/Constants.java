@@ -25,10 +25,10 @@ public final class Constants {
     // ToDo Get proper port numbers.
     // Swerve ports are in 'deploy/swerve/modules/.'
     public static final class Ports {
-        public static final int intakeMotorPort = 20;
-        public static final int shooterLeftMotorPort = 22;
-        public static final int shooterRightMotorPort = 24;
-        public static final int climbMotorPort = 26;
+        public static final int intakeMotorPort = 9;
+        public static final int shooterLeftMotorPort = 12;
+        public static final int shooterRightMotorPort = 13;
+        public static final int climbMotorPort = 10;
     }
     // ToDo See if separate PID constants are necessary.
     public static final PIDFConfig shooterLeftPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000175, 0.0);
@@ -125,12 +125,12 @@ public final class Constants {
 
     }
     public static class MotorPorts {
-        public static final int kLeftShooterPort = 11;
-        public static final int kRightShooterPort = 12;
+        public static final int kLeftShooterPort = 12;
+        public static final int kRightShooterPort = 13;
         public static final int kPanningPort = 0;
         //public static final int kAimFlap = 2;
-        public static final int kLeftFlap = 13;
-        public static final int kRightFlap = 14;
+        public static final int kLeftFlap = 14;
+        public static final int kRightFlap = 15;
       }
     
     
