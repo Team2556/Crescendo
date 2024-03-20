@@ -41,7 +41,7 @@ public class ShootControlCommand extends Command {
     public void initialize() {
         m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
         m_shooterSubsystem.resetFlaps();
-        m_shooterSubsystem.setPitchState(PitchState.NONE);
+        m_shooterSubsystem.setPitchState(PitchState.TEST);
 
         Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
         alliance.ifPresent(value -> ShooterSubsystem.red = value.equals(DriverStation.Alliance.Red));
@@ -92,6 +92,7 @@ public class ShootControlCommand extends Command {
                     m_shooterSubsystem.stop();
             }
             case SPEAKER -> {
+                rightVelocity = 0;
                 if(m_rightTrigger.getAsBoolean() || m_rightBumper.getAsBoolean())
                     m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity - leftVelocity, kSpeakerVelocity - rightVelocity);
                 else

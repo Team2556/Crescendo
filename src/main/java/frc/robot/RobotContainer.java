@@ -220,8 +220,8 @@ public class RobotContainer {
         Command pressCommand = new SequentialCommandGroup(
                 new WaitUntilCommand(m_shooterSubsystem::shouldShoot), // Wait until shooter is ready
                 new IntakeSetCommand(1.0).withTimeout(1.0), // Run intake command
-                new InstantCommand(() -> shot.set(true)), // Set 'shot' to true
-                new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE))
+                new InstantCommand(() -> shot.set(true)) // Set 'shot' to true
+//                new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE))
         );
 
         // Command to execute when right bumper is released
@@ -231,7 +231,7 @@ public class RobotContainer {
                         .alongWith(new InstantCommand(() -> shot.set(false)))
         );
 
-        driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand.andThen(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)));
+        driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand);
 
         Command ampScore = new SequentialCommandGroup(
                 new AmpVertical(),

@@ -67,7 +67,7 @@ public final class Constants {
         public static final double kMaxPIDOutput = 1.0;
         public static final double kMinPIDOutput = -1.0;
 
-        public static final double kVelocityTolerance = 400;
+        public static final double kVelocityTolerance = 100;
 
         public static final double kFlapTolerance = 1.0;
         public static final double kPitchTolerance = 1.0;
@@ -92,7 +92,7 @@ public final class Constants {
             SPEAKER
         }
 
-        public static final double kSpeakerVelocity = 5900;
+        public static final double kSpeakerVelocity = 5800;
         public static final double kShooterIntakeSpeed = -0.1;
         public static final double kAmpSpeed = 0.125;
 
