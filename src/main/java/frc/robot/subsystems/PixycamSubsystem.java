@@ -94,7 +94,7 @@ public class PixycamSubsystem extends SubsystemBase {
       // doNothing
     }
   }
-//COME BACK TO THIS- Method to find distance between pixy and ring
+//COME BACK TO THIS- Method to find distance between pixy and ring in mm
   public static double distance_from_note(){
     double noteDistance = (pixy_ff* ringHeight* 152)/ (objCoord[0]* pixyHeight);
     return noteDistance;
