@@ -13,6 +13,8 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
@@ -128,7 +130,7 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterPitchEncoder.setVelocityConversionFactor(6.0);
 
         shooterPitchPID.enableContinuousInput(0, 360.0);
-        shooterPitchPID.setTolerance(5.0);
+        shooterPitchPID.setTolerance(kPitchTolerance);
 
         stop();
 
@@ -140,6 +142,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
         leftHomeFlag = false;
         rightHomeFlag = false;
+
+        ShuffleboardTab tab = Shuffleboard.getTab("Shooter");
+        tab.addNumber("Average Velocity", this::getVelocity);
+        tab.addNumber("Left Velocity", leftShooterEncoder::getVelocity);
+        tab.addNumber("Right Velocity", rightShooterEncoder::getVelocity);
+        tab.addNumber("Shooter Pitch Angle", this::getShooterPitch);
     }
 
     /**

@@ -62,15 +62,15 @@ public final class Constants {
     public static class ShooterConstants {
         public static final PIDFConfig leftShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000175, 0.0);
         public static final PIDFConfig rightShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000170, 0.0);
-        public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(0.2, 0.0, 0.008, 0.0, 0.0);
-        public static final double kS = 0.3, kG = 1.0, kV = 3.22;
+        public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(0.6, 0.0, 0.0, 0.0, 0.0);
+        public static final double kS = 0.0, kG = 0.0, kV = 0.0;
         public static final double kMaxPIDOutput = 1.0;
         public static final double kMinPIDOutput = -1.0;
 
         public static final double kVelocityTolerance = 100;
 
         public static final double kFlapTolerance = 1.0;
-        public static final double kPitchTolerance = 1.0;
+        public static final double kPitchTolerance = 0.5;
         // Raw absolute encoder value
         public static final double kPitchAmpPosition = 22;
         public static final double kPitchVerticalPosition = 0;
