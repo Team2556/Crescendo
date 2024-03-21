@@ -49,7 +49,7 @@ public class ShootControlCommand extends Command {
 
     @Override
     public void execute() {
-        double leftVelocity = 0, rightVelocity = 0;
+        double leftVelocity = 0, rightVelocity = 50;
         switch (m_shooterSubsystem.getFlapState()) {
             case RESET -> m_shooterSubsystem.flapHome();
             case STRAIGHT -> m_shooterSubsystem.setFlapPosition(kLeft90, kRight90);
@@ -92,7 +92,7 @@ public class ShootControlCommand extends Command {
                     m_shooterSubsystem.stop();
             }
             case SPEAKER -> {
-                rightVelocity = 0;
+                rightVelocity = 50;
                 if(m_rightTrigger.getAsBoolean() || m_rightBumper.getAsBoolean())
                     m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity - leftVelocity, kSpeakerVelocity - rightVelocity);
                 else
