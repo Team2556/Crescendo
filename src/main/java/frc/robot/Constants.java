@@ -60,8 +60,8 @@ public final class Constants {
     }
 
     public static class ShooterConstants {
-        public static final PIDFConfig leftShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000175, 0.0);
-        public static final PIDFConfig rightShooterPIDF = new PIDFConfig(0.0002, 0.0, 0.0, 0.000170, 0.0);
+        public static final PIDFConfig leftShooterPIDF = new PIDFConfig(0.002, 0.0, 0.0, 0.000175, 0.0);
+        public static final PIDFConfig rightShooterPIDF = new PIDFConfig(0.002, 0.0, 0.0, 0.000170, 0.0);
         public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(0.6, 0.0, 0.0, 0.0, 0.0);
         public static final double kS = 0.0, kG = 0.0, kV = 0.0;
         public static final double kMaxPIDOutput = 1.0;
