@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -249,5 +250,19 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
+    }
+
+    public Command rumble(GenericHID.RumbleType rumbleType, double strength) {
+        return Commands.runOnce(
+                        () -> {
+                            driverXbox.getHID().setRumble(rumbleType, strength);
+                            operatorXbox.getHID().setRumble(rumbleType, strength);
+                        })
+                .andThen(Commands.waitSeconds(0.3))
+                .finallyDo(
+                        () -> {
+                            driverXbox.getHID().setRumble(rumbleType, 0);
+                            operatorXbox.getHID().setRumble(rumbleType, 0);
+                        });
     }
 }
