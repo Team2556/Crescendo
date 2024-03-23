@@ -50,7 +50,7 @@ public class RobotContainer {
 
     private final ChaseTagCommand chaseTagCommand = new ChaseTagCommand(camera, drivebase, drivebase::getPose);
 
-    private final PixySwerve pixySwerveCommand = new PixySwerve(drivebase, null, null, null);
+    //private final PixySwerve pixySwerveCommand = new PixySwerve();
 
     private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
 
@@ -58,7 +58,7 @@ public class RobotContainer {
 
     private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
 
-    private final PixycamSubsystem pixySubsystem = PixycamSubsystem.getInstance();
+    private final PixycamSubsystem m_pixySubsystem = PixycamSubsystem.getInstance();
     // CommandJoystick driverController = new
     // CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
     CommandXboxController driverXbox = new CommandXboxController(0);
@@ -86,6 +86,13 @@ public class RobotContainer {
                         driverXbox.rightBumper(),
                         driverXbox.leftBumper()));
 
+        m_pixySubsystem.setDefaultCommand(
+            new PixySwerve(
+                m_pixySubsystem,
+                drivebase,
+                operatorXbox.y()
+            )
+        );
         // m_photonSubsystem.setDefaultCommand(
         // new photonCommand(
         // m_photonSubsystem
@@ -141,7 +148,7 @@ public class RobotContainer {
         driverXbox.b().onTrue(new InstantCommand(drivebase::addFakeVisionReading));
         driverXbox.x().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
         driverXbox.a().whileTrue(chaseTagCommand);
-        operatorXbox.y().whileTrue(pixySwerveCommand);
+        //operatorXbox.y().whileTrue(pixySwerveCommand);
         // A
         // new JoystickButton(operatorXbox, 1).onTrue(new InstantCommand(() ->
         // shooter.setState(ShooterState.AMP)))

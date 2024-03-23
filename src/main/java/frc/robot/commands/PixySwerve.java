@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,15 +27,14 @@ public class PixySwerve extends Command {
   private String[] objLocation;
   private float[] XandY = { 0, 0 };
   private final SwerveSubsystem swerve;
-  private final DoubleSupplier vX, vY, heading;
-  private final PixycamSubsystem m_vision = PixycamSubsystem.getInstance();
+  private final PixycamSubsystem m_vision;
   private Trigger btnPress; // controller button
   private Translation2d translation = new Translation2d(0, 0);
 
-  public void PixycamSubsystem(Trigger bs) {
+ /*  public void PixycamSubsystem(Trigger bs) {
     addRequirements(m_vision);
-    btnPress = bs;
-  }
+    
+  }*/
 
   // Called when the command is initially scheduled.
   @Override
@@ -42,14 +42,12 @@ public class PixySwerve extends Command {
     check = false;
   }
 
-  public PixySwerve(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY,
-      DoubleSupplier heading) {
+  public PixySwerve(PixycamSubsystem pixySubsystem, SwerveSubsystem swerve, Trigger btnPressTrigger) {
     this.swerve = swerve;
-    this.vX = vX;
-    this.vY = vY;
-    this.heading = heading;
-
-    addRequirements(swerve);
+    m_vision = pixySubsystem;
+    this.btnPress = btnPressTrigger;
+    addRequirements(swerve, pixySubsystem);
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -63,10 +61,10 @@ public class PixySwerve extends Command {
         XandY[1] = Float.parseFloat(objLocation[1]);
         SmartDashboard.putNumber("Number array Y", XandY[1]);
         if ((-8 > m_vision.pixy_center) || (m_vision.pixy_center > 8)) {
-          PixycamSubsystem.readData();
-          PixycamSubsystem.calculateAngle();
+          m_vision.readData();
+          m_vision.calculateAngle();
 
-          swerve.drive(translation, frc.robot.subsystems.PixycamSubsystem.calculateAngle(), true);
+          swerve.drive(translation, m_vision.calculateAngle(), true);
         } else {
           swerve.drive(translation, 0, true);
         }

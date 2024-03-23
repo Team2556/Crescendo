@@ -9,9 +9,9 @@ public class PixycamSubsystem extends SubsystemBase {
   private final static PixycamSubsystem instance = getInstance();
   private static SerialPort m_arduinoPort;
   // private static int pixy_xVal = -1;
-  public int pixy_center; // Distance of center of Note from center of Pixy's vision- should always be
+  private int pixy_center; // Distance of center of Note from center of Pixy's vision- should always be
                            // less than 158
-  public boolean pixy_positive; // Boolean to set if object is to left or right side of Pixy center
+  private boolean pixy_positive; // Boolean to set if object is to left or right side of Pixy center
   private static int objCoord[] = { 0, 0 }; // Coordinates of the note from the Pixycam. Form {X-cord, Y-coord}
   private static String values[];
   static double pixyHeight = PixyValues.pixy_Height;
@@ -50,7 +50,7 @@ public class PixycamSubsystem extends SubsystemBase {
   }
 
   /* Function to parse data from the Arduino to RoboRIO in an array form. */
-  public static void readData() {
+  public void readData() {
 
     String arduinoData = m_arduinoPort.readString();
     SmartDashboard.putString("data", arduinoData);
@@ -62,6 +62,15 @@ public class PixycamSubsystem extends SubsystemBase {
       objCoord[0] = Integer.parseInt(values[0]);
     }
 
+  }
+
+  public int getXCoord(){
+      readData();
+      return objCoord[0];
+  }
+
+  public int getPixyCenter(){
+    return getXCoord() - 158;
   }
 
   // Function to convert readData to a usable return type
@@ -95,12 +104,12 @@ public class PixycamSubsystem extends SubsystemBase {
     }
   }
 //COME BACK TO THIS- Method to find distance between pixy and ring in mm
-  public static double distance_from_note(){
+  public double distance_from_note(){
     double noteDistance = (pixy_ff* ringHeight* 152)/ (objCoord[0]* pixyHeight);
     return noteDistance;
   }
 
-  public static double calculateAngle(){
+  public double calculateAngle(){
     double pixyRotation = objCoord[0]/ distance_from_note();
     double radiansPerSecond = (pixyRotation *(Math.PI/180))/ speed;
     return radiansPerSecond;
