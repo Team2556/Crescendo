@@ -265,12 +265,12 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public void flapHome() {
         if (rightHomeFlag && leftHomeFlag) {
-            flapState = FlapState.NONE;
+            flapState = FlapState.STRAIGHT;
             return;
         }
 
         if (rightLimitSwitch.get()) {
-            rightFlap.set(-.05);
+            rightFlap.set(-.1);
         } else {
             rFlapEncoder.setPosition(0);
             rightFlap.set(0);
@@ -278,7 +278,7 @@ public class ShooterSubsystem extends SubsystemBase {
         }
 
         if (leftLimitSwitch.get()) {
-            leftFlap.set(-.05);
+            leftFlap.set(-.1);
         } else {
             lFlapEncoder.setPosition(0);
             leftFlap.set(0);
