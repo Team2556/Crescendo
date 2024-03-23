@@ -11,6 +11,9 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -122,6 +125,7 @@ public class RobotContainer {
         new PathPlannerAuto("StartAmp3Leave");
 
         SmartDashboard.putData("Auto Mode", autoChooser);
+
     }
 
     /**
@@ -139,6 +143,13 @@ public class RobotContainer {
         }));
         driverXbox.b().onTrue(new InstantCommand(() -> TeleopDrive.fieldOriented = !TeleopDrive.fieldOriented));
         driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
+
+        driverXbox.x().whileTrue(new RunCommand(() ->
+                drivebase.driveFacingTarget(
+                        () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
+                        () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
+                        new Translation2d(0.0, 5.5)), drivebase))
+                .onFalse(new InstantCommand(() -> drivebase.drive(new ChassisSpeeds()), drivebase));
 
         Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
         Pose2d speakerPose = blueSpeakerScore, ampPose = blueAmp, intakePose = blueIntake, subwooferPose = blueSubwoofer;

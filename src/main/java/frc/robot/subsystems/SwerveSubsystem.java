@@ -8,6 +8,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -17,6 +18,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -28,6 +30,8 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import java.io.File;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import static frc.robot.Constants.SWERVE_MAX_SPEED;
 
@@ -41,6 +45,8 @@ public class SwerveSubsystem extends SubsystemBase {
     * Maximum speed of the robot in meters per second, used to limit acceleration.
     */
     public double maximumSpeed = SWERVE_MAX_SPEED;
+
+    private final PIDController rotationController = new PIDController(5.0, 0.0, 0.0);
 
     /**
     * Initialize {@link SwerveDrive} with the directory provided.
@@ -71,6 +77,9 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
         swerveDrive.setCosineCompensator(true);
         setupPathPlanner();
+
+        rotationController.enableContinuousInput(0, 2 * Math.PI);
+        rotationController.setTolerance(Math.toRadians(2.0));
     }
 
     /**
@@ -331,5 +340,33 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void setMaximumSpeed(double speed) {
         swerveDrive.setMaximumSpeed(speed);
+    }
+
+    /**
+     * Drives the robot while facing a target pose.
+     *
+     * @param vx A supplier for the absolute x velocity of the robot.
+     * @param vy A supplier for the absolute y velocity of the robot.
+     * @param translation A supplier for the translation2d to face on the field.
+     */
+    public void driveFacingTarget(
+            DoubleSupplier vx, DoubleSupplier vy, Translation2d translation) {
+        drive(vx, vy, translation.minus(getPose().getTranslation()).getAngle());
+    }
+
+    /**
+     * Drives the robot based on a DoubleSupplier for field relative x y and omega velocities.
+     *
+     * @param vx A supplier for the velocity of the robot along the x axis (perpendicular to the
+     *     alliance side).
+     * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
+     *     side).
+     * @param heading A supplier for the field relative heading of the robot.
+     */
+    public void drive(DoubleSupplier vx, DoubleSupplier vy, Rotation2d heading) {
+        drive(
+            new Translation2d(-vx.getAsDouble() * maximumSpeed, -vy.getAsDouble() * maximumSpeed),
+            rotationController.calculate(getHeading().getRadians(), heading.getRadians() + Math.toRadians(180.0)),
+            true);
     }
 }
