@@ -103,8 +103,9 @@ public class ShootControlCommand extends Command {
 
         switch (m_shooterSubsystem.getPitchState()) {
             case AUTO -> {
-                double angle = m_shooterSubsystem.getShooterCalculatedAngle(poseSubsystem.getPose());
-                m_shooterSubsystem.setPitchPosition(angle + kPitchMinimumAngle);
+                double angle = interpolation.calculate(poseSubsystem.getPose());
+                SmartDashboard.putNumber("Angle", angle);
+                m_shooterSubsystem.setPitchPosition(angle);
             }
             case SPEAKER -> m_shooterSubsystem.setPitchPosition(kPitchSpeakerPosition);
             case VERTICAL -> m_shooterSubsystem.setPitchPosition(kPitchVerticalPosition);

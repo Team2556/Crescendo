@@ -32,7 +32,7 @@ public class ShootCommand extends Command {
         m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
         Pair<Double, Double> flapAngles = m_shooterSubsystem.getFlapCalculatedAngle(poseSubsystem.getPose());
         m_shooterSubsystem.setFlapPosition(flapAngles.getFirst(), flapAngles.getSecond());
-        m_shooterSubsystem.setPitchPosition(m_shooterSubsystem.getShooterCalculatedAngle(poseSubsystem.getPose()) + kPitchMinimumAngle);
+//        m_shooterSubsystem.setPitchPosition(m_shooterSubsystem.getShooterCalculatedAngle(poseSubsystem.getPose()) + kPitchMinimumAngle);
     }
 
     @Override

@@ -341,55 +341,6 @@ public class ShooterSubsystem extends SubsystemBase {
         return new Pair<>(flapLeftAngle, flapRightAngle);
     }
 
-    public double getShooterCalculatedAngle(Pose2d pose) {
-        SmartDashboard.putBoolean("Red", red);
-        double closeZoneX = Units.inchesToMeters(72.0), closeZoneHeight = Units.inchesToMeters(92.0-6.0);
-        double mediumZoneX = 3.96, mediumZoneHeight = Units.inchesToMeters(90.0-2.0);
-        double farZoneX = 6.0, farZoneHeight = Units.inchesToMeters(120.0);
-
-        double speakerHeight;
-
-        if(red) {
-            closeZoneX = redSpeaker.getX() - closeZoneX + blueSpeaker.getX();
-            mediumZoneX = redSpeaker.getX() - mediumZoneX + blueSpeaker.getX();
-            farZoneX = redSpeaker.getX() - farZoneX + blueSpeaker.getX();
-            if(pose.getX() >= closeZoneX)
-                speakerHeight = closeZoneHeight;
-            else if(pose.getX() >= mediumZoneX)
-                speakerHeight = mediumZoneHeight;
-            else
-                speakerHeight = farZoneHeight;
-        } else {
-            if(pose.getX() <= closeZoneX)
-                speakerHeight = closeZoneHeight;
-            else if(pose.getX() <= mediumZoneX)
-                speakerHeight = mediumZoneHeight;
-            else
-                speakerHeight = farZoneHeight;
-        }
-
-        Pose3d speaker;
-        if(red) {
-            speaker = new Pose3d(redSpeaker).plus(new Transform3d(0, 0, speakerHeight, new Rotation3d()));
-        } else {
-            speaker = new Pose3d(blueSpeaker).plus(new Transform3d(0, 0, speakerHeight, new Rotation3d()));
-        }
-        // Get shooter pivot location relative to the center of the robot.
-        Transform3d shooterPivot = new Transform3d(Units.inchesToMeters(3.5), 0.0, Units.inchesToMeters(6.0), new Rotation3d());
-        if(red)
-            shooterPivot.plus(new Transform3d(0, 0, 0, new Rotation3d(0, 0, Math.toRadians(180.0))));
-        // Convert robot pose to shooter pivot pose relative to the field.
-        Pose3d deltaPose = new Pose3d(pose).plus(shooterPivot);
-        // Delta X and Delta Y variables to calculate distance from the speaker.
-        double deltaX = deltaPose.getX() - speaker.getX(), deltaY = deltaPose.getY() - speaker.getY();
-        // Calculate hypotenuse to get the distance from the speaker & the height of the speaker relative to the pivot.
-        double b = Math.sqrt(deltaX * deltaX + deltaY * deltaY), a = speaker.getZ() - shooterPivot.getZ();
-        // Calculate angle using arc-tangent.
-        double angle = Math.toDegrees(Math.atan(a / b));
-        SmartDashboard.putNumber("Shooter Pivot Calculated Angle", angle);
-        return angle;
-    }
-
     public double getShooterPitchCompensated() {
         return getShooterPitch() - kPitchMinimumAngle;
     }
