@@ -41,7 +41,7 @@ public class ShootControlCommand extends Command {
     public void initialize() {
         m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
         m_shooterSubsystem.resetFlaps();
-        m_shooterSubsystem.setPitchState(PitchState.TEST);
+        m_shooterSubsystem.setPitchState(PitchState.DRIVE);
 
         Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
         alliance.ifPresent(value -> ShooterSubsystem.red = value.equals(DriverStation.Alliance.Red));
