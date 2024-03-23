@@ -69,6 +69,8 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND));
 
+        PixySwerve pixySwerve = new PixySwerve(PixycamSubsystem.getInstance(), drivebase, driverXbox.start());
+
 //        m_shooterSubsystem.setDefaultCommand(new ShooterAngleTest());
 
         m_shooterSubsystem.setDefaultCommand(new ShootControlCommand(operatorXbox.rightTrigger(0.5), driverXbox.rightBumper()));
@@ -78,8 +80,9 @@ public class RobotContainer {
         m_poseSubsystem.setDefaultCommand(new PoseUpdateCommand(m_poseSubsystem));
         m_poseSubsystem.initialize(drivebase, new PhotonCamera("photonVision"));
 
+//        drivebase.setDefaultCommand(pixySwerve);
         drivebase.setDefaultCommand(closedFieldRel);
-
+        
         shootPreload = new SequentialCommandGroup(
                 new ResetFlaps(),
                 new PreparePreload(),
