@@ -1,0 +1,67 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6544032365173167,
+      "y": 4.421733010723286
+    },
+    "rotation": -59.58891873287456
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Preload"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StartSourceToRightNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RightNoteToMidFieldRightNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MidFieldRightNoteToShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Source",
+  "choreoAuto": false
+}
