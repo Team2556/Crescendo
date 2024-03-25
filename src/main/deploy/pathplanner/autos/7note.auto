@@ -1,0 +1,73 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.67,
+      "y": 6.66
+    },
+    "rotation": 55.04545704457471
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StartAmpToAmpNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpNoteToCenterNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterNoteToCenter1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Center1ToShootCenter"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterNoteToCenter2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Center2ToShootCenter"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterNoteToCenter3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Center3ToShootCenter"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterNoteToStageNote"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Amp",
+  "choreoAuto": false
+}
