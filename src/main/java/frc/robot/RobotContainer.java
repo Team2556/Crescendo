@@ -51,6 +51,7 @@ public class RobotContainer {
     private final IntakeSubsystem m_intakeSubsystem = IntakeSubsystem.getInstance();
     private final ElevatorSubsystem m_elevatorSubsystem = ElevatorSubsystem.getInstance();
     private final PoseSubsystem m_poseSubsystem = PoseSubsystem.getInstance();
+    private final PixycamSubsystem m_pixySubsystem = PixycamSubsystem.getInstance();
     private final SendableChooser<Command> autoChooser;
     // Drive controllers
     CommandXboxController driverXbox = new CommandXboxController(0);
@@ -72,14 +73,14 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND));
 
-        PixySwerve pixySwerve = new PixySwerve(PixycamSubsystem.getInstance(), drivebase, driverXbox.start());
+        // PixySwerve pixySwerve = new PixySwerve(m_pixySubsystem, drivebase, driverXbox.start());
 
 //        m_shooterSubsystem.setDefaultCommand(new ShooterAngleTest());
 
         m_shooterSubsystem.setDefaultCommand(new ShootControlCommand(operatorXbox.rightTrigger(0.5), driverXbox.rightBumper()));
         m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
         m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(() -> -operatorXbox.getLeftY(), () -> operatorXbox.getLeftTriggerAxis()));
-
+        m_pixySubsystem.setDefaultCommand(new PixySwerve(m_pixySubsystem, drivebase, driverXbox.start()));
         m_poseSubsystem.setDefaultCommand(new PoseUpdateCommand(m_poseSubsystem));
         m_poseSubsystem.initialize(drivebase, new PhotonCamera("photonVision"));
 

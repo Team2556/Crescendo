@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.PixyValues;
 
 import static frc.robot.Constants.PixyValues;
 
@@ -16,6 +17,8 @@ public class PixycamSubsystem extends SubsystemBase {
     private boolean pixy_positive; // Boolean to set if object is to left or right side of Pixy center
     private static int[] objCoord = { 0, 0 }; // Coordinates of the note from the Pixycam. Form {X-cord, Y-coord}
     private static String[] values;
+    private static String valueX;
+    private static String valueY;
     static double pixyHeight = PixyValues.pixy_Height;
     static double ringHeight = PixyValues.ring_Height;
     static double pixy_ff = PixyValues.ff;
@@ -58,13 +61,18 @@ public class PixycamSubsystem extends SubsystemBase {
         SmartDashboard.putString("data", arduinoData);
         if (arduinoData.contains("A")) { // BANG -Shuman 2024
             values = arduinoData.split("A");
-            SmartDashboard.putString("valueX", values[0]);
-            SmartDashboard.putString("valueY", values[1]);
-            objCoord[1] = Integer.parseInt(values[1]);
-            objCoord[0] = Integer.parseInt(values[0]);
+            valueX = values[0];
+            valueY = values[1];
+            SmartDashboard.putString("valueX", valueX);
+            SmartDashboard.putString("valueY", valueY);
+            objCoord[0] = Integer.valueOf(valueX);
+            objCoord[1] = Integer.valueOf(valueY);  
+            // objCoord[1] = Integer.valueOf(values[1]);
+            // objCoord[0] = Integer.valueOf(values[0]);
         }
 
     }
+
 
     public int getXCoord(){
         readData();
@@ -94,7 +102,7 @@ public class PixycamSubsystem extends SubsystemBase {
     }
     //Swerve implementable Pixy method
     public void pixy_range() {
-        if ((-8 > pixy_center) || (pixy_center > 8)) { // Is pixy cam within 8 pixel range of center?
+        if (Math.abs(pixy_center) > 8) { // Is pixy cam within 8 pixel range of center?
             getError(); //If not, check how far off
             if (pixy_positive = false) {
                 // Turn robot to left
@@ -114,7 +122,17 @@ public class PixycamSubsystem extends SubsystemBase {
     public double calculateAngle(){
         double pixyRotation = objCoord[0]/ distance_from_note();
         double radiansPerSecond = (pixyRotation *(Math.PI/180))/ speed;
+        if (Math.abs(radiansPerSecond) < 0.2) {
+            radiansPerSecond = 0;
+        }
         return radiansPerSecond;
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("distance from note", distance_from_note());
+        SmartDashboard.putNumber("pixyRotation", objCoord[0]/ distance_from_note());
+        SmartDashboard.putNumber("radiansPerSecond", calculateAngle());
     }
 
     public static PixycamSubsystem getInstance() {

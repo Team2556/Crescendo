@@ -28,7 +28,7 @@ public class PixySwerve extends Command {
         this.swerve = swerve;
         m_vision = pixySubsystem;
         this.btnPress = btnPressTrigger;
-        addRequirements(swerve, pixySubsystem);
+        addRequirements(pixySubsystem);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -47,8 +47,6 @@ public class PixySwerve extends Command {
                     swerve.drive(translation, 0, true);
                 }
 
-            } else {
-                SmartDashboard.getString("error", "Button not found");
             }
         } catch (Exception e) {
             SmartDashboard.putString("Error2", "Method failed!");
