@@ -17,7 +17,7 @@ public class PoseSubsystem extends SubsystemBase {
     private PhotonPoseEstimator photonPoseEstimator;
     private PhotonCamera photonCamera;
     private Transform3d camConstant =
-            new Transform3d(Units.inchesToMeters(-14.0), 0.0, Units.inchesToMeters(7.8), new Rotation3d(0.0, Math.toRadians(-10.0), Math.toRadians(180)));
+            new Transform3d(Units.inchesToMeters(-14.0), 0.0, Units.inchesToMeters(7.8), new Rotation3d(0.0, Math.toRadians(-13.0), Math.toRadians(180)));
 
     public void initialize(SwerveSubsystem swerveSubsystem, PhotonCamera photonCamera) {
         this.swerveSubsystem = swerveSubsystem;

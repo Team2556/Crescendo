@@ -124,6 +124,8 @@ public class RobotContainer {
         new PathPlannerAuto("StartAmp1Leave");
         new PathPlannerAuto("StartAmp2Leave");
         new PathPlannerAuto("StartAmp3Leave");
+        new PathPlannerAuto("StartSource2");
+        new PathPlannerAuto("StartAway2");
 
         SmartDashboard.putData("Auto Mode", autoChooser);
 
