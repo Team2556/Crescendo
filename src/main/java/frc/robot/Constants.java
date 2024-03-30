@@ -62,7 +62,7 @@ public final class Constants {
     public static class ShooterConstants {
         public static final PIDFConfig leftShooterPIDF = new PIDFConfig(0.002, 0.0, 0.0, 0.000175, 0.0);
         public static final PIDFConfig rightShooterPIDF = new PIDFConfig(0.002, 0.0, 0.0, 0.000170, 0.0);
-        public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(0.6, 0.0, 0.0, 0.0, 0.0);
+        public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(0.3, 0.0, 0.0, 0.0, 0.0);
         public static final double kS = 0.0, kG = 0.0, kV = 0.0;
         public static final double kMaxPIDOutput = 1.0;
         public static final double kMinPIDOutput = -1.0;
@@ -72,16 +72,16 @@ public final class Constants {
         public static final double kFlapTolerance = 1.0;
         public static final double kPitchTolerance = 0.5;
         // Raw absolute encoder value
-        public static final double kPitchAmpPosition = 22;
+        public static final double kPitchAmpPosition = 28;
         public static final double kPitchVerticalPosition = 0;
-        public static final double kPitchIntakePosition = 22;
-        public static final double kPitchDrivePosition = 310;
+        public static final double kPitchIntakePosition = 28;
+        public static final double kPitchDrivePosition = 315;
 
         // Raw absolute encoder value
-        public static final double kPitchSpeakerPosition = 325;
+        public static final double kPitchSpeakerPosition = 328;
         public static final double kPitchMinimumAngle = 270;
         public static final double kPitchForwardLimit = 290;
-        public static final double kPitchBackwardLimit = 20;
+        public static final double kPitchBackwardLimit = 28;
         // Degrees
         public static final double kMaxFlapAngle = 35.0;
 
@@ -93,8 +93,9 @@ public final class Constants {
         }
 
         public static final double kSpeakerVelocity = 5800;
-        public static final double kShooterIntakeSpeed = -0.1;
-        public static final double kAmpSpeed = 0.125;
+        public static final double kShooterIntakeSpeed = -0.2;
+        public static final double kAmpSpeed = 0.05;
+        public static final double kStuckAmpSpeed = 0.1;
 
 
         // Flap constants

@@ -49,7 +49,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private FlapState flapState = FlapState.NONE;
     private PitchState pitchState = PitchState.NONE;
 
-    private Pose2d blueSpeaker = new Pose2d(0.3, 5.5, new Rotation2d());
+    private Pose2d blueSpeaker = new Pose2d(Units.feetToMeters(2), 5.5, new Rotation2d());
     private Pose2d redSpeaker = new Pose2d(16.2, 5.5, new Rotation2d());
     public static boolean red = false;
 
@@ -200,9 +200,9 @@ public class ShooterSubsystem extends SubsystemBase {
     //ToDo Add angle bounding to verify the inputted position is within the physically possible range.
     public void setPitchPosition(double position) {
         SmartDashboard.putNumber("Commanded pivot position", position);
-        if(position > 18 && position < 180)
-            position = 18;
-        else if(position > 18 && position < 295)
+        if(position > kPitchBackwardLimit && position < 180)
+            position = kPitchBackwardLimit;
+        else if(position > kPitchBackwardLimit && position < 295)
             position = 295;
         double pid = shooterPitchPID.calculate(getShooterPitch(), position);
         if((!forwardLimitSwitch.get() && pid < 0) || (!backwardLimitSwitch.get() && pid > 0)) {
@@ -315,8 +315,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public Pair<Double, Double> getFlapCalculatedAngle(Pose2d pose) {
         double flapLeftAngle = kLeft90, flapRightAngle = kRight90;
-        double speakerY = red ? redSpeaker.getY() : 5.5;
-        double speakerX = red ? redSpeaker.getX() : 0.0;
+        double speakerY = red ? redSpeaker.getY() : blueSpeaker.getY();
+        double speakerX = red ? redSpeaker.getX() : blueSpeaker.getX();
 
         double deltaY = pose.getY() - speakerY;
         double deltaX = pose.getX() - speakerX;
@@ -355,6 +355,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setShooterState(ShooterState shooterState) {
         this.shooterState = shooterState;
+    }
+
+    public boolean checkShooterMovement() {
+        boolean leftCheck = Math.abs(leftShooterEncoder.getVelocity()) > 0;
+        boolean rightCheck = Math.abs(rightShooterEncoder.getVelocity()) > 0;
+        return leftCheck && rightCheck;
     }
 
     public FlapState getFlapState() {

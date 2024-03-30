@@ -26,6 +26,7 @@ public class ShootControlCommand extends Command {
     private final PoseSubsystem poseSubsystem = PoseSubsystem.getInstance();
     private final ShooterInterpolation interpolation;
     private final BooleanSupplier m_rightTrigger, m_rightBumper;
+    private boolean stuckNoteCheck =  false;
 
     public ShootControlCommand(BooleanSupplier rightTrigger, BooleanSupplier rightBumper) {
         m_rightTrigger = rightTrigger;
@@ -42,6 +43,7 @@ public class ShootControlCommand extends Command {
         m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
         m_shooterSubsystem.resetFlaps();
         m_shooterSubsystem.setPitchState(PitchState.DRIVE);
+        stuckNoteCheck = false;
 
         Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
         alliance.ifPresent(value -> ShooterSubsystem.red = value.equals(DriverStation.Alliance.Red));
@@ -86,10 +88,15 @@ public class ShootControlCommand extends Command {
                     m_shooterSubsystem.stop();
             }
             case AMP -> {
-                if(m_rightTrigger.getAsBoolean() || m_rightBumper.getAsBoolean())
+                if(((m_rightTrigger.getAsBoolean() || m_rightBumper.getAsBoolean()) && m_shooterSubsystem.checkShooterMovement()) && stuckNoteCheck) {
+                    m_shooterSubsystem.setSpeed(kStuckAmpSpeed);
+                } else if(((m_rightTrigger.getAsBoolean() || m_rightBumper.getAsBoolean()) && !m_shooterSubsystem.checkShooterMovement())) {
+                    stuckNoteCheck = true;
                     m_shooterSubsystem.setSpeed(kAmpSpeed);
-                else
+                } else {
+                    stuckNoteCheck = false;
                     m_shooterSubsystem.stop();
+                }
             }
             case SPEAKER -> {
                 rightVelocity = 50;

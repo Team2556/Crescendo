@@ -139,7 +139,7 @@ public class RobotContainer {
      * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
      */
     private void configureBindings() {
-        driverXbox.leftStick().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
+        // driverXbox.leftStick().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
         driverXbox.a().onTrue(new InstantCommand(() -> {
             drivebase.setMaximumSpeed(TeleopDrive.slowMode ? SLOW_MAX_SPEED : SWERVE_MAX_SPEED);
             TeleopDrive.slowMode = !TeleopDrive.slowMode;
@@ -223,11 +223,12 @@ public class RobotContainer {
             m_shooterSubsystem.setFlapState(FlapState.INTAKE);
             m_shooterSubsystem.setPitchState(PitchState.INTAKE);
         }));
-        operatorXbox.b().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.SPEAKER)));
+        operatorXbox.b().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.SIDE)));
         operatorXbox.x().onTrue(new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.STRAIGHT)));
         operatorXbox.y().onTrue(new InstantCommand(() -> {
             m_shooterSubsystem.setFlapState(FlapState.AUTO);
             m_shooterSubsystem.setPitchState(PitchState.AUTO);
+            m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
         }));
         operatorXbox.povUp().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.VERTICAL)));
         operatorXbox.povDown().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)));
@@ -239,8 +240,9 @@ public class RobotContainer {
         Command pressCommand = new SequentialCommandGroup(
                 new WaitUntilCommand(m_shooterSubsystem::shouldShoot), // Wait until shooter is ready
                 new IntakeSetCommand(1.0).withTimeout(1.0), // Run intake command
-                new InstantCommand(() -> shot.set(true)) // Set 'shot' to true
-//                new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE))
+                new InstantCommand(() -> shot.set(true)), // Set 'shot' to true
+                new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)),
+                new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.SIDE))
         );
 
         // Command to execute when right bumper is released
