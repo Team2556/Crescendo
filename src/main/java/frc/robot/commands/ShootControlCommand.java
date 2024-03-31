@@ -8,9 +8,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ShooterConstants.FlapState;
-import frc.robot.Constants.ShooterConstants.PitchState;
-import frc.robot.Constants.ShooterConstants.ShooterState;
+import frc.robot.Constants.ShooterConstants.*;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.ShooterInterpolation;
@@ -31,7 +29,8 @@ public class ShootControlCommand extends Command {
     public ShootControlCommand(BooleanSupplier rightTrigger, BooleanSupplier rightBumper) {
         m_rightTrigger = rightTrigger;
         m_rightBumper = rightBumper;
-        interpolation = new ShooterInterpolation();
+
+        interpolation = new ShooterInterpolation(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(DriverStation.Alliance.Red));
         addRequirements(m_shooterSubsystem);
         SmartDashboard.putNumber("Shooter Pitch Angle Input", 0);
         SmartDashboard.putNumber("Flap Test Angle", 5);

@@ -18,6 +18,18 @@ import swervelib.parser.PIDFConfig;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    public static final Mode currentMode = Mode.REAL;
+
+    public static enum Mode {
+        /** Running on a real robot. */
+        REAL,
+
+        /** Running a physics simulator. */
+        SIM,
+
+        /** Replaying from a log file. */
+        REPLAY
+    }
     public static class OperatorConstants {
         public static final double LEFT_Y_DEADBAND = 0.15;
         public static final double LEFT_X_DEADBAND = 0.15;
@@ -62,14 +74,14 @@ public final class Constants {
     public static class ShooterConstants {
         public static final PIDFConfig leftShooterPIDF = new PIDFConfig(0.002, 0.0, 0.0, 0.000175, 0.0);
         public static final PIDFConfig rightShooterPIDF = new PIDFConfig(0.002, 0.0, 0.0, 0.000170, 0.0);
-        public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(0.3, 0.0, 0.0, 0.0, 0.0);
+        public static final PIDFConfig pitchShooterPIDF = new PIDFConfig(0.6, 0.0, 0.0, 0.0, 0.0);
         public static final double kS = 0.0, kG = 0.0, kV = 0.0;
         public static final double kMaxPIDOutput = 1.0;
         public static final double kMinPIDOutput = -1.0;
 
         public static final double kVelocityTolerance = 100;
 
-        public static final double kFlapTolerance = 1.0;
+        public static final double kFlapTolerance = 0.5;
         public static final double kPitchTolerance = 0.5;
         // Raw absolute encoder value
         public static final double kPitchAmpPosition = 28;
@@ -131,6 +143,7 @@ public final class Constants {
     }
 
     public static final double kIntakeMaxSpeed = 1.0;
+    public static final double kIntakeSlowSpeed = 0.5;
     public static final double kOuttakeMaxSpeed = -1.0;
     public static final double kElevatorMaxSpeed = 1.0;
 

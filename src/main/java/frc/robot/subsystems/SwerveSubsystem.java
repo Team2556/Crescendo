@@ -8,18 +8,26 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
@@ -31,7 +39,6 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import java.io.File;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 import static frc.robot.Constants.SWERVE_MAX_SPEED;
 
@@ -195,6 +202,7 @@ public class SwerveSubsystem extends SubsystemBase {
     *
     * @return The robot's pose
     */
+    @AutoLogOutput
     public Pose2d getPose() {
         return swerveDrive.getPose();
     }
@@ -238,6 +246,7 @@ public class SwerveSubsystem extends SubsystemBase {
     *
     * @return The yaw angle
     */
+    @AutoLogOutput
     public Rotation2d getHeading() {
         return swerveDrive.getYaw();
     }
@@ -326,6 +335,32 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Checks if the alliance is red, defaults to false if alliance isn't available.
+     *
+     * @return true if the red alliance, false if blue. Defaults to false if none is available.
+     */
+    private boolean isRedAlliance() {
+        var alliance = DriverStation.getAlliance();
+        return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+    }
+
+    /**
+     * This will zero (calibrate) the robot to assume the current position is facing forward
+     * <p>
+     * If red alliance rotate the robot 180 after the drviebase zero command
+     */
+    public void zeroGyroWithAlliance() {
+        if (isRedAlliance()) {
+            zeroGyro();
+            //Set the pose 180 degrees
+            resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
+        } else {
+            zeroGyro();
+        }
+    }
+
+
+    /**
     * Gets the current pitch angle of the robot, as reported by the imu.
     *
     * @return The heading as a {@link Rotation2d} angle
@@ -343,30 +378,59 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Drives the robot while facing a target pose.
-     *
-     * @param vx A supplier for the absolute x velocity of the robot.
-     * @param vy A supplier for the absolute y velocity of the robot.
-     * @param translation A supplier for the translation2d to face on the field.
+     * AprilTag field layout.
      */
-    public void driveFacingTarget(
-            DoubleSupplier vx, DoubleSupplier vy, Translation2d translation) {
-        drive(vx, vy, translation.minus(getPose().getTranslation()).getAngle());
+    private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+
+    /**
+     * Get the distance to the speaker.
+     *
+     * @return Distance to speaker in meters.
+     */
+    public double getDistanceToSpeaker()
+    {
+        int allianceAprilTag = DriverStation.getAlliance().get() == DriverStation.Alliance.Blue ? 7 : 4;
+        // Taken from PhotonUtils.getDistanceToPose
+        Pose3d speakerAprilTagPose = aprilTagFieldLayout.getTagPose(allianceAprilTag).get();
+        return getPose().getTranslation().getDistance(speakerAprilTagPose.toPose2d().getTranslation());
     }
 
     /**
-     * Drives the robot based on a DoubleSupplier for field relative x y and omega velocities.
+     * Get the yaw to aim at the speaker.
      *
-     * @param vx A supplier for the velocity of the robot along the x axis (perpendicular to the
-     *     alliance side).
-     * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
-     *     side).
-     * @param heading A supplier for the field relative heading of the robot.
+     * @return {@link Rotation2d} of which you need to achieve.
      */
-    public void drive(DoubleSupplier vx, DoubleSupplier vy, Rotation2d heading) {
-        drive(
-            new Translation2d(-vx.getAsDouble() * maximumSpeed, -vy.getAsDouble() * maximumSpeed),
-            rotationController.calculate(getHeading().getRadians(), heading.getRadians() + Math.toRadians(180.0)),
-            true);
+    public Rotation2d getSpeakerYaw()
+    {
+        int allianceAprilTag = DriverStation.getAlliance().get() == DriverStation.Alliance.Blue ? 7 : 4;
+        // Taken from PhotonUtils.getYawToPose()
+        Pose3d speakerAprilTagPose = aprilTagFieldLayout.getTagPose(allianceAprilTag).get();
+        Translation2d relativeTrl         = speakerAprilTagPose.toPose2d().relativeTo(getPose()).getTranslation();
+        return new Rotation2d(relativeTrl.getX(), relativeTrl.getY()).plus(swerveDrive.getOdometryHeading());
+    }
+
+    /**
+     * Aim the robot at the speaker.
+     *
+     * @param tolerance Tolerance in degrees.
+     * @return Command to turn the robot to the speaker.
+     */
+    public Command aimAtSpeaker(double tolerance)
+    {
+        SwerveController controller = swerveDrive.getSwerveController();
+        return run(
+                () -> {
+                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(0,
+                            0,
+                            controller.headingCalculate(getHeading().getRadians(),
+                                    getSpeakerYaw().getRadians()),
+                            getHeading())
+                    );
+                }).until(() -> getSpeakerYaw().minus(getHeading()).getDegrees() < tolerance);
+    }
+
+    @AutoLogOutput
+    public SwerveModuleState[] getSwerveModuleState() {
+        return swerveDrive.getStates();
     }
 }

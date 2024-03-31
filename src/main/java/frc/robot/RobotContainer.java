@@ -9,9 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -23,10 +21,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.*;
 import frc.robot.commands.*;
 import frc.robot.commands.auto.*;
-import frc.robot.commands.test.ShooterAngleTest;
 import frc.robot.subsystems.*;
 import org.photonvision.PhotonCamera;
 
@@ -61,6 +57,8 @@ public class RobotContainer {
     Command intake;
     Command shoot;
 
+    public static boolean shouldRumble = false;
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -73,14 +71,17 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
             () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND));
 
-        // PixySwerve pixySwerve = new PixySwerve(m_pixySubsystem, drivebase, driverXbox.start());
+        PixySwerve pixySwerve = new PixySwerve(drivebase,
+                () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
+                () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
+                () -> MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND),
+                driverXbox.start());
 
 //        m_shooterSubsystem.setDefaultCommand(new ShooterAngleTest());
 
         m_shooterSubsystem.setDefaultCommand(new ShootControlCommand(operatorXbox.rightTrigger(0.5), driverXbox.rightBumper()));
         m_intakeSubsystem.setDefaultCommand(new IntakeControlCommand(driverXbox::getRightTriggerAxis, driverXbox::getLeftTriggerAxis));
         m_elevatorSubsystem.setDefaultCommand(new ElevatorCommand(() -> -operatorXbox.getLeftY(), () -> operatorXbox.getLeftTriggerAxis()));
-        m_pixySubsystem.setDefaultCommand(new PixySwerve(m_pixySubsystem, drivebase, driverXbox.start()));
         m_poseSubsystem.setDefaultCommand(new PoseUpdateCommand(m_poseSubsystem));
         m_poseSubsystem.initialize(drivebase, new PhotonCamera("photonVision"));
 
@@ -123,7 +124,7 @@ public class RobotContainer {
         new PathPlannerAuto("StartCenter2Leave");
         new PathPlannerAuto("StartAmp1Leave");
         new PathPlannerAuto("StartAmp2Leave");
-        new PathPlannerAuto("StartAmp3Leave");
+//        new PathPlannerAuto("StartAmp3Leave");
         new PathPlannerAuto("StartSource2");
         new PathPlannerAuto("StartAway2");
 
@@ -139,20 +140,15 @@ public class RobotContainer {
      * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
      */
     private void configureBindings() {
-        // driverXbox.leftStick().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
+         driverXbox.leftStick().whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
         driverXbox.a().onTrue(new InstantCommand(() -> {
             drivebase.setMaximumSpeed(TeleopDrive.slowMode ? SLOW_MAX_SPEED : SWERVE_MAX_SPEED);
             TeleopDrive.slowMode = !TeleopDrive.slowMode;
         }));
         driverXbox.b().onTrue(new InstantCommand(() -> TeleopDrive.fieldOriented = !TeleopDrive.fieldOriented));
-        driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyro)));
+        driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyroWithAlliance)));
 
-        driverXbox.x().whileTrue(new RunCommand(() ->
-                drivebase.driveFacingTarget(
-                        () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-                        () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-                        new Translation2d(0.0, 5.5)), drivebase))
-                .onFalse(new InstantCommand(() -> drivebase.drive(new ChassisSpeeds()), drivebase));
+        driverXbox.x().whileTrue(drivebase.aimAtSpeaker(2));
 
         Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
         Pose2d speakerPose = blueSpeakerScore, ampPose = blueAmp, intakePose = blueIntake, subwooferPose = blueSubwoofer;
@@ -235,11 +231,14 @@ public class RobotContainer {
         operatorXbox.povLeft().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.AMP)));
         operatorXbox.povRight().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.SPEAKER)));
 
+        new Trigger(() -> shouldRumble).onTrue(rumble(GenericHID.RumbleType.kBothRumble, 0.5));
+
         AtomicBoolean shot = new AtomicBoolean(false);
         // Command to execute when right bumper is pressed
         Command pressCommand = new SequentialCommandGroup(
                 new WaitUntilCommand(m_shooterSubsystem::shouldShoot), // Wait until shooter is ready
-                new IntakeSetCommand(1.0).withTimeout(1.0), // Run intake command
+                new IntakeSetCommand(1.0).withTimeout(1.0)
+                        .alongWith(rumble(GenericHID.RumbleType.kBothRumble, 0.5)), // Run intake command
                 new InstantCommand(() -> shot.set(true)), // Set 'shot' to true
                 new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)),
                 new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.SIDE))
@@ -252,7 +251,9 @@ public class RobotContainer {
                         .alongWith(new InstantCommand(() -> shot.set(false)))
         );
 
-        driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand);
+        driverXbox.rightBumper().onTrue(pressCommand).onFalse(releaseCommand.andThen(
+                new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)),
+                new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.SIDE))));
 
         Command ampScore = new SequentialCommandGroup(
                 new AmpVertical(),

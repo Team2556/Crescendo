@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 
@@ -8,11 +9,14 @@ import java.util.function.DoubleSupplier;
 import static frc.robot.Constants.OperatorConstants.LEFT_TRIGGER_DEADBAND;
 import static frc.robot.Constants.OperatorConstants.RIGHT_TRIGGER_DEADBAND;
 import static frc.robot.Constants.kIntakeMaxSpeed;
+import static frc.robot.Constants.kIntakeSlowSpeed;
 import static frc.robot.Constants.kOuttakeMaxSpeed;
 
 public class IntakeControlCommand extends Command {
     private final IntakeSubsystem m_subsystem = IntakeSubsystem.getInstance();
     private final DoubleSupplier m_rightTrigger, m_leftTrigger;
+    private double intakeSpeed = kIntakeMaxSpeed;
+
     public IntakeControlCommand(DoubleSupplier rightTrigger, DoubleSupplier leftTrigger) {
         m_rightTrigger = rightTrigger;
         m_leftTrigger = leftTrigger;
@@ -22,14 +26,22 @@ public class IntakeControlCommand extends Command {
     @Override
     public void initialize() {
         super.initialize();
+        intakeSpeed = kIntakeMaxSpeed;
         m_subsystem.stop();
     }
 
     @Override
     public void execute() {
         super.execute();
+        if (m_subsystem.getIntakeOutputCurrent() > 40) {
+            intakeSpeed = kIntakeSlowSpeed;
+        }
+        if (m_subsystem.getIntakeOutputCurrent() < 20) {
+            intakeSpeed = kIntakeMaxSpeed;
+        }
+        SmartDashboard.putNumber("Intake Set Speed", intakeSpeed);
         if(m_rightTrigger.getAsDouble() > RIGHT_TRIGGER_DEADBAND)
-            m_subsystem.setIntakeMotor(kIntakeMaxSpeed * m_rightTrigger.getAsDouble());
+            m_subsystem.setIntakeMotor(intakeSpeed * m_rightTrigger.getAsDouble());
         else if(m_leftTrigger.getAsDouble() > LEFT_TRIGGER_DEADBAND)
             m_subsystem.set(kOuttakeMaxSpeed);
         else

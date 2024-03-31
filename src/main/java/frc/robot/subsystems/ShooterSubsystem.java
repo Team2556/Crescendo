@@ -9,9 +9,9 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -19,7 +19,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.ShooterConstants.*;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import static frc.robot.Constants.ShooterConstants.*;
 
@@ -49,7 +50,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private FlapState flapState = FlapState.NONE;
     private PitchState pitchState = PitchState.NONE;
 
-    private Pose2d blueSpeaker = new Pose2d(Units.feetToMeters(2), 5.5, new Rotation2d());
+    private Pose2d blueSpeaker = new Pose2d(0.35, 5.5, new Rotation2d());
     private Pose2d redSpeaker = new Pose2d(16.2, 5.5, new Rotation2d());
     public static boolean red = false;
 
@@ -180,6 +181,8 @@ public class ShooterSubsystem extends SubsystemBase {
      */
 
     public void setFlapPosition(double leftPosition, double rightPosition) {
+        Logger.recordOutput("Left Flap Setpoint", leftPosition);
+        Logger.recordOutput("Right Flap Setpoint", rightPosition);
         lFlapPID.setReference(leftPosition, CANSparkBase.ControlType.kPosition);
         rFlapPID.setReference(rightPosition, CANSparkBase.ControlType.kPosition);
     }
@@ -205,10 +208,14 @@ public class ShooterSubsystem extends SubsystemBase {
         else if(position > kPitchBackwardLimit && position < 295)
             position = 295;
         double pid = shooterPitchPID.calculate(getShooterPitch(), position);
+
         if((!forwardLimitSwitch.get() && pid < 0) || (!backwardLimitSwitch.get() && pid > 0)) {
             shooterPitch.setVoltage(0.0);
             return;
         }
+
+        pid = Math.max(pid, -8.0);
+        pid = Math.min(pid, 8.0);
         // Convert position to the proper frame of reference for the feedforward cosine.
         double pos = position - kPitchMinimumAngle;
         if(pos < 0) {
@@ -233,6 +240,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * Get average velocity between the left and right shooter motors.
      * @return Average velocity of the shooters.
      */
+    @AutoLogOutput
     public double getVelocity() {
         return (leftShooterEncoder.getVelocity() + rightShooterEncoder.getVelocity()) / 2.0;
     }
@@ -241,6 +249,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * Get whether the current velocity is close enough to the target velocity based off a velocity error constant.
      * @return Whether the current velocity is near the target velocity.
      */
+    @AutoLogOutput
     public boolean isOnTarget() {
         return Math.abs(targetVelocity - getVelocity()) <= ShooterConstants.kVelocityTolerance;
     }
@@ -270,7 +279,7 @@ public class ShooterSubsystem extends SubsystemBase {
         }
 
         if (rightLimitSwitch.get()) {
-            rightFlap.set(-.1);
+            rightFlap.set(-0.15);
         } else {
             rFlapEncoder.setPosition(0);
             rightFlap.set(0);
@@ -278,7 +287,7 @@ public class ShooterSubsystem extends SubsystemBase {
         }
 
         if (leftLimitSwitch.get()) {
-            leftFlap.set(-.1);
+            leftFlap.set(-0.15);
         } else {
             lFlapEncoder.setPosition(0);
             leftFlap.set(0);
@@ -297,12 +306,14 @@ public class ShooterSubsystem extends SubsystemBase {
         return isOnTarget();
     }
 
+    @AutoLogOutput
     public boolean flapsArrived(double leftPos, double rightPos) {
         double dL = Math.abs(leftPos - lFlapEncoder.getPosition()),
                 dR = Math.abs(rightPos - rFlapEncoder.getPosition());
         return dL < kFlapTolerance && dR < kFlapTolerance;
     }
 
+    @AutoLogOutput
     public boolean shooterPitchArrived() {
         return shooterPitchPID.atSetpoint();
     }
@@ -345,10 +356,12 @@ public class ShooterSubsystem extends SubsystemBase {
         return getShooterPitch() - kPitchMinimumAngle;
     }
 
+    @AutoLogOutput
     public double getShooterPitch() {
         return shooterPitchEncoder.getPosition();
     }
 
+    @AutoLogOutput
     public ShooterState getShooterState() {
         return shooterState;
     }
@@ -363,6 +376,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return leftCheck && rightCheck;
     }
 
+    @AutoLogOutput
     public FlapState getFlapState() {
         return flapState;
     }
@@ -371,6 +385,7 @@ public class ShooterSubsystem extends SubsystemBase {
         this.flapState = flapState;
     }
 
+    @AutoLogOutput
     public PitchState getPitchState() {
         return pitchState;
     }

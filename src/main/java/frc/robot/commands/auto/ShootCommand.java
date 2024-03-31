@@ -6,7 +6,6 @@ import frc.robot.Constants;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
-import static frc.robot.Constants.ShooterConstants.kPitchMinimumAngle;
 import static frc.robot.Constants.ShooterConstants.kSpeakerVelocity;
 
 public class ShootCommand extends Command {
