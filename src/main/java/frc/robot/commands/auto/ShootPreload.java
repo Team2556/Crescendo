@@ -25,9 +25,9 @@ public class ShootPreload extends Command {
     @Override
     public void execute() {
         super.execute();
-        shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
+        shooterSubsystem.setShooterVelocity(4000);
         shooterSubsystem.setPitchPosition(kPitchSpeakerPosition);
-        intakeSubsystem.set(0.4);
+        intakeSubsystem.set(1.0);
     }
 
     @Override
@@ -35,8 +35,6 @@ public class ShootPreload extends Command {
         super.end(interrupted);
         shooterSubsystem.setFlapState(Constants.ShooterConstants.FlapState.STRAIGHT);
         shooterSubsystem.setShooterState(Constants.ShooterConstants.ShooterState.SPEAKER);
-//        shooterSubsystem.setPitchState(Constants.ShooterConstants.PitchState.VERTICAL);
-        shooterSubsystem.stop();
         intakeSubsystem.stop();
     }
 

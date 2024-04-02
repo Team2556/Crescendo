@@ -65,6 +65,35 @@ public class RobotContainer {
     public RobotContainer() {
         configureBindings();
 
+        shootPreload = new SequentialCommandGroup(
+                new ResetFlaps(),
+                new PreparePreload(),
+                new CanShootPreload(),
+                new ShootPreload().withTimeout(1.5)
+        );
+
+        NamedCommands.registerCommand("Shoot Preload", shootPreload);
+
+        intake = new SequentialCommandGroup(
+                new WaitUntilCommand(() -> !m_intakeSubsystem.getIntakeLimitSwitch())
+                        .alongWith(new RepeatCommand(new RunCommand(() -> m_intakeSubsystem.setIntakeMotor(kIntakeMaxSpeed), m_intakeSubsystem)))
+        );
+
+        NamedCommands.registerCommand("Intake", intake.withTimeout(1.0));
+
+        shoot = new SequentialCommandGroup(
+                new ShootCommand(),
+                new IntakeSetCommand(1.0).withTimeout(0.5),
+                new InstantCommand(() -> {
+                    m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
+                    m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
+                    m_shooterSubsystem.setPitchState(PitchState.DRIVE);
+                    m_intakeSubsystem.stop();
+                }, m_intakeSubsystem, m_shooterSubsystem)
+        );
+
+        NamedCommands.registerCommand("Shoot", shoot);
+
         TeleopDrive closedFieldRel = new TeleopDrive(
             drivebase,
             () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
@@ -87,36 +116,6 @@ public class RobotContainer {
 
 //        drivebase.setDefaultCommand(pixySwerve);
         drivebase.setDefaultCommand(closedFieldRel);
-        
-        shootPreload = new SequentialCommandGroup(
-                new ResetFlaps(),
-                new PreparePreload(),
-                new CanShootPreload(),
-                new ShootPreload().withTimeout(1.5)
-        );
-
-        NamedCommands.registerCommand("Shoot Preload", shootPreload);
-
-        intake = new SequentialCommandGroup(
-                new WaitUntilCommand(() -> !m_intakeSubsystem.getIntakeLimitSwitch())
-                        .alongWith(new RepeatCommand(new RunCommand(() -> m_intakeSubsystem.setIntakeMotor(kIntakeMaxSpeed), m_intakeSubsystem)))
-        );
-
-        NamedCommands.registerCommand("Intake", intake.withTimeout(2.0));
-
-        shoot = new SequentialCommandGroup(
-                new ShootCommand(),
-                new IntakeSetCommand(0.4).withTimeout(0.5),
-                new InstantCommand(() -> {
-                    m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
-                    m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
-                    m_shooterSubsystem.setPitchState(PitchState.DRIVE);
-                    m_shooterSubsystem.stop();
-                    m_intakeSubsystem.stop();
-                }, m_intakeSubsystem, m_shooterSubsystem)
-        );
-
-        NamedCommands.registerCommand("Shoot", shoot);
 
         autoChooser = AutoBuilder.buildAutoChooser();
 

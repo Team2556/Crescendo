@@ -25,6 +25,7 @@ public class PreparePreload extends Command {
         super.execute();
         shooterSubsystem.setFlapPosition(kLeft90, kRight90);
         shooterSubsystem.setPitchPosition(kPitchSpeakerPosition);
+        shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
     }
 
     @Override

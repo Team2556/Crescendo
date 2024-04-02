@@ -25,7 +25,7 @@ public class CanShootPreload extends Command {
     public void execute() {
         super.execute();
         shooterSubsystem.setPitchPosition(kPitchSpeakerPosition);
-        shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
+        shooterSubsystem.setShooterVelocity(4000);
     }
 
     @Override
