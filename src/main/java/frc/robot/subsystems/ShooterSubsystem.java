@@ -76,6 +76,9 @@ public class ShooterSubsystem extends SubsystemBase {
         leftShooter.clearFaults();
         rightShooter.clearFaults();
 
+        leftShooter.setSmartCurrentLimit(40, 40);
+        rightShooter.setSmartCurrentLimit(40, 40);
+
         leftShooter.setInverted(false);
         rightShooter.setInverted(true);
 
@@ -324,6 +327,7 @@ public class ShooterSubsystem extends SubsystemBase {
         flapState = FlapState.RESET;
     }
 
+    @AutoLogOutput
     public Pair<Double, Double> getFlapCalculatedAngle(Pose2d pose) {
         double flapLeftAngle = kLeft90, flapRightAngle = kRight90;
         double speakerY = red ? redSpeaker.getY() : blueSpeaker.getY();
@@ -370,6 +374,7 @@ public class ShooterSubsystem extends SubsystemBase {
         this.shooterState = shooterState;
     }
 
+    @AutoLogOutput
     public boolean checkShooterMovement() {
         boolean leftCheck = Math.abs(leftShooterEncoder.getVelocity()) > 0;
         boolean rightCheck = Math.abs(rightShooterEncoder.getVelocity()) > 0;
@@ -466,5 +471,30 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public boolean flapsHomed() {
         return leftHomeFlag && rightHomeFlag;
+    }
+
+    @AutoLogOutput
+    public double getLeftShooterCurrent() {
+        return leftShooter.getOutputCurrent();
+    }
+
+    @AutoLogOutput
+    public double getRightShooterCurrent() {
+        return rightShooter.getOutputCurrent();
+    }
+
+    @AutoLogOutput
+    public double getLeftFlapCurrent() {
+        return leftFlap.getOutputCurrent();
+    }
+
+    @AutoLogOutput
+    public double getRightFlapCurrent() {
+        return rightFlap.getOutputCurrent();
+    }
+
+    @AutoLogOutput
+    public double getPitchCurrent() {
+        return shooterPitch.getOutputCurrent();
     }
 }

@@ -255,12 +255,12 @@ public class RobotContainer {
                 new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)),
                 new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.SIDE))));
 
-        Command ampScore = new SequentialCommandGroup(
-                new AmpVertical(),
-                new AmpScore()
-        );
-
-        driverXbox.leftBumper().onTrue(ampScore);
+//        Command ampScore = new SequentialCommandGroup(
+//                new AmpVertical(),
+//                new AmpScore()
+//        );
+//
+//        driverXbox.leftBumper().onTrue(ampScore);
    }
 
     /**

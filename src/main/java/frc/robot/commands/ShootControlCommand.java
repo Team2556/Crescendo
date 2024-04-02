@@ -22,7 +22,7 @@ public class ShootControlCommand extends Command {
     /** Creates a new ShootCommand. */
     private final ShooterSubsystem m_shooterSubsystem = ShooterSubsystem.getInstance();
     private final PoseSubsystem poseSubsystem = PoseSubsystem.getInstance();
-    private final ShooterInterpolation interpolation;
+    private ShooterInterpolation interpolation;
     private final BooleanSupplier m_rightTrigger, m_rightBumper;
     private boolean stuckNoteCheck =  false;
 
@@ -30,7 +30,6 @@ public class ShootControlCommand extends Command {
         m_rightTrigger = rightTrigger;
         m_rightBumper = rightBumper;
 
-        interpolation = new ShooterInterpolation(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(DriverStation.Alliance.Red));
         addRequirements(m_shooterSubsystem);
         SmartDashboard.putNumber("Shooter Pitch Angle Input", 0);
         SmartDashboard.putNumber("Flap Test Angle", 5);
@@ -46,6 +45,7 @@ public class ShootControlCommand extends Command {
 
         Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
         alliance.ifPresent(value -> ShooterSubsystem.red = value.equals(DriverStation.Alliance.Red));
+        interpolation = new ShooterInterpolation(ShooterSubsystem.red);
     }
 
     @Override

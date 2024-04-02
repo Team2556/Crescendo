@@ -5,11 +5,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveController;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -25,6 +27,7 @@ public class TeleopDrive extends Command {
     public static boolean slowMode = false;
     public static boolean fieldOriented = true;
     private static final double slowModeScalar = 0.3;
+    private boolean red = false;
 
     public TeleopDrive(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY,
                      DoubleSupplier omega) {
@@ -41,6 +44,8 @@ public class TeleopDrive extends Command {
     public void initialize() {
         super.initialize();
         slowMode = false;
+        Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+        red = alliance.isPresent() && alliance.get().equals(DriverStation.Alliance.Red);
     }
 
     @Override
@@ -54,6 +59,11 @@ public class TeleopDrive extends Command {
         xVelocity *= slowMode ? slowModeScalar : 1;
         yVelocity *= slowMode ? slowModeScalar : 1;
         angVelocity *= slowMode ? slowModeScalar : 1;
+
+        if(red) {
+            xVelocity *= -1;
+            yVelocity *= -1;
+        }
         // Drive using raw values.
         swerve.drive(new Translation2d(xVelocity * swerve.maximumSpeed, yVelocity * swerve.maximumSpeed),
                 angVelocity * controller.config.maxAngularVelocity,

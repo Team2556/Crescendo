@@ -2,7 +2,6 @@ package frc.robot.util;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
@@ -15,26 +14,17 @@ public class ShooterInterpolation {
     private InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> map;
     private Pose2d blueSpeaker = new Pose2d(0.5, 5.5, new Rotation2d());
     private Pose2d redSpeaker = new Pose2d(16.0, 5.5, new Rotation2d());
-    private boolean red;
+    private final boolean red;
 
     public ShooterInterpolation(boolean red) {
         this.red = red;
         map = new InterpolatingTreeMap<>();
-        if(red) {
-            map.put(new InterpolatingDouble(redSpeaker.getX() - 4.6 - Units.inchesToMeters(14.0)), new InterpolatingDouble(305.5 - 1.0));
-            map.put(new InterpolatingDouble(redSpeaker.getX() - 3.4 - Units.inchesToMeters(14.0)), new InterpolatingDouble(306.5 - 1.0));
-            map.put(new InterpolatingDouble(redSpeaker.getX() - 2.6 - Units.inchesToMeters(14.0)), new InterpolatingDouble(309.5 - 2.0));
-            map.put(new InterpolatingDouble(redSpeaker.getX() - 2.0 - Units.inchesToMeters(14.0)), new InterpolatingDouble(311.5 - 3.0));
-            map.put(new InterpolatingDouble(redSpeaker.getX() - 1.5 - Units.inchesToMeters(14.0)), new InterpolatingDouble(318.5 - 3.0));
-            map.put(new InterpolatingDouble(redSpeaker.getX() - 1.0 - Units.inchesToMeters(14.0)), new InterpolatingDouble(328.0 - 4.5));
-        } else {
-            map.put(new InterpolatingDouble(4.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(305.5 - 1.0));
-            map.put(new InterpolatingDouble(3.4 + Units.inchesToMeters(14.0)), new InterpolatingDouble(306.5 - 1.0));
-            map.put(new InterpolatingDouble(2.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(309.5 - 2.0));
-            map.put(new InterpolatingDouble(2.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(311.5 - 3.0));
-            map.put(new InterpolatingDouble(1.5 + Units.inchesToMeters(14.0)), new InterpolatingDouble(318.5 - 3.0));
-            map.put(new InterpolatingDouble(1.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(328.0 - 3.5));
-        }
+        map.put(new InterpolatingDouble(4.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(305.5 - 1.0));
+        map.put(new InterpolatingDouble(3.4 + Units.inchesToMeters(14.0)), new InterpolatingDouble(306.5 - 1.0));
+        map.put(new InterpolatingDouble(2.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(309.5 - 2.0));
+        map.put(new InterpolatingDouble(2.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(311.5 - 3.0));
+        map.put(new InterpolatingDouble(1.5 + Units.inchesToMeters(14.0)), new InterpolatingDouble(318.5 - 3.0));
+        map.put(new InterpolatingDouble(1.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(328.0 - 3.5));
     }
 
     @AutoLogOutput

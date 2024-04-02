@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import static frc.robot.Constants.Ports.kIntakeBreakBeam;
@@ -52,6 +53,7 @@ public class IntakeSubsystem extends SubsystemBase {
             }
             stop();
         } else {
+            RobotContainer.shouldRumble = false;
             hasRumbled = false;
             set(speed);
         }
@@ -79,10 +81,12 @@ public class IntakeSubsystem extends SubsystemBase {
      * Get the status of the intake's break beam.
      * @return Whether the break beam is triggered.
      */
+    @AutoLogOutput
     public boolean getIntakeLimitSwitch() {
         return intakeLimitSwitch.get();
     }
 
+    @AutoLogOutput
     public double getIntakeOutputCurrent() {
         return intakeMotor.getOutputCurrent();
     }
