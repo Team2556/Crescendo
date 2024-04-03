@@ -20,12 +20,13 @@ public class ShootPreload extends Command {
     public void initialize() {
         super.initialize();
         shooterSubsystem.setPitchState(Constants.ShooterConstants.PitchState.SPEAKER);
+        shooterSubsystem.setShooterState(Constants.ShooterConstants.ShooterState.SPEAKER);
     }
 
     @Override
     public void execute() {
         super.execute();
-        shooterSubsystem.setShooterVelocity(4000);
+        shooterSubsystem.setShooterVelocity(kSpeakerVelocity);
         shooterSubsystem.setPitchPosition(kPitchSpeakerPosition);
         intakeSubsystem.set(1.0);
     }
