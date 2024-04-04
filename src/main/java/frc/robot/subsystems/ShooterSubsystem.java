@@ -303,6 +303,7 @@ public class ShooterSubsystem extends SubsystemBase {
         rightShooter.set(speed);
     }
 
+    @AutoLogOutput
     public boolean shouldShoot() {
         if(shooterState.equals(ShooterState.STOP))
             return false;
@@ -350,12 +351,17 @@ public class ShooterSubsystem extends SubsystemBase {
                 flapRightAngle = (90 + v) * rightFlapDegrees;
                 flapLeftAngle = (90 - v) * leftFlapDegrees;
             }
+            if(hyp < kMaxAutoSpeakerDistance) {
+                flapRightAngle = 90 * rightFlapDegrees;
+                flapLeftAngle = 90 * leftFlapDegrees;
+            }
             SmartDashboard.putNumber("Flap left encoder auto", flapLeftAngle);
             SmartDashboard.putNumber("Flap right encoder auto", flapRightAngle);
         }
         return new Pair<>(flapLeftAngle, flapRightAngle);
     }
 
+    @AutoLogOutput
     public double getShooterPitchCompensated() {
         return getShooterPitch() - kPitchMinimumAngle;
     }

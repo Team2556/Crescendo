@@ -83,6 +83,7 @@ public final class Constants {
 
         public static final double kFlapTolerance = 0.5;
         public static final double kPitchTolerance = 0.5;
+        public static final double kMaxAutoSpeakerDistance = 1.5;
         // Raw absolute encoder value
         public static final double kPitchAmpPosition = 28;
         public static final double kPitchVerticalPosition = 0;

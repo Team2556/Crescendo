@@ -10,6 +10,8 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -74,16 +76,13 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Shoot Preload", shootPreload);
 
-        intake = new SequentialCommandGroup(
-                new WaitUntilCommand(() -> !m_intakeSubsystem.getIntakeLimitSwitch())
-                        .alongWith(new RepeatCommand(new RunCommand(() -> m_intakeSubsystem.setIntakeMotor(kIntakeMaxSpeed), m_intakeSubsystem)))
-        );
+        intake = new IntakeAuto();
 
-        NamedCommands.registerCommand("Intake", intake.withTimeout(1.0));
+        NamedCommands.registerCommand("Intake", intake.withTimeout(0.5));
 
         shoot = new SequentialCommandGroup(
                 new ShootCommand(),
-                new IntakeSetCommand(1.0).withTimeout(0.5),
+                new IntakeSetCommand(1.0).withTimeout(0.3),
                 new InstantCommand(() -> {
                     m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
                     m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
@@ -126,6 +125,8 @@ public class RobotContainer {
 //        new PathPlannerAuto("StartAmp3Leave");
         new PathPlannerAuto("StartSource2");
         new PathPlannerAuto("StartAway2");
+        new PathPlannerAuto("StartCenterTo4Note");
+        new PathPlannerAuto("Amp1Middle1");
 
         SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -172,14 +173,22 @@ public class RobotContainer {
 
         driverXbox.povLeft().onTrue(
                 AutoBuilder.pathfindToPose(
-                        ampPose,
+                        ampPose.plus(new Transform2d(0, Units.inchesToMeters(-12.0), new Rotation2d())),
                         new PathConstraints(
-                                3.0, 2.0,
+                                1.0, 2.0,
                                 Units.degreesToRadians(360), Units.degreesToRadians(540)
                         ),
                         0,
                         0
-                )
+                ).andThen(AutoBuilder.pathfindToPose(
+                        ampPose,
+                        new PathConstraints(
+                                1.0, 2.0,
+                                Units.degreesToRadians(360), Units.degreesToRadians(540)
+                        ),
+                        0,
+                        0
+                ))
         );
 
         driverXbox.povRight().onTrue(
