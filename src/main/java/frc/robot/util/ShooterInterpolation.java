@@ -21,9 +21,9 @@ public class ShooterInterpolation {
         map = new InterpolatingTreeMap<>();
         map.put(new InterpolatingDouble(4.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(305.5 - 1.0));
         map.put(new InterpolatingDouble(3.4 + Units.inchesToMeters(14.0)), new InterpolatingDouble(306.5 - 1.0));
-        map.put(new InterpolatingDouble(2.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(309.5 - 2.0));
+        map.put(new InterpolatingDouble(2.8 + Units.inchesToMeters(14.0)), new InterpolatingDouble(309.5 - 2.0));
         map.put(new InterpolatingDouble(2.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(311.5 - 3.0));
-        map.put(new InterpolatingDouble(1.5 + Units.inchesToMeters(14.0)), new InterpolatingDouble(318.5 - 3.0));
+        map.put(new InterpolatingDouble(1.55 + Units.inchesToMeters(14.0)), new InterpolatingDouble(318.5 - 3.0));
         map.put(new InterpolatingDouble(1.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(328.0 - 3.5));
     }
 

@@ -344,8 +344,8 @@ public class ShooterSubsystem extends SubsystemBase {
         if(!(Math.abs(flapCenter) > kMaxFlapAngle)) {
             double v = 78.0 * Math.sin(Math.toRadians(flapCenter));
             if(red) {
-                flapRightAngle = (90 - v) * rightFlapDegrees;
-                flapLeftAngle = (90 + v) * leftFlapDegrees;
+                flapRightAngle = (90 + v) * rightFlapDegrees;
+                flapLeftAngle = (90 - v) * leftFlapDegrees;
             } else {
                 flapRightAngle = (90 + v) * rightFlapDegrees;
                 flapLeftAngle = (90 - v) * leftFlapDegrees;
