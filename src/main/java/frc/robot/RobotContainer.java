@@ -248,8 +248,10 @@ public class RobotContainer {
                 new IntakeSetCommand(1.0).withTimeout(1.0)
                         .alongWith(rumble(GenericHID.RumbleType.kBothRumble, 0.5)), // Run intake command
                 new InstantCommand(() -> shot.set(true)), // Set 'shot' to true
-                new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)),
-                new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.SIDE))
+                new WaitCommand(3.0).andThen(
+                       new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)),
+                        new InstantCommand(() -> m_shooterSubsystem.setFlapState(FlapState.SIDE)) 
+                )
         );
 
         // Command to execute when right bumper is released

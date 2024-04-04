@@ -144,7 +144,7 @@ public final class Constants {
     }
 
     public static final double kIntakeMaxSpeed = 1.0;
-    public static final double kIntakeSlowSpeed = 0.5;
+    public static final double kIntakeSlowSpeed = 0.6;
     public static final double kOuttakeMaxSpeed = -1.0;
     public static final double kElevatorMaxSpeed = 1.0;
 
