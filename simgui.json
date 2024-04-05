@@ -5,24 +5,27 @@
         "header": {
           "open": true
         }
+      },
+      "window": {
+        "visible": false
       }
     }
   },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Auto Mode": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/navX-Sensor[1]": "Gyro",
       "/SmartDashboard/navX-Sensor[4]": "Gyro"
     },
     "windows": {
       "/SmartDashboard/Field": {
-        "bottom": 544,
-        "builtin": "2024 Crescendo",
-        "height": 8.013679504394531,
-        "left": 46,
-        "right": 1088,
-        "top": 36,
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
         "width": 16.541748046875,
         "window": {
           "visible": true
@@ -54,7 +57,6 @@
         "open": true
       },
       "open": true
-    },
-    "visible": true
+    }
   }
 }

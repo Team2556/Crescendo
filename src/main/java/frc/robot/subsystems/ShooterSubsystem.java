@@ -204,7 +204,6 @@ public class ShooterSubsystem extends SubsystemBase {
      * Set the shooter angle.
      * @param position Position in degrees to set the shooter angle to.
      */
-    //ToDo Add angle bounding to verify the inputted position is within the physically possible range.
     public void setPitchPosition(double position) {
         SmartDashboard.putNumber("Commanded pivot position", position);
         if(position > kPitchBackwardLimit && position < 180)
@@ -338,13 +337,13 @@ public class ShooterSubsystem extends SubsystemBase {
         double deltaY = pose.getY() - speakerY;
         double deltaX = pose.getX() - speakerX;
         double hyp = Math.sqrt(deltaY * deltaY + deltaX * deltaX);
-        double sin = Math.sin(deltaY / hyp);
-        double rot = red ? pose.getRotation().minus(new Rotation2d(Math.toRadians(180.0))).getRadians() : pose.getRotation().getRadians();
-        if (red) {
-            flapCenter = Math.toDegrees(sin + rot);
-        } else {
-            flapCenter = Math.toDegrees(sin - rot);
-        }
+        double asin = Math.asin(deltaY / hyp);
+
+        // Adjust rotation angle based on robot's orientation
+        double rawRot = pose.getRotation().getRadians() + (red ? Math.PI : 0);
+        double rot = (rawRot + Math.PI) % (2 * Math.PI) - Math.PI; // Normalize rotation angle to range [-π, π]
+
+        double flapCenter = Math.toDegrees(asin) - (Math.toDegrees(rot) * (red ? -1.0 : 1.0));
         SmartDashboard.putNumber("Flap Center", flapCenter);
         // Verify robot's angle is not outside the max angle the flaps should align at.
         if(!(Math.abs(flapCenter) > kMaxFlapAngle)) {
