@@ -249,7 +249,7 @@ public class RobotContainer {
         operatorXbox.povLeft().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.AMP)));
         operatorXbox.povRight().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.SPEAKER)));
 
-        new Trigger(() -> shouldRumble).onTrue(rumble(GenericHID.RumbleType.kBothRumble, 0.5));
+        new Trigger(() -> shouldRumble).onTrue(rumble(GenericHID.RumbleType.kBothRumble, 1.0));
 
         AtomicBoolean shot = new AtomicBoolean(false);
         // Command to execute when right bumper is pressed
