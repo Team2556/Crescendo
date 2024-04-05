@@ -2,6 +2,8 @@ package frc.robot.util;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -14,16 +16,17 @@ import org.littletonrobotics.junction.Logger;
 public class ShooterInterpolation {
     private static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> map;
     private static Pose2d blueSpeaker = new Pose2d(0.05, 5.5, new Rotation2d());
-    private static Pose2d redSpeaker = new Pose2d(16.0, 5.5, new Rotation2d());
+    private static Pose2d redSpeaker = new Pose2d(16.5, 5.5, new Rotation2d());
     private static boolean red;
 
     public ShooterInterpolation(boolean red) {
         ShooterInterpolation.red = red;
         map = new InterpolatingTreeMap<>();
         map.put(new InterpolatingDouble(4.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(305.5));
-        map.put(new InterpolatingDouble(3.4 + Units.inchesToMeters(14.0)), new InterpolatingDouble(306.5));
+        map.put(new InterpolatingDouble(3.4 + Units.inchesToMeters(14.0)), new InterpolatingDouble(307.5));
         map.put(new InterpolatingDouble(2.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(310.5));
-        map.put(new InterpolatingDouble(2.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(312.5));
+        map.put(new InterpolatingDouble(2.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(314.5));
+        map.put(new InterpolatingDouble(1.83 + Units.inchesToMeters(14.0)), new InterpolatingDouble(317.0));
         map.put(new InterpolatingDouble(1.5 + Units.inchesToMeters(14.0)), new InterpolatingDouble(318.5));
         map.put(new InterpolatingDouble(1.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(328.0));
     }
@@ -44,6 +47,7 @@ public class ShooterInterpolation {
         // Delta X and Delta Y variables to calculate distance from the speaker.
         double deltaX = deltaPose.getX() - speaker.getX(), deltaY = deltaPose.getY() - speaker.getY();
         // Calculate hypotenuse to get the distance from the speaker & the height of the speaker relative to the pivot.
+        SmartDashboard.putNumber("sqrt", Math.sqrt(deltaX * deltaX + deltaY * deltaY));
         return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
 

@@ -83,7 +83,7 @@ public class RobotContainer {
 
         shoot = new SequentialCommandGroup(
                 new ShootCommand(),
-                new IntakeSetCommand(1.0).withTimeout(0.3),
+                new IntakeSetCommand(1.0).withTimeout(0.7),
                 new InstantCommand(() -> {
                     m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
                     m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
