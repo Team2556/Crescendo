@@ -98,7 +98,7 @@ public class ShootControlCommand extends Command {
                 }
             }
             case SPEAKER -> {
-                rightVelocity = 50;
+                rightVelocity = 0;
                 if(m_rightTrigger.getAsBoolean() || m_rightBumper.getAsBoolean())
                     m_shooterSubsystem.setShooterVelocity(kSpeakerVelocity - leftVelocity, kSpeakerVelocity - rightVelocity);
                 else

@@ -34,6 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotor.clearFaults();
         intakeMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
         intakeMotor.setInverted(false);
+        // intakeMotor.setSmartCurrentLimit(20);
 
         intakeLimitSwitch = new DigitalInput(kIntakeBreakBeam);
 

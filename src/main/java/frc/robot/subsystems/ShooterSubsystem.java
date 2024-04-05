@@ -49,6 +49,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private ShooterState shooterState = ShooterState.STOP;
     private FlapState flapState = FlapState.NONE;
     private PitchState pitchState = PitchState.NONE;
+    double flapCenter;
 
     private Pose2d blueSpeaker = new Pose2d(0.35, 5.5, new Rotation2d());
     private Pose2d redSpeaker = new Pose2d(16.2, 5.5, new Rotation2d());
@@ -339,14 +340,18 @@ public class ShooterSubsystem extends SubsystemBase {
         double hyp = Math.sqrt(deltaY * deltaY + deltaX * deltaX);
         double sin = Math.sin(deltaY / hyp);
         double rot = red ? pose.getRotation().minus(new Rotation2d(Math.toRadians(180.0))).getRadians() : pose.getRotation().getRadians();
-        double flapCenter = Math.toDegrees(sin - rot);
+        if (red) {
+            flapCenter = Math.toDegrees(sin + rot);
+        } else {
+            flapCenter = Math.toDegrees(sin - rot);
+        }
         SmartDashboard.putNumber("Flap Center", flapCenter);
         // Verify robot's angle is not outside the max angle the flaps should align at.
         if(!(Math.abs(flapCenter) > kMaxFlapAngle)) {
             double v = 78.0 * Math.sin(Math.toRadians(flapCenter));
             if(red) {
-                flapRightAngle = (90 + v) * rightFlapDegrees;
-                flapLeftAngle = (90 - v) * leftFlapDegrees;
+                flapRightAngle = (90 - v) * rightFlapDegrees;
+                flapLeftAngle = (90 + v) * leftFlapDegrees;
             } else {
                 flapRightAngle = (90 + v) * rightFlapDegrees;
                 flapLeftAngle = (90 - v) * leftFlapDegrees;
