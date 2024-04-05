@@ -211,6 +211,8 @@ public class ShooterSubsystem extends SubsystemBase {
         else if(position > kPitchBackwardLimit && position < 295)
             position = 295;
         double pid = shooterPitchPID.calculate(getShooterPitch(), position);
+        
+        Logger.recordOutput("Pitch Setpoint", position);
 
         if((!forwardLimitSwitch.get() && pid < 0) || (!backwardLimitSwitch.get() && pid > 0)) {
             shooterPitch.setVoltage(0.0);

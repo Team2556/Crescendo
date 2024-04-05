@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.commands.auto.*;
 import frc.robot.subsystems.*;
+import frc.robot.util.ShooterInterpolation;
 import org.photonvision.PhotonCamera;
 
 import java.io.File;
@@ -160,61 +161,69 @@ public class RobotContainer {
             subwooferPose = alliance.get().equals(DriverStation.Alliance.Red) ? redSubwoofer : blueSubwoofer;
         }
 
-        driverXbox.povUp().onTrue(
-                AutoBuilder.pathfindToPose(
-                        speakerPose,
-                        new PathConstraints(
-                                3.0, 2.0,
-                                Units.degreesToRadians(360), Units.degreesToRadians(540)
-                        ),
-                        0,
-                        0
-                )
+        driverXbox.povUp().onTrue(new InstantCommand(() ->
+                ShooterInterpolation.updateClosestInterpolationValue(m_poseSubsystem.getPose(), 1.0))
+        );
+        
+        driverXbox.povDown().onTrue(new InstantCommand(() ->
+                ShooterInterpolation.updateClosestInterpolationValue(m_poseSubsystem.getPose(), -1.0))
         );
 
-        driverXbox.povLeft().onTrue(
-                AutoBuilder.pathfindToPose(
-                        ampPose.plus(new Transform2d(0, Units.inchesToMeters(-12.0), new Rotation2d())),
-                        new PathConstraints(
-                                1.0, 2.0,
-                                Units.degreesToRadians(360), Units.degreesToRadians(540)
-                        ),
-                        0,
-                        0
-                ).andThen(AutoBuilder.pathfindToPose(
-                        ampPose,
-                        new PathConstraints(
-                                1.0, 2.0,
-                                Units.degreesToRadians(360), Units.degreesToRadians(540)
-                        ),
-                        0,
-                        0
-                ))
-        );
-
-        driverXbox.povRight().onTrue(
-                AutoBuilder.pathfindToPose(
-                        intakePose,
-                        new PathConstraints(
-                                3.0, 2.0,
-                                Units.degreesToRadians(360), Units.degreesToRadians(540)
-                        ),
-                        0,
-                        0
-                )
-        );
-
-        driverXbox.povDown().onTrue(
-                AutoBuilder.pathfindToPose(
-                        subwooferPose,
-                        new PathConstraints(
-                                3.0, 2.0,
-                                Units.degreesToRadians(360), Units.degreesToRadians(540)
-                        ),
-                        0,
-                        0
-                )
-        );
+//        driverXbox.povUp().onTrue(
+//                AutoBuilder.pathfindToPose(
+//                        speakerPose,
+//                        new PathConstraints(
+//                                3.0, 2.0,
+//                                Units.degreesToRadians(360), Units.degreesToRadians(540)
+//                        ),
+//                        0,
+//                        0
+//                )
+//        );
+//
+//        driverXbox.povLeft().onTrue(
+//                AutoBuilder.pathfindToPose(
+//                        ampPose.plus(new Transform2d(0, Units.inchesToMeters(-12.0), new Rotation2d())),
+//                        new PathConstraints(
+//                                1.0, 2.0,
+//                                Units.degreesToRadians(360), Units.degreesToRadians(540)
+//                        ),
+//                        0,
+//                        0
+//                ).andThen(AutoBuilder.pathfindToPose(
+//                        ampPose,
+//                        new PathConstraints(
+//                                1.0, 2.0,
+//                                Units.degreesToRadians(360), Units.degreesToRadians(540)
+//                        ),
+//                        0,
+//                        0
+//                ))
+//        );
+//
+//        driverXbox.povRight().onTrue(
+//                AutoBuilder.pathfindToPose(
+//                        intakePose,
+//                        new PathConstraints(
+//                                3.0, 2.0,
+//                                Units.degreesToRadians(360), Units.degreesToRadians(540)
+//                        ),
+//                        0,
+//                        0
+//                )
+//        );
+//
+//        driverXbox.povDown().onTrue(
+//                AutoBuilder.pathfindToPose(
+//                        subwooferPose,
+//                        new PathConstraints(
+//                                3.0, 2.0,
+//                                Units.degreesToRadians(360), Units.degreesToRadians(540)
+//                        ),
+//                        0,
+//                        0
+//                )
+//        );
 
         operatorXbox.start().onTrue(new InstantCommand(m_shooterSubsystem::resetFlaps));
         operatorXbox.rightBumper().onTrue(new InstantCommand(() -> m_shooterSubsystem.setShooterState(ShooterState.SPEAKER)));
