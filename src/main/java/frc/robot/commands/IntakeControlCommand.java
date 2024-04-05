@@ -2,9 +2,13 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.PoseSubsystem;
 
 import java.util.function.DoubleSupplier;
+
+import org.photonvision.common.hardware.VisionLEDMode;
 
 import static frc.robot.Constants.OperatorConstants.LEFT_TRIGGER_DEADBAND;
 import static frc.robot.Constants.OperatorConstants.RIGHT_TRIGGER_DEADBAND;
@@ -14,6 +18,7 @@ import static frc.robot.Constants.kOuttakeMaxSpeed;
 
 public class IntakeControlCommand extends Command {
     private final IntakeSubsystem m_subsystem = IntakeSubsystem.getInstance();
+    private final PoseSubsystem m_pose = PoseSubsystem.getInstance();
     private final DoubleSupplier m_rightTrigger, m_leftTrigger;
     private double intakeSpeed = kIntakeMaxSpeed;
 
@@ -35,9 +40,12 @@ public class IntakeControlCommand extends Command {
         super.execute();
         if (m_subsystem.getIntakeOutputCurrent() > 40) {
             intakeSpeed = kIntakeSlowSpeed;
+            m_pose.photonCamera.setLED(VisionLEDMode.kBlink);
+            RobotContainer.shouldRumble = true;
         }
         if (m_subsystem.getIntakeOutputCurrent() < 20) {
             intakeSpeed = kIntakeMaxSpeed;
+            RobotContainer.shouldRumble = false;
         }
         SmartDashboard.putNumber("Intake Set Speed", intakeSpeed);
         if(m_rightTrigger.getAsDouble() > RIGHT_TRIGGER_DEADBAND)

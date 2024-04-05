@@ -123,6 +123,7 @@ public class RobotContainer {
         new PathPlannerAuto("StartAmp1Leave");
         new PathPlannerAuto("StartAmp2Leave");
 //        new PathPlannerAuto("StartAmp3Leave");
+        new PathPlannerAuto("StartSource1");
         new PathPlannerAuto("StartSource2");
         new PathPlannerAuto("StartAway2");
         new PathPlannerAuto("StartCenterTo4Note");
@@ -246,7 +247,7 @@ public class RobotContainer {
         Command pressCommand = new SequentialCommandGroup(
                 new WaitUntilCommand(m_shooterSubsystem::shouldShoot), // Wait until shooter is ready
                 new IntakeSetCommand(1.0).withTimeout(1.0)
-                        .alongWith(rumble(GenericHID.RumbleType.kBothRumble, 0.5)), // Run intake command
+                        .alongWith(rumble(GenericHID.RumbleType.kBothRumble, 1)), // Run intake command
                 new InstantCommand(() -> shot.set(true)), // Set 'shot' to true
                 new WaitCommand(3.0).andThen(
                        new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.DRIVE)),

@@ -12,19 +12,18 @@ import org.littletonrobotics.junction.AutoLogOutput;
  */
 public class ShooterInterpolation {
     private InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> map;
-    private Pose2d blueSpeaker = new Pose2d(0.5, 5.5, new Rotation2d());
+    private Pose2d blueSpeaker = new Pose2d(0, 5.5, new Rotation2d());
     private Pose2d redSpeaker = new Pose2d(16.0, 5.5, new Rotation2d());
     private final boolean red;
 
     public ShooterInterpolation(boolean red) {
         this.red = red;
         map = new InterpolatingTreeMap<>();
-        //added a degree bc it was consistently undershooting
         map.put(new InterpolatingDouble(4.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(305.5));
         map.put(new InterpolatingDouble(3.4 + Units.inchesToMeters(14.0)), new InterpolatingDouble(306.5));
-        map.put(new InterpolatingDouble(2.8 + Units.inchesToMeters(14.0)), new InterpolatingDouble(310.5));
+        map.put(new InterpolatingDouble(2.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(310.5));
         map.put(new InterpolatingDouble(2.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(312.5));
-        map.put(new InterpolatingDouble(1.55 + Units.inchesToMeters(14.0)), new InterpolatingDouble(315.5));
+        map.put(new InterpolatingDouble(1.5 + Units.inchesToMeters(14.0)), new InterpolatingDouble(318.5));
         map.put(new InterpolatingDouble(1.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(328.0));
     }
 
