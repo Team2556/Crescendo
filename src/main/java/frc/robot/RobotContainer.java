@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.CANifier.GeneralPin;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -83,7 +84,7 @@ public class RobotContainer {
 
         shoot = new SequentialCommandGroup(
                 new ShootCommand(),
-                new IntakeSetCommand(1.0).withTimeout(0.3),
+                new IntakeSetCommand(1.0).withTimeout(0.7),
                 new InstantCommand(() -> {
                     m_shooterSubsystem.setFlapState(FlapState.STRAIGHT);
                     m_shooterSubsystem.setShooterState(ShooterState.SPEAKER);
@@ -124,6 +125,7 @@ public class RobotContainer {
         new PathPlannerAuto("StartAmp1Leave");
         new PathPlannerAuto("StartAmp2Leave");
 //        new PathPlannerAuto("StartAmp3Leave");
+        new PathPlannerAuto("StartSourceLeave");
         new PathPlannerAuto("StartSource1");
         new PathPlannerAuto("StartSource2");
         new PathPlannerAuto("StartAway2");
@@ -255,7 +257,8 @@ public class RobotContainer {
         operatorXbox.povLeft().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.AMP)));
         operatorXbox.povRight().onTrue(new InstantCommand(() -> m_shooterSubsystem.setPitchState(PitchState.SPEAKER)));
 
-        new Trigger(() -> shouldRumble).onTrue(rumble(GenericHID.RumbleType.kBothRumble, 0.5));
+        new Trigger(() -> shouldRumble).onTrue(rumble(GenericHID.RumbleType.kBothRumble, 1.0));
+        // new Trigger(() -> shouldRumble).onFalse(rumbleStop(GenericHID.RumbleType.kBothRumble));
 
         AtomicBoolean shot = new AtomicBoolean(false);
         // Command to execute when right bumper is pressed
@@ -311,4 +314,12 @@ public class RobotContainer {
                             operatorXbox.getHID().setRumble(rumbleType, 0);
                         });
     }
+
+//     public Command rumbleStop(GenericHID.RumbleType rumbleType) {
+//         return Commands.runOnce(
+//                         () -> {
+//                             driverXbox.getHID().setRumble(rumbleType, 0);
+//                             operatorXbox.getHID().setRumble(rumbleType, 0);
+//                         });
+//     }
 }

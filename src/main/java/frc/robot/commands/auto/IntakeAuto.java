@@ -18,7 +18,7 @@ public class IntakeAuto extends Command {
     public void execute() {
         super.execute();
 
-        if (intakeSubsystem.getIntakeOutputCurrent() > 40) {
+        if (intakeSubsystem.getIntakeOutputCurrent() > 30) {
             intakeSpeed = kIntakeSlowSpeed;
         }
         if (intakeSubsystem.getIntakeOutputCurrent() < 20) {

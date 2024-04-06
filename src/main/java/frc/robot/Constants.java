@@ -108,7 +108,7 @@ public final class Constants {
         public static final double kSpeakerVelocity = 5800;
         public static final double kShooterIntakeSpeed = -0.2;
         public static final double kAmpSpeed = 0.05;
-        public static final double kStuckAmpSpeed = 0.07;
+        public static final double kStuckAmpSpeed = 0.06;
 
 
         // Flap constants

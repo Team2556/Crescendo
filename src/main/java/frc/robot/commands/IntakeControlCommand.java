@@ -3,8 +3,10 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.ShooterConstants.ShooterState;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PoseSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
 import java.util.function.DoubleSupplier;
 
@@ -19,6 +21,7 @@ import static frc.robot.Constants.kOuttakeMaxSpeed;
 public class IntakeControlCommand extends Command {
     private final IntakeSubsystem m_subsystem = IntakeSubsystem.getInstance();
     private final PoseSubsystem m_pose = PoseSubsystem.getInstance();
+    private final ShooterSubsystem m_shooter = ShooterSubsystem.getInstance();
     private final DoubleSupplier m_rightTrigger, m_leftTrigger;
     private double intakeSpeed = kIntakeMaxSpeed;
 
@@ -38,14 +41,14 @@ public class IntakeControlCommand extends Command {
     @Override
     public void execute() {
         super.execute();
-        if (m_subsystem.getIntakeOutputCurrent() > 40) {
-            intakeSpeed = kIntakeSlowSpeed;
+        if (m_subsystem.getIntakeOutputCurrent() > 30 && m_shooter.getShooterState() != ShooterState.AMP) {
             m_pose.photonCamera.setLED(VisionLEDMode.kBlink);
             RobotContainer.shouldRumble = true;
+            intakeSpeed = kIntakeSlowSpeed;
         }
-        if (m_subsystem.getIntakeOutputCurrent() < 20) {
-            intakeSpeed = kIntakeMaxSpeed;
+        if (m_subsystem.getIntakeOutputCurrent() < 20 || m_shooter.getShooterState() == ShooterState.AMP) {
             RobotContainer.shouldRumble = false;
+            intakeSpeed = kIntakeMaxSpeed;
         }
         SmartDashboard.putNumber("Intake Set Speed", intakeSpeed);
         if(m_rightTrigger.getAsDouble() > RIGHT_TRIGGER_DEADBAND)
