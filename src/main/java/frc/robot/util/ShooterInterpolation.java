@@ -22,13 +22,15 @@ public class ShooterInterpolation {
     public ShooterInterpolation(boolean red) {
         ShooterInterpolation.red = red;
         map = new InterpolatingTreeMap<>();
-        map.put(new InterpolatingDouble(4.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(305.5));
-        map.put(new InterpolatingDouble(3.4 + Units.inchesToMeters(14.0)), new InterpolatingDouble(307.5));
-        map.put(new InterpolatingDouble(2.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(310.5));
-        map.put(new InterpolatingDouble(2.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(314.5));
-        map.put(new InterpolatingDouble(1.83 + Units.inchesToMeters(14.0)), new InterpolatingDouble(317.0));
-        map.put(new InterpolatingDouble(1.5 + Units.inchesToMeters(14.0)), new InterpolatingDouble(318.5));
-        map.put(new InterpolatingDouble(1.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(328.0));
+        map.put(new InterpolatingDouble(4.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(306.5));
+        map.put(new InterpolatingDouble(3.4 + Units.inchesToMeters(14.0)), new InterpolatingDouble(308.5));
+        map.put(new InterpolatingDouble(2.87 + Units.inchesToMeters(14.0)), new InterpolatingDouble(311.0));
+        map.put(new InterpolatingDouble(2.6 + Units.inchesToMeters(14.0)), new InterpolatingDouble(311.5));
+        map.put(new InterpolatingDouble(2.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(315.5));
+        map.put(new InterpolatingDouble(1.83 + Units.inchesToMeters(14.0)), new InterpolatingDouble(318.0));
+        map.put(new InterpolatingDouble(1.63 + Units.inchesToMeters(14.0)), new InterpolatingDouble(321.5));
+        map.put(new InterpolatingDouble(1.5 + Units.inchesToMeters(14.0)), new InterpolatingDouble(321.0));
+        map.put(new InterpolatingDouble(1.0 + Units.inchesToMeters(14.0)), new InterpolatingDouble(329.0));
     }
 
     @AutoLogOutput
