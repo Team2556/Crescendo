@@ -150,16 +150,22 @@ public class RobotContainer {
         driverXbox.b().onTrue(new InstantCommand(() -> TeleopDrive.fieldOriented = !TeleopDrive.fieldOriented));
         driverXbox.y().onTrue((new InstantCommand(drivebase::zeroGyroWithAlliance)));
 
-        driverXbox.x().whileTrue(drivebase.aimAtSpeaker(2));
-
         Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
-        Pose2d speakerPose = blueSpeakerScore, ampPose = blueAmp, intakePose = blueIntake, subwooferPose = blueSubwoofer;
-        if(alliance.isPresent()) {
-            speakerPose = alliance.get().equals(DriverStation.Alliance.Red) ? redSpeakerScore : blueSpeakerScore;
-            ampPose = alliance.get().equals(DriverStation.Alliance.Red) ? redAmp : blueAmp;
-            intakePose = alliance.get().equals(DriverStation.Alliance.Red) ? redIntake : blueIntake;
-            subwooferPose = alliance.get().equals(DriverStation.Alliance.Red) ? redSubwoofer : blueSubwoofer;
-        }
+
+        driverXbox.x().whileTrue(new RunCommand(() ->
+                        drivebase.driveFacingTarget(
+                                () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
+                                () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
+                                new Translation2d(0.0, 5.5)), drivebase))
+                .onFalse(new InstantCommand(() -> drivebase.drive(new ChassisSpeeds()), drivebase));
+
+//        Pose2d speakerPose = blueSpeakerScore, ampPose = blueAmp, intakePose = blueIntake, subwooferPose = blueSubwoofer;
+//        if(alliance.isPresent()) {
+//            speakerPose = alliance.get().equals(DriverStation.Alliance.Red) ? redSpeakerScore : blueSpeakerScore;
+//            ampPose = alliance.get().equals(DriverStation.Alliance.Red) ? redAmp : blueAmp;
+//            intakePose = alliance.get().equals(DriverStation.Alliance.Red) ? redIntake : blueIntake;
+//            subwooferPose = alliance.get().equals(DriverStation.Alliance.Red) ? redSubwoofer : blueSubwoofer;
+//        }
 
         driverXbox.povUp().onTrue(new InstantCommand(() ->
                 ShooterInterpolation.updateClosestInterpolationValue(m_poseSubsystem.getPose(), 1.0))

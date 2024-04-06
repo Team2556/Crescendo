@@ -429,6 +429,37 @@ public class SwerveSubsystem extends SubsystemBase {
                 }).until(() -> getSpeakerYaw().minus(getHeading()).getDegrees() < tolerance);
     }
 
+
+    /**
+     * Drives the robot while facing a target pose.
+     *
+     * @param vx A supplier for the absolute x velocity of the robot.
+     * @param vy A supplier for the absolute y velocity of the robot.
+     * @param translation A supplier for the translation2d to face on the field.
+     */
+    public void driveFacingTarget(
+            DoubleSupplier vx, DoubleSupplier vy, Translation2d translation) {
+        translation = isRedAlliance() ? new Translation2d(16.5, 5.5) : translation;
+        drive(vx, vy, translation.minus(getPose().getTranslation()).getAngle());
+    }
+
+    /**
+     * Drives the robot based on a DoubleSupplier for field relative x y and omega velocities.
+     *
+     * @param vx A supplier for the velocity of the robot along the x axis (perpendicular to the
+     *     alliance side).
+     * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
+     *     side).
+     * @param heading A supplier for the field relative heading of the robot.
+     */
+    public void drive(DoubleSupplier vx, DoubleSupplier vy, Rotation2d heading) {
+        Translation2d drive = new Translation2d(-vx.getAsDouble() * maximumSpeed, -vy.getAsDouble() * maximumSpeed);
+        drive(
+                drive.times(isRedAlliance() ? -1.0 : 1.0),
+                rotationController.calculate(getHeading().getRadians(), heading.getRadians() + Math.toRadians(180.0)),
+                true);
+    }
+
     @AutoLogOutput
     public SwerveModuleState[] getSwerveModuleState() {
         return swerveDrive.getStates();
